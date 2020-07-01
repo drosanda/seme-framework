@@ -1,0 +1,22 @@
+{
+  "name": "seme/framework",
+  "description": "Seme Framework",
+  "type": "project",
+  "license": "gpl",
+  "authors": [
+    {
+      "name": "Daeng Rosanda",
+      "email": "daengrosanda@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "seme\\": "kero/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7"
+  }
+}
