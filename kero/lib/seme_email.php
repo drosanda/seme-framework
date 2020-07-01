@@ -1,5 +1,9 @@
 <?php
-/*
+/**
+ * Class helper for sending email
+ */
+
+/**
 * Cara penggunaan
 * ====================================
 * $this->load("seme_email","lib");

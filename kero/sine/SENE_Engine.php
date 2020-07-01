@@ -57,6 +57,10 @@ class SENE_Engine
     {
         return self::$_instance;
     }
+    
+    /**
+     * Run the framework
+     */
     public function SENE_Engine()
     {
         if (strlen($this->config->core_prefix)) {

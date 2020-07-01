@@ -2,8 +2,9 @@
 /*
 * Global functions goes here
 */
+
 /**
- * Set base url
+ * Get relatives base url
  * @param  string $url addtional url
  * @return string      full base url
  */
@@ -56,14 +57,12 @@ function dd($var)
 }
 /**
  * Customize Error Handler
- * @param  [type] $errno         [description]
- * @param  [type] $errstr        [description]
- * @param  [type] $error_file    [description]
- * @param  [type] $error_line    [description]
- * @param  [type] $error_context [description]
- * @return [type]                [description]
+ * @param  int $errno         Error number
+ * @param  string $errstr        Error string (message)
+ * @param  string $error_file    Error occured on
+ * @param  int $error_line    occurences line number in a file
  */
-function seme_error_handling($errno, $errstr, $error_file, $error_line, $error_context)
+function seme_error_handling($errno, $errstr, $error_file, $error_line)
 {
     if (isset($_SERVER['argv'])) {
         $backtraces = debug_backtrace();

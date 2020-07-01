@@ -917,6 +917,13 @@ class SENE_MySQLi_Engine
         $this->pagesize = $pagesize;
         return $this;
     }
+    
+    /**
+     * Get query result
+     * @param  string $tipe     result type, array of array or array of object
+     * @param  int $is_debug produce executed query, and throw http header 500
+     * @return mixed           result
+     */
     public function get($tipe="object", $is_debug="")
     {
         $this->in_select = rtrim($this->in_select, ", ");
@@ -1015,7 +1022,13 @@ class SENE_MySQLi_Engine
         $this->flushQuery();
         return $res;
     }
-
+    
+    /**
+     * Get single result
+     * @param  string $tipe     result type, array of array or array of object
+     * @param  int $is_debug produce executed query, and throw http header 500
+     * @return [type]           [description]
+     */
     public function get_first($tipe="object", $is_debug="")
     {
         $this->in_select = rtrim($this->in_select, ", ");
