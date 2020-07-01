@@ -1,4 +1,7 @@
 <?php
+/**
+ * Class for model wrapper for MySQLi
+ */
 class SENE_MySQLi_Engine
 {
     protected static $__instance;

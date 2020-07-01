@@ -205,11 +205,7 @@ function seme_error_handling($errno, $errstr, $error_file, $error_line, $error_c
             echo '<hr>';
         }
         echo '</div>';
-        if (defined(SEME_VERSION)) {
-            echo "<hr><p><small>Seme Framework v".SEME_VERSION." Error Handler</small></p>";
-        } else {
-            echo "<hr><p><small>Seme Framework Error Handler</small></p>";
-        }
+        echo "<hr><p><small>Seme Framework v".SEME_VERSION." Error Handler</small></p>";
         die();
     }
 }

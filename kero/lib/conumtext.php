@@ -1,4 +1,7 @@
 <?php
+/**
+ * Convert number to alphabet or vice versa
+ */
 class Conumtext
 {
     private $key='';

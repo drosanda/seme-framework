@@ -1,4 +1,8 @@
 <?php
+/**
+ * Abstract class for Sene_Model
+ * @var [type]
+ */
 abstract class SENE_Model
 {
     protected $db;

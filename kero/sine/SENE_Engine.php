@@ -1,4 +1,7 @@
 <?php
+/**
+ * Main Engine of seme framework
+ */
 class SENE_Engine
 {
     protected static $__instance;
@@ -18,6 +21,7 @@ class SENE_Engine
         $this->default = $this->config->controller_main;
         $this->notfound = $this->config->controller_404;
 
+        require_once $this->directories->kero_sine."SENE_Input.php";
         require_once $this->directories->kero_sine."SENE_Controller.php";
         require_once $this->directories->kero_sine."SENE_Model.php";
 

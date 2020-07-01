@@ -49,7 +49,11 @@ class Seme_Email
     public $body = "";
     public $eol = PHP_EOL;
     public $template;
-
+    
+    /**
+     * Clear data
+     * @return [type] [description]
+     */
     public function flush()
     {
         $this->log = '';
@@ -65,6 +69,7 @@ class Seme_Email
         $this->body = '';
         $this->template = '';
         $this->log = "Seme_Email: Flush Successfully".$this->eol;
+        return $this;
     }
     public function from($mail, $name="")
     {
@@ -77,12 +82,14 @@ class Seme_Email
             trigger_error('from email cant empty');
         }
         $this->log .= "set from $name $mail".$this->eol;
+        return $this;
     }
 
     public function replyto($name, $mail)
     {
         $this->header .= "Reply-To: $name <$mail>".$this->eol;
         $this->log .= "adding Reply-To $name <$mail>".$this->eol;
+        return $this;
     }
 
     public function to($mail, $name="")
@@ -96,18 +103,21 @@ class Seme_Email
             $this->toname[] = "";
             $this->log .= "Send to $name $mail".$this->eol;
         }
+        return $this;
     }
 
     public function cc($mail)
     {
         $this->cc[] = $mail;
         $this->log .= "adding cc $mail".$this->eol;
+        return $this;
     }
 
     public function bcc($mail)
     {
         $this->bcc[] = $mail;
         $this->log .= "adding bcc $mail".$this->eol;
+        return $this;
     }
 
 
@@ -115,6 +125,7 @@ class Seme_Email
     {
         $this->subject = $subject;
         $this->log .= "adding subject $subject".$this->eol;
+        return $this;
     }
 
     public function text($text)
@@ -123,6 +134,7 @@ class Seme_Email
         $this->body .= "Content-Transfer-Encoding: 8bit".$this->eol;
         $this->body .= $text."".$this->eol;
         $this->log .= "adding text content".$this->eol;
+        return $this;
     }
 
     public function html($html, $type="windows")
@@ -136,6 +148,7 @@ class Seme_Email
         $this->body .= "Content-Transfer-Encoding: quoted-printable".$this->eol;
         $this->body .= "<html><body>".$this->eol."".$html."".$this->eol."</body></html>".$this->eol;
         $this->log .= "adding html content \n";
+        return $this;
     }
     /**
      * Mengatur lokasi email template
@@ -159,6 +172,7 @@ class Seme_Email
             die();
         }
         $this->template = $ftemp;
+        return $this;
     }
     /**
      * Memproses variabel dari template
@@ -177,10 +191,12 @@ class Seme_Email
         } elseif (!empty($val)) {
             $this->replacer[$replacer] = $val;
         }
+        return $this;
     }
     public function attachment_clear()
     {
         $this->attachment = array();
+        return $this;
     }
     public function attachment_add($filepath, $filename="")
     {
@@ -202,6 +218,7 @@ class Seme_Email
             $this->attachment[] = $a;
             unset($a);
         }
+        return $this;
     }
 
     public function send()
@@ -310,11 +327,7 @@ class Seme_Email
                 $this->header .= $message;
             }
         }
-        //echo '<br /><pre>';
-        //print_r($this->header);
-        //print_r($this->body);
-        //die();
-
+        
         foreach ($this->to as $mail) {
             if ($atc) {
                 $res = mail($mail, $this->subject, $this->body, $this->header);
@@ -328,6 +341,8 @@ class Seme_Email
             }
             $this->log .= "\n";
         }
+        
+        return $this;
     }
     public function getLog()
     {

@@ -1,4 +1,8 @@
 <?php
+/**
+ * Abstract class for controller wrapper
+ * @var [type]
+ */
 abstract class SENE_Controller
 {
     protected static $__instance;
@@ -23,13 +27,25 @@ abstract class SENE_Controller
     public $theme = 'front/';
     public $js_footer = array();
     public $js_ready = "";
-    public $__content = ""; //loads by view
-    public $__themeContent = ""; //use by putThemeContent
-    public $__themeRightContent = ""; //use by putRightThemeContent
-    public $__themeLeftContent = ""; //use by putLeftThemeContent
-    public $__themeRightMenu = ""; //use by putLeftThemeContent
-  public $__bodyBefore = "";
-
+    
+    //put unrendered content for view
+    public $__content = ""; 
+    
+    //used by putThemeContent
+    public $__themeContent = ""; 
+    
+    //used by putRightThemeContent
+    public $__themeRightContent = "";
+    
+    //use by putLeftThemeContent
+    public $__themeLeftContent = ""; 
+    
+    //use by putLeftThemeContent
+    public $__themeRightMenu = "";
+    
+    public $__bodyBefore = "";
+    
+    
     public function __construct()
     {
         $this->directories = $GLOBALS['SEMEDIR'];
@@ -44,25 +60,150 @@ abstract class SENE_Controller
         $this->__jsContent = '';
         self::$__instance = $this;
     }
-    public function loadLayout($u, $data=array())
+    
+    /**
+     * Loads CSS and another header files from theme.json
+     * relatives to theme location
+     */
+    private function getThemeConfig()
     {
-        if (empty($u)) {
+        if (file_exists($this->directories->app_view.'/'.$this->getTheme().'/theme.json')) {
+            return json_decode($this->fgc($this->directories->app_view.$this->getTheme().'/theme.json'));
+        } else {
+            return array();
+        }
+    }
+    
+    /**
+     * Loads javascript from script.json
+     * relative to theme location
+     * @return [type] [description]
+     */
+    private function getJsFooterBasic()
+    {
+        if (file_exists($this->directories->app_view.'/'.$this->getTheme().'/script.json')) {
+            return json_decode($this->fgc($this->directories->app_view.$this->getTheme().'/script.json'));
+        } else {
+            return array();
+        }
+    }
+    
+    /**
+     * Set theme location, relative to app/view
+     * @param string $theme name of directory theme, e.g. front
+     */
+    public function setTheme(string $theme="front")
+    {
+        $theme = rtrim($theme, '/').'/';
+        $this->theme = $theme;
+        $this->additional = $this->getThemeConfig();
+        $this->js_footer = $this->getJsFooterBasic();
+        return $this;
+    }
+    
+    /**
+     * Load the model or library from controller and instantiate object with same name in controller
+     * if model relatives to app/model
+     * if library relatives to kero/lib
+     * @param  string $a          location and name of view without .php suffix
+     * @param  string $b          alias of instantiate object, default empty
+     * @param  string $c       [description]
+     * @return object             return this class
+     */
+    protected function load(string $a, string $b="", string $c="model")
+    {
+        if ($c=="model") {
+            $mfile = $this->directories->app_model.$a.'.php';
+            $cname = basename($mfile, '.php');
+            if (empty($b)) {
+                $b = $cname;
+            }
+            $b = strtolower($b);
+            if (file_exists($mfile)) {
+                if (!class_exists($cname)) {
+                    require_once $mfile;
+                }
+                $this->{$b} = new $cname();
+            } else {
+                trigger_error('could not find model '.$a.'  on '.$mfile);
+                //die();
+            }
+        } elseif ($c=="lib") {
+            $mfile = $this->directories->kero_lib.$a.'.php';
+            if (empty($b)) {
+                $b = $cname;
+            }
+            $b = strtolower($b);
+            if (file_exists($mfile)) {
+                require_once $mfile;
+                $this->$b = new $b();
+            } else {
+                trigger_error('could not find library '.$a.'  on '.$mfile);
+            }
+        } else {
+            if (file_exists($this->directories->kero_lib.$a.'.php')) {
+                require_once $this->directories->kero_lib.$a.'.php';
+            } else {
+                trigger_error('could not find require_once library '.$a.' on '.$mfile);
+            }
+        }
+        return $this;
+    }
+    
+    /**
+     * bring view from another file
+     *   relatives from theme location
+     * @param  string $a         location and name of view without .php suffix
+     * @param  array  $__forward data that will be passed to 
+     * @return object            return this class
+     */
+    public function getThemeElement(string $a="", string $__forward=array(), int $cacheable=0)
+    {
+        if (!empty($a)) {
+            $this->view(str_replace("//", "/", $this->theme.DS.$a), $__forward);
+            $this->render($cacheable);
+        }
+        return $this;
+    }
+    
+    /**
+     * For loading layout from a theme
+     * Default file location app/view/front/page/
+     * @param  string $u          name of layout without .php suffix
+     * @param  array  $__forward  data that will be passed to 
+     * @return object             return this class
+     */
+    public function loadLayout($a, $__forward=array())
+    {
+        if (empty($a)) {
             trigger_error("Layout not found. Please check layout file at ".$this->directories->app_view.$this->getTheme()."page/ executed", E_USER_ERROR);
         }
-        $this->view($this->getTheme()."page/".$u, $data);
+        $this->view($this->getTheme()."page/".$a, $__forward);
+        return $this;
     }
+    
+    /**
+     * Empty the __themeContent variable
+     * @return object            return this class
+     */
     public function resetThemeContent()
     {
         $this->__themeContent = '';
+        return $this;
     }
-    public function putThemeContent($tc="", $__forward=array())
+    
+    /**
+     * Inject view to a layout 
+     * @param  string $u         relative theme location filename without .php extension
+     * @param  array  $__forward  data that will be passed to 
+     * @return object             return this class
+     */
+    public function putThemeContent($u="", $__forward=array())
     {
-        $v = $this->directories->app_view.$this->theme.'/'.$tc;
-        //die($v);
+        $v = $this->directories->app_view.$this->theme.'/'.$u;
         if (file_exists($v.".php")) {
             $keytemp=md5(date("h:i:s"));
             $_SESSION[$keytemp] = $__forward;
-            //print_r($_SESSION);
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
             ob_start();
@@ -77,6 +218,7 @@ abstract class SENE_Controller
             trigger_error("unable to putThemeContent ".$v.".php");
             die();
         }
+        return $this;
     }
     public function getRightMenuTitle()
     {
@@ -86,13 +228,20 @@ abstract class SENE_Controller
     {
         $this->__themeRightMenu = $title;
     }
-    public function putThemeRightContent($tc="", $__forward=array())
+    
+    /**
+     * Inject view for left content 
+     * @param  string $a          [description]
+     * @param  array  $b          [description]
+     * @return object             this class
+     */
+    public function putThemeRightContent($a="", $b=array())
     {
-        $v = $this->directories->app_view.$this->theme.'/'.$tc;
+        $v = $this->directories->app_view.$this->theme.'/'.$a;
         //die($v);
         if (file_exists($v.".php")) {
             $keytemp=md5(date("h:i:s"));
-            $_SESSION[$keytemp] = $__forward;
+            $_SESSION[$keytemp] = $b;
             //print_r($_SESSION);
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
@@ -109,14 +258,20 @@ abstract class SENE_Controller
             die();
         }
     }
-    //sidemenuleft
-    public function putThemeLeftContent($tc="", $__forward=array())
+    
+    /**
+     * Inject view for left content 
+     * @param  string $a          [description]
+     * @param  array  $b          [description]
+     * @return object             this class
+     */
+    public function putThemeLeftContent($a="", $b=array())
     {
-        $v = $this->directories->app_view.$this->theme.'/'.$tc;
+        $v = $this->directories->app_view.$this->theme.'/'.$a;
         //die($v);
         if (file_exists($v.".php")) {
             $keytemp=md5(date("h:i:s"));
-            $_SESSION[$keytemp] = $__forward;
+            $_SESSION[$keytemp] = $b;
             //print_r($_SESSION);
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
@@ -133,13 +288,19 @@ abstract class SENE_Controller
             die();
         }
     }
-    public function putJsReady($tc="", $__forward=array())
+    
+    /**
+     * Inject javascript from php files
+     * @param  string $a          [description]
+     * @param  array  $b          [description]
+     * @return object             this class
+     */
+    public function putJsReady($a="", $b=array())
     {
-        $v = $this->directories->app_view.$this->theme.'/'.$tc;
-        //die($v);
+        $v = $this->directories->app_view.$this->theme.'/'.$a;
         if (file_exists($v.".php")) {
             $keytemp=md5(date("h:i:s"));
-            $_SESSION[$keytemp] = $__forward;
+            $_SESSION[$keytemp] = $b;
             //print_r($_SESSION);
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
@@ -156,25 +317,42 @@ abstract class SENE_Controller
             die();
         }
     }
+    
+    /**
+     * Get injected main view into a layout
+     * @return [type] [description]
+     */
     public function getThemeContent()
     {
         echo $this->__themeContent;
     }
+    
+    /**
+     * Get injected right view into a layout
+     * @return [type] [description]
+     */
     public function getThemeRightContent()
     {
         echo $this->__themeRightContent;
     }
+    
+    /**
+     * Get injected left view into a layout
+     * @return [type] [description]
+     */
     public function getThemeLeftContent()
     {
-        //echo '<pre>';
-        //var_dump($this->__themeLeftContent);
-        //die('</pre>');
         echo $this->__themeLeftContent;
     }
+    
+    /**
+     * Get injected javascript content in php file into a layout
+     */
     public function getJsReady()
     {
         echo $this->js_ready;
     }
+    
     public function putJsContent($tc="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$tc;
@@ -229,22 +407,7 @@ abstract class SENE_Controller
     {
         echo $this->__jsContent;
     }
-    public function getThemeConfig()
-    {
-        if (file_exists($this->directories->app_view.'/'.$this->getTheme().'/theme.json')) {
-            return json_decode($this->fgc($this->directories->app_view.$this->getTheme().'/theme.json'));
-        } else {
-            return array();
-        }
-    }
-    public function getJsFooterBasic()
-    {
-        if (file_exists($this->directories->app_view.'/'.$this->getTheme().'/script.json')) {
-            return json_decode($this->fgc($this->directories->app_view.$this->getTheme().'/script.json'));
-        } else {
-            return array();
-        }
-    }
+    
     public function fgc($path)
     {
         $x = json_encode(array());
@@ -282,13 +445,6 @@ abstract class SENE_Controller
     public function getContentLanguage()
     {
         return $this->content_language;
-    }
-    public function setTheme($theme="front")
-    {
-        $theme = rtrim($theme, '/').'/';
-        $this->theme = $theme;
-        $this->additional = $this->getThemeConfig();
-        $this->js_footer = $this->getJsFooterBasic();
     }
     public function setLang($lang="en")
     {
@@ -400,23 +556,43 @@ abstract class SENE_Controller
     {
         unset($this->additional[$key]);
     }
-
+    
+    /**
+     * Return author name for html head meta language
+     * @return string lang
+     */
     public function getLang()
     {
         return $this->lang;
     }
+    
+    /**
+     * Return title text for html head title
+     * @return string title
+     */
     public function getTitle()
     {
         return $this->title;
     }
+    
+    /**
+     * Return author name for html head meta author
+     * @return string author
+     */
     public function getAuthor()
     {
         return $this->author;
     }
+    
+    /**
+     * Return author name for html head meta description
+     * @return string description
+     */
     public function getDescription()
     {
         return $this->description;
     }
+    
     public function getKeyword()
     {
         return $this->keyword;
@@ -465,6 +641,7 @@ abstract class SENE_Controller
             }
         }
     }
+    
     public function getJsFooter()
     {
         foreach ($this->js_footer as $key=>$a) {
@@ -475,65 +652,28 @@ abstract class SENE_Controller
             }
         }
     }
+    
     public function getContentType()
     {
         return $this->content_type;
     }
+    
+    /**
+     * Get current theme
+     * @return string     name of theme
+     */
     public function getTheme()
     {
         return $this->theme;
     }
-    public function getThemeElement($el="", $__forward=array(), $cacheable=0)
-    {
-        if (!empty($el)) {
-            $this->view(str_replace("//", "/", $this->theme.DS.$el), $__forward);
-            $this->render($cacheable);
-        }
-    }
+    
     public function getThemeView($el="", $comp='page', $__forward=array(), $cacheable=0)
     {
         if (!empty($el)) {
             $this->view($this->theme.'/'.$comp.'/'.$el, $__forward);
         }
     }
-    protected function load($item, $malias="", $type="model")
-    {
-        if ($type=="model") {
-            $mfile = $this->directories->app_model.$item.'.php';
-            $cname = basename($mfile, '.php');
-            if (empty($malias)) {
-                $malias = $cname;
-            }
-            $malias = strtolower($malias);
-            if (file_exists($mfile)) {
-                if (!class_exists($cname)) {
-                    require_once $mfile;
-                }
-                $this->{$malias} = new $cname();
-            } else {
-                trigger_error('could not find model '.$item.'  on '.$mfile);
-                //die();
-            }
-        } elseif ($type=="lib") {
-            $mfile = $this->directories->kero_lib.$item.'.php';
-            if (empty($malias)) {
-                $malias = $cname;
-            }
-            $malias = strtolower($malias);
-            if (file_exists($mfile)) {
-                require_once $mfile;
-                $this->$malias = new $malias();
-            } else {
-                trigger_error('could not find library '.$item.'  on '.$mfile);
-            }
-        } else {
-            if (file_exists($this->directories->kero_lib.$item.'.php')) {
-                require_once $this->directories->kero_lib.$item.'.php';
-            } else {
-                trigger_error('could not find require_once library '.$item.' on '.$mfile);
-            }
-        }
-    }
+    
     public function isLoggedIn($t="user")
     {
         $sess = $this->getKey();
@@ -542,10 +682,16 @@ abstract class SENE_Controller
         }
         return isset($sess->$t->id);
     }
-    public function __($d)
+    
+    /**
+     * echo string as HTML5 Entity
+     * @param  string $a    string
+     */
+    public function __($a)
     {
-        echo htmlentities((string) $d, ENT_HTML5, 'UTF-8');
+        echo htmlentities((string) $a, ENT_HTML5, 'UTF-8');
     }
+    
     public function getLoggedIn($t="user")
     {
         $sess = $this->getKey();
@@ -562,7 +708,6 @@ abstract class SENE_Controller
     {
         return self::$_instance;
     }
-    abstract public function index();
 
     protected function wrapper($data)
     {
@@ -582,6 +727,7 @@ abstract class SENE_Controller
         $json_engine = new JSON_Engine($data);
         $json_engine->parse();
     }
+    
     protected function view($v, $__forward=array())
     {
         if (file_exists($this->directories->app_view.$v.".php")) {
@@ -599,45 +745,64 @@ abstract class SENE_Controller
             die("unable to load view ".$this->directories->app_view.$v.".php");
         }
     }
-    protected function lib($data, $lalias="", $type="lib")
+    
+    /**
+     * Load the library from controller and instantiate object with same name in controller
+     * relatives to kero/lib
+     * @param  string $a          location and name of view without .php suffix
+     * @param  string $b          alias of instantiate object, default empty
+     * @param  string $c          type of embedding. lib: autoinstantiate, otherwise include only
+     * @return object             return this class
+     */
+    protected function lib($a, $b="", $c="lib")
     {
-        if ($type=='lib') {
-            $lpath = str_replace("\\", "/", $this->directories->kero_lib.$data.".php");
+        if ($c=='lib') {
+            $lpath = str_replace("\\", "/", $this->directories->kero_lib.$a.".php");
             if (file_exists(strtolower($lpath))) {
                 require_once(strtolower($lpath));
                 $cname = basename($lpath, '.php');
                 $method = new $cname();
-                if (empty($lalias)) {
-                    $lalias = $cname;
+                if (empty($b)) {
+                    $b = $cname;
                 }
-                $lalias = strtolower($lalias);
-                $this->{$lalias} = $method;
+                $b = strtolower($b);
+                $this->{$b} = $method;
             } elseif (file_exists($lpath)) {
                 require_once($lpath);
                 $cname = basename($lpath, '.php');
                 $method = new $cname();
-                if (empty($lalias)) {
-                    $lalias = $cname;
+                if (empty($b)) {
+                    $b = $cname;
                 }
-                $lalias = strtolower($lalias);
-                $this->{$lalias} = $method;
+                $b = strtolower($b);
+                $this->{$b} = $method;
             } else {
                 die("unable to load library on ".$lpath);
             }
         } else {
-            if (file_exists(strtolower($this->directories->kero_lib.$data.".php"))) {
-                require_once(strtolower($this->directories->kero_lib.$data.".php"));
-            } elseif (file_exists($this->directories->kero_lib.$data.".php")) {
-                require_once($this->directories->kero_lib.$data.".php");
+            if (file_exists(strtolower($this->directories->kero_lib.$a.".php"))) {
+                require_once(strtolower($this->directories->kero_lib.$a.".php"));
+            } elseif (file_exists($this->directories->kero_lib.$a.".php")) {
+                require_once($this->directories->kero_lib.$a.".php");
             } else {
-                die("unable to load library on ".strtolower($this->directories->kero_lib.$data.".php x"));
+                die("unable to load library on ".strtolower($this->directories->kero_lib.$a.".php x"));
             }
         }
     }
-    public function setKey($arr)
+    
+    /**
+     * Session set value
+     * @param mixed $a    value(s) want to saved to session
+     */
+    public function setKey($a)
     {
-        $_SESSION[$this->config->saltkey]=$arr;
+        $_SESSION[$this->config->saltkey]=$a;
     }
+    
+    /**
+     * Session get saved value
+     * @return mixed      Saved value(s) from session
+     */
     public function getKey()
     {
         if (isset($_SESSION[$this->config->saltkey])) {
@@ -646,11 +811,13 @@ abstract class SENE_Controller
             return 0;
         }
     }
+    
     public function delKey()
     {
         unset($_SESSION[$this->config->saltkey]);
         session_destroy();
     }
+    
     public function getcookie($var="")
     {
         if (empty($var)) {
@@ -662,22 +829,34 @@ abstract class SENE_Controller
             return 0;
         }
     }
+    
     public function setcookie($var="", $val="0")
     {
         $_COOKIE[$var] = $val;
     }
-    public function debug($arr)
+    
+    /**
+     * Show printed content of variable
+     * @param  mixed $a     [description]
+     */
+    public function debug($a)
     {
         echo '<pre>';
-        print_r($arr);
+        print_r($a);
         echo '</pre>';
     }
-    public function dd($arr)
+    
+    /**
+     * Show variable dump
+     * @param  mixed $a     [description]
+     */
+    public function dd($a)
     {
         echo '<pre>';
-        var_dump($arr);
+        var_dump($a);
         echo '</pre>';
     }
+    
     public function cdn_url($url="")
     {
         if ($this->config->environment == 'development' || empty($this->config->environment)) {
@@ -689,6 +868,13 @@ abstract class SENE_Controller
             return base_url($url);
         }
     }
+    
+    
+    /**
+     * Render buffered view to browser
+     * @param  integer $cacheable true or false
+     * @return void
+     */
     public function render($cacheable=0)
     {
         $cacheable = (int) $cacheable;
@@ -721,57 +907,7 @@ abstract class SENE_Controller
             echo $this->__content;
         }
     }
-}
-class SENE_Loader
-{
-    public function model($item, $alias="")
-    {
-        $mfile = MODEL_PATH.$item.'.php';
-        if (empty($alias)) {
-            $nfile = basename($mfile);
-        }
-        if (file_exists($fmodels)) {
-            require_once($fmodels);
-            return new $nfile();
-        }
-    }
-}
-class SENE_Input
-{
-    public function post($var)
-    {
-        if (isset($_POST[$var])) {
-            return $_POST[$var];
-        } else {
-            return 0;
-        }
-    }
-    public function get($var)
-    {
-        if (isset($_GET[$var])) {
-            return $_GET[$var];
-        } else {
-            return 0;
-        }
-    }
-    public function file($var)
-    {
-        if (isset($_FILES[$var])) {
-            return $_FILES[$var];
-        } else {
-            return 0;
-        }
-    }
-    public function debug()
-    {
-        return array("post_param"=>$_POST,"get_param"=>$_GET,"file_param"=>$_FILES);
-    }
-    public function request($var)
-    {
-        if (isset($_REQUEST[$var])) {
-            return $_REQUEST[$var];
-        } else {
-            return 0;
-        }
-    }
+    
+    // create abstract method index, so every controller has index method
+    abstract public function index();
 }
