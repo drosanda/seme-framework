@@ -4,5 +4,6 @@ php \
     -i vendor \
     -i kero/lib/fpdf \
     -i kero/lib/wideimage \
+    -i app \
     -t /Applications/XAMPP/htdocs/semedocs
     

@@ -1,7 +1,6 @@
 <?php
 /**
  * Abstract class for Sene_Model
- * @var [type]
  */
 abstract class SENE_Model
 {
@@ -24,17 +23,14 @@ abstract class SENE_Model
         if (!isset($db->engine)) {
             $db->engine = '';
         }
-        if ($db->engine=="mysql") {
-            require_once($this->directories->kero_sine."SENE_MySQL_Engine.php");
-            $this->db = new SENE_MySQLi_Engine($db);
-        } elseif ($db->engine=="pdo") {
-            require_once($this->directories->kero_sine."SENE_PDO_Engine.php");
-            $this->db = new SENE_MySQLi_Engine($db);
-        } else {
-            require_once($this->directories->kero_sine."SENE_MySQLi_Engine.php");
-            $this->db = new SENE_MySQLi_Engine($db);
-        }
+        require_once($this->directories->kero_sine."SENE_MySQLi_Engine.php");
+        $this->db = new SENE_MySQLi_Engine($db);
     }
+    /**
+     * Execute query
+     * @param  string $sql Raw query
+     * @return int         return 1s, otherwise 0
+     */
     public function exec($sql)
     {
         // $this->field = $this->engine->getField();

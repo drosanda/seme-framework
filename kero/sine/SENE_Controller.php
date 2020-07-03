@@ -28,21 +28,22 @@ abstract class SENE_Controller
     public $js_footer = array();
     public $js_ready = "";
     
-    //put unrendered content for view
-    public $__content = ""; 
+    /** @var string put unrendered string content for view */
+    public $__content = "";
     
-    //used by putThemeContent
-    public $__themeContent = ""; 
+    /** @var string used by putThemeContent */
+    public $__themeContent = "";
     
-    //used by putRightThemeContent
+    /** @var string used by putRightThemeContent */
     public $__themeRightContent = "";
     
-    //use by putLeftThemeContent
-    public $__themeLeftContent = ""; 
+    /** @var string used by putLeftThemeContent */
+    public $__themeLeftContent = "";
     
-    //use by putLeftThemeContent
+    /** @var string used by putLeftThemeContent */
     public $__themeRightMenu = "";
     
+    /** @var string  */
     public $__bodyBefore = "";
     
     
@@ -154,7 +155,7 @@ abstract class SENE_Controller
      * bring view from another file
      *   relatives from theme location
      * @param  string $a         location and name of view without .php suffix
-     * @param  array  $__forward data that will be passed to 
+     * @param  array  $__forward data that will be passed to
      * @return object            return this class
      */
     public function getThemeElement(string $a="", string $__forward=array(), int $cacheable=0)
@@ -170,7 +171,7 @@ abstract class SENE_Controller
      * For loading layout from a theme
      * Default file location app/view/front/page/
      * @param  string $u          name of layout without .php suffix
-     * @param  array  $__forward  data that will be passed to 
+     * @param  array  $__forward  data that will be passed to
      * @return object             return this class
      */
     public function loadLayout($a, $__forward=array())
@@ -193,9 +194,9 @@ abstract class SENE_Controller
     }
     
     /**
-     * Inject view to a layout 
+     * Inject view to a layout
      * @param  string $u         relative theme location filename without .php extension
-     * @param  array  $__forward  data that will be passed to 
+     * @param  array  $__forward  data that will be passed to
      * @return object             return this class
      */
     public function putThemeContent($u="", $__forward=array())
@@ -230,7 +231,7 @@ abstract class SENE_Controller
     }
     
     /**
-     * Inject view for left content 
+     * Inject view for left content
      * @param  string $a          [description]
      * @param  array  $b          [description]
      * @return object             this class
@@ -260,7 +261,7 @@ abstract class SENE_Controller
     }
     
     /**
-     * Inject view for left content 
+     * Inject view for left content
      * @param  string $a          [description]
      * @param  array  $b          [description]
      * @return object             this class
@@ -352,11 +353,15 @@ abstract class SENE_Controller
     {
         echo $this->js_ready;
     }
-    
-    public function putJsContent($tc="", $__forward=array())
+    /**
+     * Inject javascript content from php files
+     * @param  string $tc        template location
+     * @param  array  $__forward data
+     * @return object            this class
+     */
+    public function putJsContent(string $tc="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$tc;
-        //die($v);
         if (file_exists($v.".php")) {
             $keytemp=md5(date("h:i:s"));
             $_SESSION[$keytemp] = $__forward;
@@ -375,7 +380,9 @@ abstract class SENE_Controller
             trigger_error("putJsContent unable to load  ".$v.".php");
             die();
         }
+        return $this;
     }
+    
     public function putBodyBefore($tc="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$tc;
@@ -403,6 +410,9 @@ abstract class SENE_Controller
     {
         echo $this->__bodyBefore;
     }
+    /**
+     * Get JavaScript content injected from putJsContent
+     */
     public function getJsContent()
     {
         echo $this->__jsContent;
@@ -421,6 +431,12 @@ abstract class SENE_Controller
         }
         return $x;
     }
+    /**
+     * inject html script for javacript source to before body element
+     * @param  [type]  $stype       [description]
+     * @param  integer $is_external [description]
+     * @return [type]               [description]
+     */
     public function putJsFooter($stype, $is_external=0)
     {
         if ($is_external) {
@@ -642,6 +658,9 @@ abstract class SENE_Controller
         }
     }
     
+    /**
+     * get injected html script to put in before closing body
+     */
     public function getJsFooter()
     {
         foreach ($this->js_footer as $key=>$a) {
@@ -653,6 +672,10 @@ abstract class SENE_Controller
         }
     }
     
+    /**
+     * get value for meta content type
+     * @return [type] [description]
+     */
     public function getContentType()
     {
         return $this->content_type;
@@ -674,15 +697,6 @@ abstract class SENE_Controller
         }
     }
     
-    public function isLoggedIn($t="user")
-    {
-        $sess = $this->getKey();
-        if (!is_object($sess)) {
-            $sess = new stdClass();
-        }
-        return isset($sess->$t->id);
-    }
-    
     /**
      * echo string as HTML5 Entity
      * @param  string $a    string
@@ -692,43 +706,18 @@ abstract class SENE_Controller
         echo htmlentities((string) $a, ENT_HTML5, 'UTF-8');
     }
     
-    public function getLoggedIn($t="user")
-    {
-        $sess = $this->getKey();
-        if (!is_object($sess)) {
-            $sess = new stdClass();
-        }
-        if (isset($sess->$t->id)) {
-            return $sess->$t;
-        } else {
-            return new stdClass();
-        }
-    }
     public static function getInstance()
     {
         return self::$_instance;
     }
-
-    protected function wrapper($data)
-    {
-        return array("result"=>$data);
-    }
-    protected function data_wrapper($data)
-    {
-        return array("data"=>$data);
-    }
-    protected function xml_out($data)
-    {
-        $xml_engine = new XML_Engine($data);
-        $xml_engine->parse();
-    }
-    protected function json_out($data)
-    {
-        $json_engine = new JSON_Engine($data);
-        $json_engine->parse();
-    }
     
-    protected function view($v, $__forward=array())
+    /**
+     * Loading html view relative to selected theme
+     * - extract forwarded variable(s) from array to single variable
+     * @param  string $v         [description]
+     * @param  array  $__forward forwarded variable
+     */
+    private function view($v, $__forward=array())
     {
         if (file_exists($this->directories->app_view.$v.".php")) {
             $keytemp=md5(date("h:i:s"));
@@ -744,6 +733,7 @@ abstract class SENE_Controller
             trigger_error("unable to load view ".$this->directories->app_view.$v.".php ", E_USER_ERROR);
             die("unable to load view ".$this->directories->app_view.$v.".php");
         }
+        return $this;
     }
     
     /**
@@ -788,6 +778,7 @@ abstract class SENE_Controller
                 die("unable to load library on ".strtolower($this->directories->kero_lib.$a.".php x"));
             }
         }
+        return $this;
     }
     
     /**
@@ -797,6 +788,7 @@ abstract class SENE_Controller
     public function setKey($a)
     {
         $_SESSION[$this->config->saltkey]=$a;
+        return $this;
     }
     
     /**
@@ -810,12 +802,18 @@ abstract class SENE_Controller
         } else {
             return 0;
         }
+        return $this;
     }
     
+    /**
+     * Delete session key
+     * @return [type] [description]
+     */
     public function delKey()
     {
         unset($_SESSION[$this->config->saltkey]);
         session_destroy();
+        return $this;
     }
     
     public function getcookie($var="")
@@ -857,18 +855,6 @@ abstract class SENE_Controller
         echo '</pre>';
     }
     
-    public function cdn_url($url="")
-    {
-        if ($this->config->environment == 'development' || empty($this->config->environment)) {
-            return base_url($url);
-        }
-        if (strlen($this->config->cdn_url)>6) {
-            return $this->config->cdn_url.$url;
-        } else {
-            return base_url($url);
-        }
-    }
-    
     
     /**
      * Render buffered view to browser
@@ -908,6 +894,8 @@ abstract class SENE_Controller
         }
     }
     
-    // create abstract method index, so every controller has index method
+    /**
+     * Create abstract method index, so every controller has index method
+     */
     abstract public function index();
 }
