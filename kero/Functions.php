@@ -103,12 +103,12 @@ function seme_error_handling($errno, $errstr, $error_file, $error_line)
             $error_file = $bcts[0]['file'];
             $error_line = $bcts[0]['line'];
         }
-        $error_file = substr($error_file, strlen(SENEROOT));
+        $error_file = substr($error_file, strlen(SEMEROOT));
         print '================= ERROR ===================='.PHP_EOL;
         print $error_file.''.PHP_EOL;
         print 'Line: '.$error_line.PHP_EOL;
         print 'Error: ['.$errno.'] '.$errstr.''.PHP_EOL;
-        $error_file = substr($error_file, strlen(SENEROOT));
+        $error_file = substr($error_file, strlen(SEMEROOT));
         print '--------------------------------------------'.PHP_EOL;
         print 'Backtrace: ---------------------------------'.PHP_EOL;
         $i=0;
@@ -120,7 +120,7 @@ function seme_error_handling($errno, $errstr, $error_file, $error_line)
             if (!isset($e['file'])) {
                 continue;
             }
-            $e['file'] = substr($e['file'], strlen(SENEROOT));
+            $e['file'] = substr($e['file'], strlen(SEMEROOT));
             print $i.'. File: '.$e['file'].PHP_EOL;
             print 'Line: '.$e['line'].PHP_EOL;
             if (isset($e['class'])) {
