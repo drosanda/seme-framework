@@ -27,26 +27,26 @@ abstract class SENE_Controller
     public $theme = 'front/';
     public $js_footer = array();
     public $js_ready = "";
-    
+
     /** @var string put unrendered string content for view */
     public $__content = "";
-    
+
     /** @var string used by putThemeContent */
     public $__themeContent = "";
-    
+
     /** @var string used by putRightThemeContent */
     public $__themeRightContent = "";
-    
+
     /** @var string used by putLeftThemeContent */
     public $__themeLeftContent = "";
-    
+
     /** @var string used by putLeftThemeContent */
     public $__themeRightMenu = "";
-    
+
     /** @var string  */
     public $__bodyBefore = "";
-    
-    
+
+
     public function __construct()
     {
         $this->directories = $GLOBALS['SEMEDIR'];
@@ -61,7 +61,7 @@ abstract class SENE_Controller
         $this->__jsContent = '';
         self::$__instance = $this;
     }
-    
+
     /**
      * Loads CSS and another header files from theme.json
      * relatives to theme location
@@ -74,7 +74,7 @@ abstract class SENE_Controller
             return array();
         }
     }
-    
+
     /**
      * Loads javascript from script.json
      * relative to theme location
@@ -88,7 +88,7 @@ abstract class SENE_Controller
             return array();
         }
     }
-    
+
     /**
      * Set theme location, relative to app/view
      * @param string $theme name of directory theme, e.g. front
@@ -101,7 +101,7 @@ abstract class SENE_Controller
         $this->js_footer = $this->getJsFooterBasic();
         return $this;
     }
-    
+
     /**
      * Load the model or library from controller and instantiate object with same name in controller
      * if model relatives to app/model
@@ -150,7 +150,7 @@ abstract class SENE_Controller
         }
         return $this;
     }
-    
+
     /**
      * bring view from another file
      *   relatives from theme location
@@ -158,7 +158,7 @@ abstract class SENE_Controller
      * @param  array  $__forward data that will be passed to
      * @return object            return this class
      */
-    public function getThemeElement(string $a="", string $__forward=array(), int $cacheable=0)
+    public function getThemeElement(string $a="", array $__forward=array(), int $cacheable=0)
     {
         if (!empty($a)) {
             $this->view(str_replace("//", "/", $this->theme.DS.$a), $__forward);
@@ -166,7 +166,7 @@ abstract class SENE_Controller
         }
         return $this;
     }
-    
+
     /**
      * For loading layout from a theme
      * Default file location app/view/front/page/
@@ -182,7 +182,7 @@ abstract class SENE_Controller
         $this->view($this->getTheme()."page/".$a, $__forward);
         return $this;
     }
-    
+
     /**
      * Empty the __themeContent variable
      * @return object            return this class
@@ -192,7 +192,7 @@ abstract class SENE_Controller
         $this->__themeContent = '';
         return $this;
     }
-    
+
     /**
      * Inject view to a layout
      * @param  string $u         relative theme location filename without .php extension
@@ -229,7 +229,7 @@ abstract class SENE_Controller
     {
         $this->__themeRightMenu = $title;
     }
-    
+
     /**
      * Inject view for left content
      * @param  string $a          [description]
@@ -259,7 +259,7 @@ abstract class SENE_Controller
             die();
         }
     }
-    
+
     /**
      * Inject view for left content
      * @param  string $a          [description]
@@ -289,7 +289,7 @@ abstract class SENE_Controller
             die();
         }
     }
-    
+
     /**
      * Inject javascript from php files
      * @param  string $a          [description]
@@ -318,7 +318,7 @@ abstract class SENE_Controller
             die();
         }
     }
-    
+
     /**
      * Get injected main view into a layout
      * @return [type] [description]
@@ -327,7 +327,7 @@ abstract class SENE_Controller
     {
         echo $this->__themeContent;
     }
-    
+
     /**
      * Get injected right view into a layout
      * @return [type] [description]
@@ -336,7 +336,7 @@ abstract class SENE_Controller
     {
         echo $this->__themeRightContent;
     }
-    
+
     /**
      * Get injected left view into a layout
      * @return [type] [description]
@@ -345,7 +345,7 @@ abstract class SENE_Controller
     {
         echo $this->__themeLeftContent;
     }
-    
+
     /**
      * Get injected javascript content in php file into a layout
      */
@@ -382,7 +382,7 @@ abstract class SENE_Controller
         }
         return $this;
     }
-    
+
     public function putBodyBefore($tc="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$tc;
@@ -417,7 +417,7 @@ abstract class SENE_Controller
     {
         echo $this->__jsContent;
     }
-    
+
     public function fgc($path)
     {
         $x = json_encode(array());
@@ -572,7 +572,7 @@ abstract class SENE_Controller
     {
         unset($this->additional[$key]);
     }
-    
+
     /**
      * Return author name for html head meta language
      * @return string lang
@@ -581,7 +581,7 @@ abstract class SENE_Controller
     {
         return $this->lang;
     }
-    
+
     /**
      * Return title text for html head title
      * @return string title
@@ -590,7 +590,7 @@ abstract class SENE_Controller
     {
         return $this->title;
     }
-    
+
     /**
      * Return author name for html head meta author
      * @return string author
@@ -599,7 +599,7 @@ abstract class SENE_Controller
     {
         return $this->author;
     }
-    
+
     /**
      * Return author name for html head meta description
      * @return string description
@@ -608,7 +608,7 @@ abstract class SENE_Controller
     {
         return $this->description;
     }
-    
+
     public function getKeyword()
     {
         return $this->keyword;
@@ -657,7 +657,7 @@ abstract class SENE_Controller
             }
         }
     }
-    
+
     /**
      * get injected html script to put in before closing body
      */
@@ -671,7 +671,7 @@ abstract class SENE_Controller
             }
         }
     }
-    
+
     /**
      * get value for meta content type
      * @return [type] [description]
@@ -680,7 +680,7 @@ abstract class SENE_Controller
     {
         return $this->content_type;
     }
-    
+
     /**
      * Get current theme
      * @return string     name of theme
@@ -689,14 +689,14 @@ abstract class SENE_Controller
     {
         return $this->theme;
     }
-    
+
     public function getThemeView($el="", $comp='page', $__forward=array(), $cacheable=0)
     {
         if (!empty($el)) {
             $this->view($this->theme.'/'.$comp.'/'.$el, $__forward);
         }
     }
-    
+
     /**
      * echo string as HTML5 Entity
      * @param  string $a    string
@@ -705,12 +705,12 @@ abstract class SENE_Controller
     {
         echo htmlentities((string) $a, ENT_HTML5, 'UTF-8');
     }
-    
+
     public static function getInstance()
     {
         return self::$_instance;
     }
-    
+
     /**
      * Loading html view relative to selected theme
      * - extract forwarded variable(s) from array to single variable
@@ -735,7 +735,7 @@ abstract class SENE_Controller
         }
         return $this;
     }
-    
+
     /**
      * Load the library from controller and instantiate object with same name in controller
      * relatives to kero/lib
@@ -780,7 +780,7 @@ abstract class SENE_Controller
         }
         return $this;
     }
-    
+
     /**
      * Session set value
      * @param mixed $a    value(s) want to saved to session
@@ -790,7 +790,7 @@ abstract class SENE_Controller
         $_SESSION[$this->config->saltkey]=$a;
         return $this;
     }
-    
+
     /**
      * Session get saved value
      * @return mixed      Saved value(s) from session
@@ -804,7 +804,7 @@ abstract class SENE_Controller
         }
         return $this;
     }
-    
+
     /**
      * Delete session key
      * @return [type] [description]
@@ -815,7 +815,7 @@ abstract class SENE_Controller
         session_destroy();
         return $this;
     }
-    
+
     public function getcookie($var="")
     {
         if (empty($var)) {
@@ -827,12 +827,12 @@ abstract class SENE_Controller
             return 0;
         }
     }
-    
+
     public function setcookie($var="", $val="0")
     {
         $_COOKIE[$var] = $val;
     }
-    
+
     /**
      * Show printed content of variable
      * @param  mixed $a     [description]
@@ -843,7 +843,7 @@ abstract class SENE_Controller
         print_r($a);
         echo '</pre>';
     }
-    
+
     /**
      * Show variable dump
      * @param  mixed $a     [description]
@@ -854,8 +854,8 @@ abstract class SENE_Controller
         var_dump($a);
         echo '</pre>';
     }
-    
-    
+
+
     /**
      * Render buffered view to browser
      * @param  integer $cacheable true or false
@@ -893,7 +893,7 @@ abstract class SENE_Controller
             echo $this->__content;
         }
     }
-    
+
     /**
      * Create abstract method index, so every controller has index method
      */
