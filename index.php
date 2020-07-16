@@ -23,14 +23,11 @@ if (defined('STDIN')) {
 }
 $SEMEDIR = new stdClass();
 
-//echo '<pre>';
-//print_r($_SERVER);
-//die();
-
 /**
- * Register a direcotyr
- * @param  string $directory directory name
- * @param  string $name      alias
+ * Register a directory into config or constant
+ * @param  string $directory      directory name
+ * @param  string $name           alias
+ * @param  string $constant       constant name
  */
 $regdir = function ($directory, $name, $constant="") {
     if (realpath($directory) !== false) {
