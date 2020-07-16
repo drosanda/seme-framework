@@ -99,6 +99,18 @@ $controller_404='notfound';
 /*  - accessing value by $this->semevar->key in controller extended class */
 /*  - accessing value by $this->semevar->key in model extended class */
 /****************************/
+
+//firebase messaging
+$semevar['fcm'] = new stdClass();
+$semevar['fcm']->version = '';
+$semevar['fcm']->apiKey = '';
+$semevar['fcm']->authDomain = '';
+$semevar['fcm']->databaseURL = '';
+$semevar['fcm']->projectId = '';
+$semevar['fcm']->storageBucket = '';
+$semevar['fcm']->messagingSenderId = '';
+$semevar['fcm']->appId = '';
+
 // example
 $semevar['site_name'] = 'Seme Framework';
 $semevar['email_from'] = 'noreply@thecloudalert.com';

@@ -14,6 +14,8 @@ class SENE_Engine
     public $core_controller = '';
     public $core_model = '';
     public $routes;
+
+
     public function __construct()
     {
         $this->directories = $GLOBALS['SEMEDIR'];
@@ -53,11 +55,13 @@ class SENE_Engine
         self::$__instance = $this;
         $GLOBALS['SEMECFG'] = $this->config;
     }
+
+
     public static function getInstance()
     {
         return self::$_instance;
     }
-    
+
     /**
      * Run the framework
      */
@@ -85,10 +89,7 @@ class SENE_Engine
                 }
             }
         }
-
-
         $this->newRouteFolder();
-        //$this->newRouteFolder2();
     }
     private function defaultController()
     {

@@ -93,7 +93,7 @@ abstract class SENE_Controller
      * Set theme location, relative to app/view
      * @param string $theme name of directory theme, e.g. front
      */
-    public function setTheme(string $theme="front")
+    protected function setTheme(string $theme="front")
     {
         $theme = rtrim($theme, '/').'/';
         $this->theme = $theme;
@@ -158,7 +158,7 @@ abstract class SENE_Controller
      * @param  array  $__forward data that will be passed to
      * @return object            return this class
      */
-    public function getThemeElement(string $a="", array $__forward=array(), int $cacheable=0)
+    protected function getThemeElement(string $a="", array $__forward=array(), int $cacheable=0)
     {
         if (!empty($a)) {
             $this->view(str_replace("//", "/", $this->theme.DS.$a), $__forward);
@@ -174,7 +174,7 @@ abstract class SENE_Controller
      * @param  array  $__forward  data that will be passed to
      * @return object             return this class
      */
-    public function loadLayout($a, $__forward=array())
+    protected function loadLayout($a, $__forward=array())
     {
         if (empty($a)) {
             trigger_error("Layout not found. Please check layout file at ".$this->directories->app_view.$this->getTheme()."page/ executed", E_USER_ERROR);
@@ -187,7 +187,7 @@ abstract class SENE_Controller
      * Empty the __themeContent variable
      * @return object            return this class
      */
-    public function resetThemeContent()
+    protected function resetThemeContent()
     {
         $this->__themeContent = '';
         return $this;
@@ -199,7 +199,7 @@ abstract class SENE_Controller
      * @param  array  $__forward  data that will be passed to
      * @return object             return this class
      */
-    public function putThemeContent($u="", $__forward=array())
+    protected function putThemeContent($u="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$u;
         if (file_exists($v.".php")) {
@@ -221,11 +221,11 @@ abstract class SENE_Controller
         }
         return $this;
     }
-    public function getRightMenuTitle()
+    protected function getRightMenuTitle()
     {
         return $this->__themeRightMenu;
     }
-    public function setRightMenuTitle($title="")
+    protected function setRightMenuTitle($title="")
     {
         $this->__themeRightMenu = $title;
     }
@@ -236,7 +236,7 @@ abstract class SENE_Controller
      * @param  array  $b          [description]
      * @return object             this class
      */
-    public function putThemeRightContent($a="", $b=array())
+    protected function putThemeRightContent($a="", $b=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$a;
         //die($v);
@@ -266,7 +266,7 @@ abstract class SENE_Controller
      * @param  array  $b          [description]
      * @return object             this class
      */
-    public function putThemeLeftContent($a="", $b=array())
+    protected function putThemeLeftContent($a="", $b=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$a;
         //die($v);
@@ -296,7 +296,7 @@ abstract class SENE_Controller
      * @param  array  $b          [description]
      * @return object             this class
      */
-    public function putJsReady($a="", $b=array())
+    protected function putJsReady($a="", $b=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$a;
         if (file_exists($v.".php")) {
@@ -323,7 +323,7 @@ abstract class SENE_Controller
      * Get injected main view into a layout
      * @return [type] [description]
      */
-    public function getThemeContent()
+    protected function getThemeContent()
     {
         echo $this->__themeContent;
     }
@@ -332,7 +332,7 @@ abstract class SENE_Controller
      * Get injected right view into a layout
      * @return [type] [description]
      */
-    public function getThemeRightContent()
+    protected function getThemeRightContent()
     {
         echo $this->__themeRightContent;
     }
@@ -341,7 +341,7 @@ abstract class SENE_Controller
      * Get injected left view into a layout
      * @return [type] [description]
      */
-    public function getThemeLeftContent()
+    protected function getThemeLeftContent()
     {
         echo $this->__themeLeftContent;
     }
@@ -349,7 +349,7 @@ abstract class SENE_Controller
     /**
      * Get injected javascript content in php file into a layout
      */
-    public function getJsReady()
+    protected function getJsReady()
     {
         echo $this->js_ready;
     }
@@ -359,7 +359,7 @@ abstract class SENE_Controller
      * @param  array  $__forward data
      * @return object            this class
      */
-    public function putJsContent(string $tc="", $__forward=array())
+    protected function putJsContent(string $tc="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$tc;
         if (file_exists($v.".php")) {
@@ -383,7 +383,7 @@ abstract class SENE_Controller
         return $this;
     }
 
-    public function putBodyBefore($tc="", $__forward=array())
+    protected function putBodyBefore($tc="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$tc;
         //die($v);
@@ -406,19 +406,19 @@ abstract class SENE_Controller
             die();
         }
     }
-    public function getBodyBefore()
+    protected function getBodyBefore()
     {
         echo $this->__bodyBefore;
     }
     /**
      * Get JavaScript content injected from putJsContent
      */
-    public function getJsContent()
+    protected function getJsContent()
     {
         echo $this->__jsContent;
     }
 
-    public function fgc($path)
+    protected function fgc($path)
     {
         $x = json_encode(array());
         if (file_exists($path)) {
@@ -437,7 +437,7 @@ abstract class SENE_Controller
      * @param  integer $is_external [description]
      * @return [type]               [description]
      */
-    public function putJsFooter($stype, $is_external=0)
+    protected function putJsFooter($stype, $is_external=0)
     {
         if ($is_external) {
             $this->js_footer[] = '<script src="'.$stype.'"></script>';
@@ -446,65 +446,65 @@ abstract class SENE_Controller
             $this->js_footer[] = '<script src="'.$stype.'.js"></script>';
         }
     }
-    public function setCanonical($l="")
+    protected function setCanonical($l="")
     {
         $this->canonical = $l;
     }
-    public function getCanonical()
+    protected function getCanonical()
     {
         return $this->canonical;
     }
-    public function setContentLanguage($l="en")
+    protected function setContentLanguage($l="en")
     {
         $this->content_language = $l;
     }
-    public function getContentLanguage()
+    protected function getContentLanguage()
     {
         return $this->content_language;
     }
-    public function setLang($lang="en")
+    protected function setLang($lang="en")
     {
         $this->lang = $lang;
     }
-    public function setTitle($title="SEME FRAMEWORK")
+    protected function setTitle($title="SEME FRAMEWORK")
     {
         $this->title = $title;
     }
-    public function setDescription($description="en")
+    protected function setDescription($description="en")
     {
         $this->description = $description;
     }
-    public function setKeyword($keyword="lightweight,framework,php,api,generator")
+    protected function setKeyword($keyword="lightweight,framework,php,api,generator")
     {
         $this->keyword = $keyword;
     }
-    public function setRobots($robots="INDEX,FOLLOW")
+    protected function setRobots($robots="INDEX,FOLLOW")
     {
         if ($robots != "INDEX,FOLLOW") {
             $robots='NOINDEX,NOFOLLOW';
         }
         $this->robots = $robots;
     }
-    public function setIcon($icon="favicon.png")
+    protected function setIcon($icon="favicon.png")
     {
         $this->icon = $icon;
     }
-    public function setAuthor($author="SEME Framework")
+    protected function setAuthor($author="SEME Framework")
     {
         $this->author = $author;
     }
-    public function setShortcutIcon($shortcut_icon="favicon.png")
+    protected function setShortcutIcon($shortcut_icon="favicon.png")
     {
         $this->shortcut_icon = $shortcut_icon;
     }
-    public function setAdditional($val)
+    protected function setAdditional($val)
     {
         end($this->additional); // move the internal pointer to the end of the array
         $key = (int)key($this->additional);
         $key = $key+1;
         $this->additional[$key] = $val;
     }
-    public function setAdditionalBefore($val)
+    protected function setAdditionalBefore($val)
     {
         if (!is_array($this->additionalBefore)) {
             $this->additionalBefore = array();
@@ -518,7 +518,7 @@ abstract class SENE_Controller
             $this->additionalBefore[] = $val;
         }
     }
-    public function setAdditionalAfter($val)
+    protected function setAdditionalAfter($val)
     {
         if (!is_array($this->additionalAfter)) {
             $this->additionalAfter = array();
@@ -532,7 +532,7 @@ abstract class SENE_Controller
             $this->additionalAfter[] = $val;
         }
     }
-    public function loadCss($css_url, $utype="after")
+    protected function loadCss($css_url, $utype="after")
     {
         if (strtolower($utype)=="after") {
             $this->setAdditionalAfter('<link rel="stylesheet" href="'.$css_url.'.css" />');
@@ -540,15 +540,15 @@ abstract class SENE_Controller
             $this->setAdditionalBefore('<link rel="stylesheet" href="'.$css_url.'.css" />');
         }
     }
-    public function putCssAfter($css_url, $utype="after")
+    protected function putCssAfter($css_url, $utype="after")
     {
         $this->setAdditionalAfter('<link rel="stylesheet" href="'.$css_url.'.css" />');
     }
-    public function putCssBefore($css_url)
+    protected function putCssBefore($css_url)
     {
         $this->setAdditionalBefore('<link rel="stylesheet" href="'.$css_url.'.css" />');
     }
-    public function redirToHttps()
+    protected function redirToHttps()
     {
         if (isset($_SERVER['HTTP_HOST'])) {
             if ($_SERVER['HTTP_HOST']!="localhost") {
@@ -568,7 +568,7 @@ abstract class SENE_Controller
         }
     }
 
-    public function removeAdditional($key)
+    protected function removeAdditional($key)
     {
         unset($this->additional[$key]);
     }
@@ -577,7 +577,7 @@ abstract class SENE_Controller
      * Return author name for html head meta language
      * @return string lang
      */
-    public function getLang()
+    protected function getLang()
     {
         return $this->lang;
     }
@@ -586,7 +586,7 @@ abstract class SENE_Controller
      * Return title text for html head title
      * @return string title
      */
-    public function getTitle()
+    protected function getTitle()
     {
         return $this->title;
     }
@@ -595,7 +595,7 @@ abstract class SENE_Controller
      * Return author name for html head meta author
      * @return string author
      */
-    public function getAuthor()
+    protected function getAuthor()
     {
         return $this->author;
     }
@@ -604,55 +604,82 @@ abstract class SENE_Controller
      * Return author name for html head meta description
      * @return string description
      */
-    public function getDescription()
+    protected function getDescription()
     {
         return $this->description;
     }
 
-    public function getKeyword()
+    protected function getKeyword()
     {
         return $this->keyword;
     }
-    public function getRobots()
+    protected function getRobots()
     {
         return $this->robots;
     }
-    public function getIcon($icon="favicon.png")
+    protected function getIcon($icon="favicon.png")
     {
         return $this->icon;
     }
-    public function getShortcutIcon($shortcut_icon="favicon.png")
+    protected function getShortcutIcon($shortcut_icon="favicon.png")
     {
         return $this->shortcut_icon;
     }
-    public function getAdditionalBefore()
+    protected function getAdditionalBefore()
     {
         foreach ($this->additionalBefore as $key=>$a) {
             if (is_string($a)) {
                 $a = str_replace("{{base_url}}", base_url(), $a);
                 $a = str_replace("{{base_url_admin}}", base_url_admin(), $a);
+                $cdn_url = '';
+                if(isset($this->config->cdn_url)){
+                  $cdn_url = $this->config->cdn_url;
+                }
+                if(strlen($cdn_url)>4){
+                    $a = str_replace("{{cdn_url}}", $cdn_url, $a);
+                }else{
+                    $a = str_replace("{{cdn_url}}", base_url(), $a);
+                }
                 echo "\n\t".$a;
             }
         }
     }
-    public function getAdditional()
+    protected function getAdditional()
     {
         if (count($this->additional)):
             foreach ($this->additional as $key=>$a) {
                 if (is_string($a)) {
                     $a = str_replace("{{base_url}}", base_url(), $a);
                     $a = str_replace("{{base_url_admin}}", base_url_admin(), $a);
+                    $cdn_url = '';
+                    if(isset($this->config->cdn_url)){
+                      $cdn_url = $this->config->cdn_url;
+                    }
+                    if(strlen($cdn_url)>4){
+                        $a = str_replace("{{cdn_url}}", $cdn_url, $a);
+                    }else{
+                        $a = str_replace("{{cdn_url}}", base_url(), $a);
+                    }
                     echo "\n\t".$a;
                 }
             }
         endif;
     }
-    public function getAdditionalAfter()
+    protected function getAdditionalAfter()
     {
         foreach ($this->additionalAfter as $key=>$a) {
             if (is_string($a)) {
                 $a = str_replace("{{base_url}}", base_url(), $a);
                 $a = str_replace("{{base_url_admin}}", base_url_admin(), $a);
+                $cdn_url = '';
+                if(isset($this->config->cdn_url)){
+                  $cdn_url = $this->config->cdn_url;
+                }
+                if(strlen($cdn_url)>4){
+                    $a = str_replace("{{cdn_url}}", $cdn_url, $a);
+                }else{
+                    $a = str_replace("{{cdn_url}}", base_url(), $a);
+                }
                 echo "\n\t".$a;
             }
         }
@@ -661,12 +688,21 @@ abstract class SENE_Controller
     /**
      * get injected html script to put in before closing body
      */
-    public function getJsFooter()
+    protected function getJsFooter()
     {
         foreach ($this->js_footer as $key=>$a) {
             if (is_string($a)) {
                 $a = str_replace("{{base_url}}", base_url(), $a);
                 $a = str_replace("{{base_url_admin}}", base_url_admin(), $a);
+                $cdn_url = '';
+                if(isset($this->config->cdn_url)){
+                  $cdn_url = $this->config->cdn_url;
+                }
+                if(strlen($cdn_url)>4){
+                    $a = str_replace("{{cdn_url}}", $cdn_url, $a);
+                }else{
+                    $a = str_replace("{{cdn_url}}", base_url(), $a);
+                }
                 echo "\n\t".$a;
             }
         }
@@ -676,7 +712,7 @@ abstract class SENE_Controller
      * get value for meta content type
      * @return [type] [description]
      */
-    public function getContentType()
+    protected function getContentType()
     {
         return $this->content_type;
     }
@@ -685,12 +721,12 @@ abstract class SENE_Controller
      * Get current theme
      * @return string     name of theme
      */
-    public function getTheme()
+    protected function getTheme()
     {
         return $this->theme;
     }
 
-    public function getThemeView($el="", $comp='page', $__forward=array(), $cacheable=0)
+    protected function getThemeView($el="", $comp='page', $__forward=array(), $cacheable=0)
     {
         if (!empty($el)) {
             $this->view($this->theme.'/'.$comp.'/'.$el, $__forward);
@@ -701,7 +737,7 @@ abstract class SENE_Controller
      * echo string as HTML5 Entity
      * @param  string $a    string
      */
-    public function __($a)
+    protected function __($a)
     {
         echo htmlentities((string) $a, ENT_HTML5, 'UTF-8');
     }
@@ -785,7 +821,7 @@ abstract class SENE_Controller
      * Session set value
      * @param mixed $a    value(s) want to saved to session
      */
-    public function setKey($a)
+    protected function setKey($a)
     {
         $_SESSION[$this->config->saltkey]=$a;
         return $this;
@@ -795,7 +831,7 @@ abstract class SENE_Controller
      * Session get saved value
      * @return mixed      Saved value(s) from session
      */
-    public function getKey()
+    protected function getKey()
     {
         if (isset($_SESSION[$this->config->saltkey])) {
             return $_SESSION[$this->config->saltkey];
@@ -809,14 +845,14 @@ abstract class SENE_Controller
      * Delete session key
      * @return [type] [description]
      */
-    public function delKey()
+    protected function delKey()
     {
         unset($_SESSION[$this->config->saltkey]);
         session_destroy();
         return $this;
     }
 
-    public function getcookie($var="")
+    protected function getcookie($var="")
     {
         if (empty($var)) {
             return 0;
@@ -828,7 +864,7 @@ abstract class SENE_Controller
         }
     }
 
-    public function setcookie($var="", $val="0")
+    protected function setcookie($var="", $val="0")
     {
         $_COOKIE[$var] = $val;
     }
@@ -837,7 +873,7 @@ abstract class SENE_Controller
      * Show printed content of variable
      * @param  mixed $a     [description]
      */
-    public function debug($a)
+    protected function debug($a)
     {
         echo '<pre>';
         print_r($a);
@@ -848,20 +884,19 @@ abstract class SENE_Controller
      * Show variable dump
      * @param  mixed $a     [description]
      */
-    public function dd($a)
+    protected function dd($a)
     {
         echo '<pre>';
         var_dump($a);
         echo '</pre>';
     }
 
-
     /**
      * Render buffered view to browser
      * @param  integer $cacheable true or false
      * @return void
      */
-    public function render($cacheable=0)
+    protected function render($cacheable=0)
     {
         $cacheable = (int) $cacheable;
         if ($cacheable) {
@@ -895,7 +930,28 @@ abstract class SENE_Controller
     }
 
     /**
+     * Get CDN URL if exist or fallback to base_url if not exists
+     * @param  string $url URL wihtout base_url
+     * @return string      URL with CDN URL
+     */
+    protected function cdn_url($url="")
+    {
+        $cdn_url = '';
+        if(isset($this->config->cdn_url)){
+          $cdn_url = $this->config->cdn_url;
+        }
+        if ($this->config->environment == 'development' || empty($this->config->environment)) {
+            return base_url($url);
+        }
+        if (strlen($cdn_url)>6) {
+            return $cdn_url.$url;
+        } else {
+            return base_url($url);
+        }
+    }
+
+    /**
      * Create abstract method index, so every controller has index method
      */
-    abstract public function index();
+    abstract protected function index();
 }
