@@ -57,7 +57,7 @@ $regdir('app/core', 'app_core');
 $regdir('app/model', 'app_model');
 $regdir('app/view', 'app_view');
 $regdir('kero', 'kero');
-$regdir('kero/lib', 'kero_lib');
+$regdir('kero/lib', 'kero_lib','semelib');
 $regdir('kero/sine', 'kero_sine');
 $regdir('kero/bin', 'kero_bin');
 
