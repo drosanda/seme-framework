@@ -917,7 +917,7 @@ class SENE_MySQLi_Engine
         $this->pagesize = $pagesize;
         return $this;
     }
-    
+
     /**
      * Get query result
      * @param  string $tipe     result type, array of array or array of object
@@ -1022,7 +1022,7 @@ class SENE_MySQLi_Engine
         $this->flushQuery();
         return $res;
     }
-    
+
     /**
      * Get single result
      * @param  string $tipe     result type, array of array or array of object
@@ -1309,7 +1309,7 @@ class SENE_MySQLi_Engine
             $b = $this->pagesize;
             $sql .= " LIMIT ".$b;
         }
-        
+
         $this->query_last = $sql;
         if ($is_debug) {
             http_response_code(500);
@@ -1337,7 +1337,7 @@ class SENE_MySQLi_Engine
             $b = $this->pagesize;
             $sql .= " LIMIT ".$b;
         }
-        
+
         $this->query_last = $sql;
         if ($is_debug) {
             http_response_code(500);
@@ -1561,21 +1561,26 @@ class SENE_MySQLi_Engine
         $this->flushQuery();
         return $res;
     }
+
+    /**
+     * Filter data by WHERE IN
+     * @param  string  $tbl_key     column name
+     * @param  array   $values      plain array
+     * @param  int     $is_not      flag is not select (1|0)
+     * @param  string  $after       operand (AND|OR)
+     * @return object               this object model
+     */
     public function where_in($tbl_key, $values, $is_not="0", $after="AND")
     {
         $not = '';
-
-        if ($is_not == '1' || $is_not == 1) {
-            $not = 'NOT';
-        }
-
+        $is_not = (int) $is_not;
+        if (!empty($is_not)) $not = 'NOT';
         $this->in_where .= ' '.$tbl_key.' '.$not.' IN (';
         foreach ($values as $v) {
             $this->in_where .= $this->esc($v).", ";
         }
         $this->in_where = rtrim($this->in_where, ", ");
         $this->in_where .= ') '.$after.' ';
-
         return $this;
     }
     public function getCharSet()
