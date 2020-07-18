@@ -1367,6 +1367,17 @@ class SENE_MySQLi_Engine
 
         return $this;
     }
+
+    /**
+     * For creating array key composite join
+     * @param  string  $key1          columname or columname with table alias
+     * @param  string  $operator      operator (=|<>|<|>|>=|<=|!+)
+     * @param  string  $key2          columname or columname with table alias
+     * @param  string  $method        operand method (AND|OR)
+     * @param  integer $bracket_open  open bracket (1|0)
+     * @param  integer $bracket_close close bracket (1|0)
+     * @return [type]                 this object
+     */
     public function composite_create($key1, $operator, $key2, $method="AND", $bracket_open=0, $bracket_close=0)
     {
         $composite = new stdClass();
@@ -1378,6 +1389,15 @@ class SENE_MySQLi_Engine
         $composite->bracket_close = $bracket_close;
         return $composite;
     }
+
+    /**
+     * Join table by multiple keys
+     * @param  string $table       table name
+     * @param  string $table_alias table alias
+     * @param  array  $composites  composites array, created from $this->composite_create
+     * @param  string $method      available options (inner|outer|left|right). Default empty string
+     * @return object              this object
+     */
     public function join_composite($table, $table_alias, $composites=array(), $method="")
     {
         $method = strtoupper($method);
@@ -1447,6 +1467,15 @@ class SENE_MySQLi_Engine
         $this->in_join_multi = $this->in_join_multi+1;
         return $this;
     }
+
+    /**
+     * Add between query
+     * @param  string  $key    column name or value
+     * @param  string  $val1   column name or value
+     * @param  string  $val2   column name or value
+     * @param  integer $is_not for between negation (1|0)
+     * @return object          this model
+     */
     public function between($key, $val1, $val2, $is_not=0)
     {
         $this->in_where .= "(";
@@ -1458,6 +1487,12 @@ class SENE_MySQLi_Engine
         $this->in_where .= ") AND ";
         return $this;
     }
+
+    /**
+     * Add group by query
+     * @param  string $params     String or Column name to group by
+     * @return object             this object
+     */
     public function group_by($params)
     {
         //die($params);
