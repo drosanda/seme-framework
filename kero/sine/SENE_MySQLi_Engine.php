@@ -104,6 +104,7 @@ class SENE_MySQLi_Engine
     {
         return $this->__mysqli->savepoint($sp);
     }
+
     public function debug($sql="")
     {
         $this->fieldname[] = 'error';
@@ -113,6 +114,12 @@ class SENE_MySQLi_Engine
         $this->fieldvalue[] = $this->__mysqli->error;
         $this->fieldvalue[] = $sql;
     }
+
+    /**
+     * Execute raw query
+     * @param  string   $sql    RAW SQL Query
+     * @return boolean          Return 1 if success
+     */
     public function exec($sql)
     {
         $res = $this->__mysqli->query($sql);
@@ -125,6 +132,14 @@ class SENE_MySQLi_Engine
             return 0;
         }
     }
+
+    /**
+     * Select column name or function with alias
+     * @param  string  $skey    column name or string function
+     * @param  string  $sval    name alias
+     * @param  integer $escape  value (1|0)
+     * @return object           this class
+     */
     public function select_as($skey, $sval="", $escape=1)
     {
         if (is_array($skey)) {
@@ -303,7 +318,7 @@ class SENE_MySQLi_Engine
         return array("field"=>$this->fieldname,"value"=>fieldvalue);
     }
 
-    /*
+   /**
     * Function Where
     * ==========================================================
     * Params1 -> Bisa Array kalau bukan array, parameter 2 wajib
@@ -315,13 +330,17 @@ class SENE_MySQLi_Engine
     *            like%,%like,%like%
     *            bisa juga not like%,%like,%like%
     * -----------------------------------------------------------
+    * Add where condition query
+    * @param  string  $params   Column name or function
+    * @param  string  $params2  Column name or function or string value
+    * @param  string  $operand  (AND|OR)
+    * @param  string  $comp     (=|>|<|>=|<=|!=|<>|like%|%like|%like%|like%%|notlike)
+    * @param  integer $bracket  Open Bracket (1|0)
+    * @param  integer $bracket2 Close Bracket (1|0)
+    * @return object            this object
     */
     public function where($params, $params2="", $operand="AND", $comp="=", $bracket=0, $bracket2=0)
     {
-        //die("params: ".$params);
-        //die("params2: ".$params2);
-        //die("operand: ".$operand);
-        //die("comp: ".$comp);
         $comp = strtolower($comp);
         $c="=";
         $operand = strtoupper($operand);
@@ -565,6 +584,17 @@ class SENE_MySQLi_Engine
         }
         return $this;
     }
+
+    /**
+     * Add where condition query with alias
+     * @param  string  $params   Column name or function
+     * @param  string  $params2  Column name or function or string value
+     * @param  string  $operand  (AND|OR)
+     * @param  string  $comp     (=|>|<|>=|<=|!=|<>|like%|%like|%like%|like%%|notlike)
+     * @param  integer $bracket  Open Bracket (1|0)
+     * @param  integer $bracket2 Close Bracket (1|0)
+     * @return object            this object
+     */
     public function where_as($params, $params2="", $operand="AND", $comp="=", $bracket=0, $bracket2=0)
     {
         $comp = strtolower($comp);
@@ -822,6 +852,13 @@ class SENE_MySQLi_Engine
         }
         return $this;
     }
+
+    /**
+     * Add from query
+     * @param  string $table Table name
+     * @param  string $as    Table alias
+     * @return object        this object
+     */
     public function from($table, $as="")
     {
         if (empty($table)) {
