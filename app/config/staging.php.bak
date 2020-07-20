@@ -42,11 +42,13 @@ $cdn_url = "";
 /* Database connection information */
 /* @var array of string */
 /********************************/
-$db['host']  = "localhost";
-$db['user']  = "root";
-$db['pass']  = "";
-$db['name']  = "";
-$db['engine']= "mysqli";
+$db['host']  = 'localhost';
+$db['user']  = 'root';
+$db['pass']  = '';
+$db['name']  = 'seme_framework';
+$db['port'] = '3306';
+$db['charset'] = 'utf8';
+$db['engine'] = 'mysqli';
 
 /****************************/
 /* == Session Configuration == */

@@ -1,7 +1,4 @@
 <?php
-/**
- * Class for model wrapper for MySQLi
- */
 class SENE_MySQLi_Engine
 {
     protected static $__instance;
@@ -37,27 +34,41 @@ class SENE_MySQLi_Engine
     {
         $this->directories = $GLOBALS['SEMEDIR'];
         $this->config = $GLOBALS['SEMECFG'];
-        $port = ini_get('mysqli.default_port');
+        $port = 3306;
+        if(isset($this->config->database->port)){
+          if(strlen($this->config->database->port)>0){
+            $port = $this->config->database->port;
+          }
+        }
         mysqli_report(MYSQLI_REPORT_STRICT);
         $this->__mysqli = new mysqli();
         try {
             $this->__mysqli->connect($this->config->database->host, $this->config->database->user, $this->config->database->pass, $this->config->database->name, $port);
         } catch (Exception $e) {
-            //trigger_error('Tidak dapat tersambung ke database.');
-            //die();
-        }
-        if ($this->__mysqli->connect_errno) {
-            header("content-type: application/json");
-            http_response_code(200);
-            $data = array();
-            $data['status'] = $this->__mysqli->connect_errno;
-            $data['message'] = 'Failed to connect to Database: '.$this->__mysqli->connect_error;
-            $data['data'] = array();
-            echo json_encode($data);
-            //die('Failed to connect to MySQL: '.$this->__mysqli->connect_error);
+          if($this->config->environment == 'development'){
+            trigger_error('Tidak dapat tersambung ke database.');
             die();
+          }else if($this->config->environment == 'staging'){
+            if ($this->__mysqli->connect_errno) {
+                header("content-type: application/json");
+                http_response_code(200);
+                $data = array();
+                $data['status'] = $this->__mysqli->connect_errno;
+                $data['message'] = 'Failed to connect to Database: '.$this->__mysqli->connect_error;
+                $data['data'] = array();
+                echo json_encode($data);
+                die();
+            }
+          }
         }
-        $this->__mysqli->set_charset('utf8');
+
+        $cs = 'utf8';
+        if(isset($this->config->database->charset)){
+          if(strlen($this->config->database->port)>0){
+            $cs = $this->config->database->charset;
+          }
+        }
+        $this->__mysqli->set_charset($cs);
 
         self::$__instance = $this;
 
@@ -104,7 +115,6 @@ class SENE_MySQLi_Engine
     {
         return $this->__mysqli->savepoint($sp);
     }
-
     public function debug($sql="")
     {
         $this->fieldname[] = 'error';
@@ -114,12 +124,6 @@ class SENE_MySQLi_Engine
         $this->fieldvalue[] = $this->__mysqli->error;
         $this->fieldvalue[] = $sql;
     }
-
-    /**
-     * Execute raw query
-     * @param  string   $sql    RAW SQL Query
-     * @return boolean          Return 1 if success
-     */
     public function exec($sql)
     {
         $res = $this->__mysqli->query($sql);
@@ -132,14 +136,6 @@ class SENE_MySQLi_Engine
             return 0;
         }
     }
-
-    /**
-     * Select column name or function with alias
-     * @param  string  $skey    column name or string function
-     * @param  string  $sval    name alias
-     * @param  integer $escape  value (1|0)
-     * @return object           this class
-     */
     public function select_as($skey, $sval="", $escape=1)
     {
         if (is_array($skey)) {
@@ -318,7 +314,7 @@ class SENE_MySQLi_Engine
         return array("field"=>$this->fieldname,"value"=>fieldvalue);
     }
 
-   /**
+    /*
     * Function Where
     * ==========================================================
     * Params1 -> Bisa Array kalau bukan array, parameter 2 wajib
@@ -330,17 +326,13 @@ class SENE_MySQLi_Engine
     *            like%,%like,%like%
     *            bisa juga not like%,%like,%like%
     * -----------------------------------------------------------
-    * Add where condition query
-    * @param  string  $params   Column name or function
-    * @param  string  $params2  Column name or function or string value
-    * @param  string  $operand  (AND|OR)
-    * @param  string  $comp     (=|>|<|>=|<=|!=|<>|like%|%like|%like%|like%%|notlike)
-    * @param  integer $bracket  Open Bracket (1|0)
-    * @param  integer $bracket2 Close Bracket (1|0)
-    * @return object            this object
     */
     public function where($params, $params2="", $operand="AND", $comp="=", $bracket=0, $bracket2=0)
     {
+        //die("params: ".$params);
+        //die("params2: ".$params2);
+        //die("operand: ".$operand);
+        //die("comp: ".$comp);
         $comp = strtolower($comp);
         $c="=";
         $operand = strtoupper($operand);
@@ -584,17 +576,6 @@ class SENE_MySQLi_Engine
         }
         return $this;
     }
-
-    /**
-     * Add where condition query with alias
-     * @param  string  $params   Column name or function
-     * @param  string  $params2  Column name or function or string value
-     * @param  string  $operand  (AND|OR)
-     * @param  string  $comp     (=|>|<|>=|<=|!=|<>|like%|%like|%like%|like%%|notlike)
-     * @param  integer $bracket  Open Bracket (1|0)
-     * @param  integer $bracket2 Close Bracket (1|0)
-     * @return object            this object
-     */
     public function where_as($params, $params2="", $operand="AND", $comp="=", $bracket=0, $bracket2=0)
     {
         $comp = strtolower($comp);
@@ -852,13 +833,6 @@ class SENE_MySQLi_Engine
         }
         return $this;
     }
-
-    /**
-     * Add from query
-     * @param  string $table Table name
-     * @param  string $as    Table alias
-     * @return object        this object
-     */
     public function from($table, $as="")
     {
         if (empty($table)) {
@@ -954,13 +928,6 @@ class SENE_MySQLi_Engine
         $this->pagesize = $pagesize;
         return $this;
     }
-
-    /**
-     * Get query result
-     * @param  string $tipe     result type, array of array or array of object
-     * @param  int $is_debug produce executed query, and throw http header 500
-     * @return mixed           result
-     */
     public function get($tipe="object", $is_debug="")
     {
         $this->in_select = rtrim($this->in_select, ", ");
@@ -1060,12 +1027,6 @@ class SENE_MySQLi_Engine
         return $res;
     }
 
-    /**
-     * Get single result
-     * @param  string $tipe     result type, array of array or array of object
-     * @param  int $is_debug produce executed query, and throw http header 500
-     * @return [type]           [description]
-     */
     public function get_first($tipe="object", $is_debug="")
     {
         $this->in_select = rtrim($this->in_select, ", ");
@@ -1404,17 +1365,6 @@ class SENE_MySQLi_Engine
 
         return $this;
     }
-
-    /**
-     * For creating array key composite join
-     * @param  string  $key1          columname or columname with table alias
-     * @param  string  $operator      operator (=|<>|<|>|>=|<=|!+)
-     * @param  string  $key2          columname or columname with table alias
-     * @param  string  $method        operand method (AND|OR)
-     * @param  integer $bracket_open  open bracket (1|0)
-     * @param  integer $bracket_close close bracket (1|0)
-     * @return [type]                 this object
-     */
     public function composite_create($key1, $operator, $key2, $method="AND", $bracket_open=0, $bracket_close=0)
     {
         $composite = new stdClass();
@@ -1426,15 +1376,6 @@ class SENE_MySQLi_Engine
         $composite->bracket_close = $bracket_close;
         return $composite;
     }
-
-    /**
-     * Join table by multiple keys
-     * @param  string $table       table name
-     * @param  string $table_alias table alias
-     * @param  array  $composites  composites array, created from $this->composite_create
-     * @param  string $method      available options (inner|outer|left|right). Default empty string
-     * @return object              this object
-     */
     public function join_composite($table, $table_alias, $composites=array(), $method="")
     {
         $method = strtoupper($method);
@@ -1504,15 +1445,6 @@ class SENE_MySQLi_Engine
         $this->in_join_multi = $this->in_join_multi+1;
         return $this;
     }
-
-    /**
-     * Add between query
-     * @param  string  $key    column name or value
-     * @param  string  $val1   column name or value
-     * @param  string  $val2   column name or value
-     * @param  integer $is_not for between negation (1|0)
-     * @return object          this model
-     */
     public function between($key, $val1, $val2, $is_not=0)
     {
         $this->in_where .= "(";
@@ -1524,12 +1456,6 @@ class SENE_MySQLi_Engine
         $this->in_where .= ") AND ";
         return $this;
     }
-
-    /**
-     * Add group by query
-     * @param  string $params     String or Column name to group by
-     * @return object             this object
-     */
     public function group_by($params)
     {
         //die($params);
@@ -1642,11 +1568,12 @@ class SENE_MySQLi_Engine
      * @param  string  $after       operand (AND|OR)
      * @return object               this object model
      */
-    public function where_in($tbl_key, $values, $is_not="0", $after="AND")
+    public function where_in($tbl_key, $values, $is_not=0, $after="AND")
     {
         $not = '';
-        $is_not = (int) $is_not;
-        if (!empty($is_not)) $not = 'NOT';
+        if ($is_not == '1' || $is_not == 1) {
+            $not = 'NOT';
+        }
         $this->in_where .= ' '.$tbl_key.' '.$not.' IN (';
         foreach ($values as $v) {
             $this->in_where .= $this->esc($v).", ";
@@ -1655,6 +1582,7 @@ class SENE_MySQLi_Engine
         $this->in_where .= ') '.$after.' ';
         return $this;
     }
+
     public function getCharSet()
     {
         $res = $this->__mysqli->character_set_name();

@@ -35,18 +35,20 @@ $admin_secret_url = 'admin';
  * Base URL with http:// or https:// prefix and trailing slash
  * @var string
  */
-$cdn_url = "";
+$cdn_url = '';
 
 /********************************/
 /* == Database Configuration == */
 /* Database connection information */
 /* @var array of string */
 /********************************/
-$db['host']  = "localhost";
-$db['user']  = "root";
-$db['pass']  = "";
-$db['name']  = "seme_framework";
-$db['engine']= "mysqli";
+$db['host']  = 'localhost';
+$db['user']  = 'root';
+$db['pass']  = '';
+$db['name']  = 'seme_framework';
+$db['port'] = '3306';
+$db['charset'] = 'utf8';
+$db['engine'] = 'mysqli';
 
 /****************************/
 /* == Session Configuration == */
