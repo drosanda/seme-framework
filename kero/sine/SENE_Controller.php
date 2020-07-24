@@ -21,9 +21,15 @@ abstract class SENE_Controller
     public $icon = 'favicon.png';
     public $shortcut_icon = 'favicon.png';
     public $content_type = 'text/html; charset=utf-8';
+
+    /**
+     * For additional CSS
+     * @var string
+     */
     public $additional = array();
     public $additionalBefore = array();
     public $additionalAfter = array();
+
     public $theme = 'front/';
     public $js_footer = array();
     public $js_ready = "";
@@ -418,7 +424,7 @@ abstract class SENE_Controller
         echo $this->__jsContent;
     }
 
-    protected function fgc($path)
+    private function fgc($path)
     {
         $x = json_encode(array());
         if (file_exists($path)) {
@@ -431,24 +437,27 @@ abstract class SENE_Controller
         }
         return $x;
     }
+
     /**
      * inject html script for javacript source to before body element
-     * @param  [type]  $stype       [description]
-     * @param  integer $is_external [description]
-     * @return [type]               [description]
+     * @param  string  $src         js url, if $ext = 0 use without .js suffix
+     * @param  integer $ext (1|0),
+     * @return object               this object
      */
-    protected function putJsFooter($stype, $is_external=0)
+    protected function putJsFooter($src, $ext=0)
     {
-        if ($is_external) {
-            $this->js_footer[] = '<script src="'.$stype.'"></script>';
+        if ($ext) {
+            $this->js_footer[] = '<script src="'.$src.'"></script>';
         } else {
             $stype = rtrim($stype, '.js');
-            $this->js_footer[] = '<script src="'.$stype.'.js"></script>';
+            $this->js_footer[] = '<script src="'.$src.'.js"></script>';
         }
+        return $this;
     }
     protected function setCanonical($l="")
     {
         $this->canonical = $l;
+        return $this;
     }
     protected function getCanonical()
     {
@@ -532,50 +541,36 @@ abstract class SENE_Controller
             $this->additionalAfter[] = $val;
         }
     }
-    protected function loadCss($css_url, $utype="after")
+    /**
+     * LOad css stylesheet file
+     * @param  string $css_url load CSS url
+     * @param  string $utype   (before | after) main css defined on theme.json
+     * @return object          this object
+     */
+    protected function loadCss($src, $utype="after")
     {
         if (strtolower($utype)=="after") {
-            $this->setAdditionalAfter('<link rel="stylesheet" href="'.$css_url.'.css" />');
+            $this->setAdditionalAfter('<link rel="stylesheet" href="'.$src.'.css" />');
         } else {
-            $this->setAdditionalBefore('<link rel="stylesheet" href="'.$css_url.'.css" />');
+            $this->setAdditionalBefore('<link rel="stylesheet" href="'.$src.'.css" />');
         }
-    }
-    protected function putCssAfter($css_url, $utype="after")
-    {
-        $this->setAdditionalAfter('<link rel="stylesheet" href="'.$css_url.'.css" />');
-    }
-    protected function putCssBefore($css_url)
-    {
-        $this->setAdditionalBefore('<link rel="stylesheet" href="'.$css_url.'.css" />');
-    }
-    protected function redirToHttps()
-    {
-        if (isset($_SERVER['HTTP_HOST'])) {
-            if ($_SERVER['HTTP_HOST']!="localhost") {
-                if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
-                    $b = ltrim(base_url(), 'http://');
-                    $b = ltrim($b, 's://');
-                    $b = rtrim($b, '/');
-                    if ($_SERVER['HTTP_X_FORWARDED_PROTO']!="https") {
-                        redir(base_url().ltrim($_SERVER['REQUEST_URI'], "/"));
-                    //die();
-                    } elseif ($_SERVER['HTTP_HOST']!=$b) {
-                        redir(base_url().ltrim($_SERVER['REQUEST_URI'], "/"));
-                        //die();
-                    }
-                }
-            }
-        }
+        return $this;
     }
 
+    /**
+     * Remove additional CSS
+     * @param  string $key  key of css array
+     * @return object          this object
+     */
     protected function removeAdditional($key)
     {
-        unset($this->additional[$key]);
+        if(isset($this->additional[$key])) unset($this->additional[$key]);
+        return $this;
     }
 
     /**
      * Return author name for html head meta language
-     * @return string lang
+     * @return string     language defined from setLang() method
      */
     protected function getLang()
     {
@@ -843,7 +838,7 @@ abstract class SENE_Controller
 
     /**
      * Delete session key
-     * @return [type] [description]
+     * @return object this object
      */
     protected function delKey()
     {

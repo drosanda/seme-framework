@@ -47,7 +47,7 @@ $db['user']  = 'root';
 $db['pass']  = '';
 $db['name']  = 'seme_framework';
 $db['port'] = '3306';
-$db['charset'] = 'utf8';
+$db['charset'] = 'latin1';
 $db['engine'] = 'mysqli';
 
 /****************************/
