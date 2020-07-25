@@ -8,13 +8,18 @@ abstract class SENE_Model
     protected $directories;
     protected $config;
     public $field = array();
-    
+
     public function __construct()
     {
         $this->directories = $GLOBALS['SEMEDIR'];
         $this->config = $GLOBALS['SEMECFG'];
         $this->loadEngine($this->config->database);
     }
+    /**
+     * Load engine
+     * @param  object $db   Database configuration
+     * @return object       this object
+     */
     private function loadEngine($db)
     {
         if (!is_object($db)) {
@@ -25,58 +30,26 @@ abstract class SENE_Model
         }
         require_once($this->directories->kero_sine."SENE_MySQLi_Engine.php");
         $this->db = new SENE_MySQLi_Engine($db);
+        return $this;
     }
+
     /**
-     * Execute query
-     * @param  string $sql Raw query
-     * @return int         return 1s, otherwise 0
+     * Encrypt the string
+     * @param  string $val plain string
+     * @return string      encrypt command
      */
-    public function exec($sql)
+    public function __encrypt($val)
     {
-        // $this->field = $this->engine->getField();
-        return $this->db->exec($sql);
+        return 'AES_ENCRYPT('.$this->db->esc($val).',"'.$this->db->enckey.'")';
     }
-    
-    public function multiExec($sql)
+
+    /**
+     * Decrypt the string
+     * @param  string $val decrypted string
+     * @return string      decrypt command
+     */
+    public function __decrypt($key)
     {
-        // $this->field = $this->engine->getField();
-        $res = $this->db->multiExec($sql);
-    }
-    
-    public function select($sql, $cache_engine=0, $flushcache=0, $tipe="object")
-    {
-        //die($tipe);
-        return $this->db->select($sql, $cache_engine, $flushcache, $tipe);
-    }
-    public function lastId()
-    {
-        return $this->db->lastId();
-    }
-    public function esc($str)
-    {
-        return $this->db->esc($str);
-    }
-    public function prettyName($name)
-    {
-        $name=strtolower(trim($name));
-        $names=explode("_", $name);
-        $name='';
-        foreach ($names as $n) {
-            $name=$name.''.ucfirst($n).' ';
-        }
-        return $name;
-    }
-    
-    public function filter(&$str)
-    {
-        $str=filter_var($str, FILTER_SANITIZE_SPECIAL_CHARS);
-    }
-    public function getLastQuery()
-    {
-        return $this->db->getLastQuery();
-    }
-    public function setDebug($is_debug)
-    {
-        return $this->db->setDebug($is_debug);
+        return 'AES_DECRYPT('.$key.',"'.$this->db->enckey.'")';
     }
 }

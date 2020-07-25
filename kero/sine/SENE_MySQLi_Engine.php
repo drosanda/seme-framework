@@ -1603,6 +1603,11 @@ class SENE_MySQLi_Engine
     {
         return $this->query_last;
     }
+
+    /**
+     * Set debug flag for query command
+     * @param boolean $is_debug     (1|0)
+     */
     public function setDebug($is_debug)
     {
         if (!empty($is_debug)) {
@@ -1611,5 +1616,25 @@ class SENE_MySQLi_Engine
             $this->is_debug = 0;
         }
         return $this;
+    }
+
+    /**
+     * Encrypt the string
+     * @param  string $s plain string
+     * @return string      encrypt command
+     */
+    public function __encrypt($s)
+    {
+        return 'AES_ENCRYPT('.$this->db->esc($s).',"'.$this->db->enckey.'")';
+    }
+
+    /**
+     * Decrypt the string
+     * @param  string $s decrypted string
+     * @return string      decrypt command
+     */
+    public function __decrypt($s)
+    {
+        return 'AES_DECRYPT('.$s.',"'.$this->db->enckey.'")';
     }
 }

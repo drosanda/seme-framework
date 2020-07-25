@@ -22,6 +22,9 @@ abstract class SENE_Controller
     public $shortcut_icon = 'favicon.png';
     public $content_type = 'text/html; charset=utf-8';
 
+    public $css_json = 'theme.json';
+    public $js_json = 'script.json';
+
     /**
      * For additional CSS
      * @var string
@@ -71,28 +74,31 @@ abstract class SENE_Controller
     /**
      * Loads CSS and another header files from theme.json
      * relatives to theme location
+     * @return object this object
      */
     private function getThemeConfig()
     {
-        if (file_exists($this->directories->app_view.'/'.$this->getTheme().'/theme.json')) {
-            return json_decode($this->fgc($this->directories->app_view.$this->getTheme().'/theme.json'));
+        if (file_exists($this->directories->app_view.'/'.$this->getTheme().'/'.$this->css_json)) {
+            return json_decode($this->fgc($this->directories->app_view.$this->getTheme().'/'.$this->css_json));
         } else {
             return array();
         }
+        return $this;
     }
 
     /**
      * Loads javascript from script.json
      * relative to theme location
-     * @return [type] [description]
+     * @return object this object
      */
     private function getJsFooterBasic()
     {
-        if (file_exists($this->directories->app_view.'/'.$this->getTheme().'/script.json')) {
-            return json_decode($this->fgc($this->directories->app_view.$this->getTheme().'/script.json'));
+        if (file_exists($this->directories->app_view.'/'.$this->getTheme().'/'.$this->js_json)) {
+            return json_decode($this->fgc($this->directories->app_view.$this->getTheme().'/'..$this->js_json));
         } else {
             return array();
         }
+        return $this;
     }
 
     /**
@@ -487,6 +493,11 @@ abstract class SENE_Controller
     {
         $this->keyword = $keyword;
     }
+
+    /**
+     * Set robots properties for html meta head
+     * @param string $robots [description]
+     */
     protected function setRobots($robots="INDEX,FOLLOW")
     {
         if ($robots != "INDEX,FOLLOW") {
@@ -494,25 +505,48 @@ abstract class SENE_Controller
         }
         $this->robots = $robots;
     }
+
+    /**
+     * Set html favicon
+     * @param string $icon [description]
+     */
     protected function setIcon($icon="favicon.png")
     {
         $this->icon = $icon;
     }
-    protected function setAuthor($author="SEME Framework")
-    {
-        $this->author = $author;
-    }
+
+    /**
+     * Set shortcut icon properties for html meta head
+     * @param string $icon [description]
+     */
     protected function setShortcutIcon($shortcut_icon="favicon.png")
     {
         $this->shortcut_icon = $shortcut_icon;
     }
+
+    /**
+     * Set authorname properties for html meta head
+     * @param string $icon [description]
+     */
+    protected function setAuthor($author="SEME Framework")
+    {
+        $this->author = $author;
+    }
+
+    /**
+     * Set additional CSS files
+     */
     protected function setAdditional($val)
     {
-        end($this->additional); // move the internal pointer to the end of the array
+        end($this->additional);
         $key = (int)key($this->additional);
         $key = $key+1;
         $this->additional[$key] = $val;
     }
+
+    /**
+     * Set additional CSS files before current default configuration from theme.json
+     */
     protected function setAdditionalBefore($val)
     {
         if (!is_array($this->additionalBefore)) {
@@ -527,6 +561,10 @@ abstract class SENE_Controller
             $this->additionalBefore[] = $val;
         }
     }
+
+    /**
+     * Set additional CSS files after current default configuration from theme.json
+     */
     protected function setAdditionalAfter($val)
     {
         if (!is_array($this->additionalAfter)) {
@@ -541,8 +579,9 @@ abstract class SENE_Controller
             $this->additionalAfter[] = $val;
         }
     }
+
     /**
-     * LOad css stylesheet file
+     * Load css stylesheet file
      * @param  string $css_url load CSS url
      * @param  string $utype   (before | after) main css defined on theme.json
      * @return object          this object
@@ -596,7 +635,7 @@ abstract class SENE_Controller
     }
 
     /**
-     * Return author name for html head meta description
+     * Return string for html head meta description
      * @return string description
      */
     protected function getDescription()
@@ -604,22 +643,45 @@ abstract class SENE_Controller
         return $this->description;
     }
 
+    /**
+     * Return string for html head meta keyword
+     * @return string keyword
+     */
     protected function getKeyword()
     {
         return $this->keyword;
     }
+
+    /**
+     * Return string for robots.txt location
+     * @return string keyword
+     */
     protected function getRobots()
     {
         return $this->robots;
     }
+
+    /**
+     * Return string for favicon / icon location
+     * @return string keyword
+     */
     protected function getIcon($icon="favicon.png")
     {
         return $this->icon;
     }
+
+    /**
+     * Return string for shortcut favicon / icon location
+     * @return string keyword
+     */
     protected function getShortcutIcon($shortcut_icon="favicon.png")
     {
         return $this->shortcut_icon;
     }
+
+    /**
+     * Get list of array CSS before default configration from theme.json
+     */
     protected function getAdditionalBefore()
     {
         foreach ($this->additionalBefore as $key=>$a) {
@@ -639,6 +701,10 @@ abstract class SENE_Controller
             }
         }
     }
+
+    /**
+     * Get list of array CSS after default configration from theme.json
+     */
     protected function getAdditional()
     {
         if (count($this->additional)):
@@ -660,6 +726,10 @@ abstract class SENE_Controller
             }
         endif;
     }
+
+    /**
+     * Get list of array CSS after default configration from theme.json
+     */
     protected function getAdditionalAfter()
     {
         foreach ($this->additionalAfter as $key=>$a) {
@@ -876,7 +946,7 @@ abstract class SENE_Controller
     }
 
     /**
-     * Show variable dump
+     * Print variable dump
      * @param  mixed $a     [description]
      */
     protected function dd($a)
