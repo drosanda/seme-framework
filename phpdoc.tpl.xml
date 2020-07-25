@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+  <parser>
+    <target>docs</target>
+  </parser>
+  <transformer>
+    <target>docs</target>
+  </transformer>
+  <files>
+    <directory>kero/sine/.</directory>
+    <directory>kero/lib/.</directory>
+    <file>index.php</file>
+    <file>kero/sine/SENE_Engine.php</file>
+    <file>kero/sine/SENE_Model.php</file>
+    <file>kero/sine/SENE_MySQLi_Engine.php</file>
+    <file>kero/sine/SENE_Input.php</file>
+    <file>kero/sine/SENE_Model.php</file>
+    <file>kero/sine/SENE_Controller.php</file>
+    <file>kero/lib/conumtext.php</file>
+    <file>kero/lib/seme_log.php</file>
+    <file>kero/lib/seme_fpdf.php</file>
+    <ignore>.phpdoc</ignore>
+    <ignore>docs/*</ignore>
+    <ignore>vendor/*</ignore>
+    <ignore>kero/lib/*</ignore>
+  </files>
+</phpdoc>

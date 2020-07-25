@@ -1,7 +1,6 @@
 <?php
 /**
  * Abstract class for controller wrapper
- * @var [type]
  */
 abstract class SENE_Controller
 {
@@ -244,8 +243,8 @@ abstract class SENE_Controller
 
     /**
      * Inject view for left content
-     * @param  string $a          [description]
-     * @param  array  $b          [description]
+     * @param  string $a          view file location wihtout .php suffix related to theme location
+     * @param  array  $b          data to passed
      * @return object             this class
      */
     protected function putThemeRightContent($a="", $b=array())
@@ -274,8 +273,8 @@ abstract class SENE_Controller
 
     /**
      * Inject view for left content
-     * @param  string $a          [description]
-     * @param  array  $b          [description]
+     * @param  string $a          view file location wihtout .php suffix related to theme location
+     * @param  array  $b          data to passed
      * @return object             this class
      */
     protected function putThemeLeftContent($a="", $b=array())
@@ -304,8 +303,8 @@ abstract class SENE_Controller
 
     /**
      * Inject javascript from php files
-     * @param  string $a          [description]
-     * @param  array  $b          [description]
+     * @param  string $a          view file location wihtout .php suffix related to theme location
+     * @param  array  $b          data to passed
      * @return object             this class
      */
     protected function putJsReady($a="", $b=array())
@@ -333,7 +332,6 @@ abstract class SENE_Controller
 
     /**
      * Get injected main view into a layout
-     * @return [type] [description]
      */
     protected function getThemeContent()
     {
@@ -342,7 +340,6 @@ abstract class SENE_Controller
 
     /**
      * Get injected right view into a layout
-     * @return [type] [description]
      */
     protected function getThemeRightContent()
     {
@@ -351,7 +348,6 @@ abstract class SENE_Controller
 
     /**
      * Get injected left view into a layout
-     * @return [type] [description]
      */
     protected function getThemeLeftContent()
     {
@@ -368,10 +364,10 @@ abstract class SENE_Controller
     /**
      * Inject javascript content from php files
      * @param  string $tc        template location
-     * @param  array  $__forward data
+     * @param  array  $b         data
      * @return object            this class
      */
-    protected function putJsContent(string $tc="", $__forward=array())
+    protected function putJsContent(string $tc="", $b=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$tc;
         if (file_exists($v.".php")) {
@@ -496,7 +492,7 @@ abstract class SENE_Controller
 
     /**
      * Set robots properties for html meta head
-     * @param string $robots [description]
+     * @param string $robots robots configuration (INDEX,FOLLOW|INDEX,NOFOLLOW)
      */
     protected function setRobots($robots="INDEX,FOLLOW")
     {
@@ -504,29 +500,32 @@ abstract class SENE_Controller
             $robots='NOINDEX,NOFOLLOW';
         }
         $this->robots = $robots;
+        return $this;
     }
 
     /**
      * Set html favicon
-     * @param string $icon [description]
+     * @param string $icon icon file location
      */
     protected function setIcon($icon="favicon.png")
     {
         $this->icon = $icon;
+        return $this;
     }
 
     /**
      * Set shortcut icon properties for html meta head
-     * @param string $icon [description]
+     * @param string $icon icon file location
      */
     protected function setShortcutIcon($shortcut_icon="favicon.png")
     {
         $this->shortcut_icon = $shortcut_icon;
+        return $this;
     }
 
     /**
      * Set authorname properties for html meta head
-     * @param string $icon [description]
+     * @param string $icon icon file location
      */
     protected function setAuthor($author="SEME Framework")
     {
@@ -775,7 +774,7 @@ abstract class SENE_Controller
 
     /**
      * get value for meta content type
-     * @return [type] [description]
+     * @return string content type
      */
     protected function getContentType()
     {

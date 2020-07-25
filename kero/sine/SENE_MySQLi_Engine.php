@@ -1,4 +1,7 @@
 <?php
+/**
+ * Class model for  MySQLi connection
+ */
 class SENE_MySQLi_Engine
 {
     protected static $__instance;

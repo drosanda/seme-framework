@@ -1,12 +1,2 @@
-php /Applications/XAMPP/htdocs/phpDocumentor.phar \
-  -f /Applications/XAMPP/htdocs/seme-framework-4.0.0/index.php \
-  -f /Applications/XAMPP/htdocs/seme-framework-4.0.0/kero/sine/SENE_Controller.php \
-  -f /Applications/XAMPP/htdocs/seme-framework-4.0.0/kero/sine/SENE_Input.php \
-  -f /Applications/XAMPP/htdocs/seme-framework-4.0.0/kero/sine/SENE_MySQLi_Engine.php \
-  -f /Applications/XAMPP/htdocs/seme-framework-4.0.0/kero/sine/SENE_Engine.php \
-  -f /Applications/XAMPP/htdocs/seme-framework-4.0.0/kero/sine/SENE_Model.php \
-  -f /Applications/XAMPP/htdocs/seme-framework-4.0.0/kero/lib/conumtext.php \
-  -f /Applications/XAMPP/htdocs/seme-framework-4.0.0/kero/lib/seme_email.php \
-  -f /Applications/XAMPP/htdocs/seme-framework-4.0.0/kero/lib/seme_log.php \
-  -f /Applications/XAMPP/htdocs/seme-framework-4.0.0/kero/lib/seme_fpdf.php \
-  -t /Applications/XAMPP/docs/seme-framework/4.0.0
+php /Applications/XAMPP/htdocs/phpDocumentor.phar -v \
+  -c /Applications/XAMPP/htdocs/seme-framework-v4.0.0/phpdoc.tpl.xml

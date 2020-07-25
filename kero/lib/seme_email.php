@@ -53,10 +53,10 @@ class Seme_Email
     public $body = "";
     public $eol = PHP_EOL;
     public $template;
-    
+
     /**
      * Clear data
-     * @return [type] [description]
+     * @return object this object
      */
     public function flush()
     {
@@ -157,7 +157,7 @@ class Seme_Email
     /**
      * Mengatur lokasi email template
      * @param  string $template relative path terhadap directory template email
-     * @return [type]           [description]
+     * @return object           this object
      */
     public function template($template)
     {
@@ -331,7 +331,7 @@ class Seme_Email
                 $this->header .= $message;
             }
         }
-        
+
         foreach ($this->to as $mail) {
             if ($atc) {
                 $res = mail($mail, $this->subject, $this->body, $this->header);
@@ -345,7 +345,7 @@ class Seme_Email
             }
             $this->log .= "\n";
         }
-        
+
         return $this;
     }
     public function getLog()
