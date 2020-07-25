@@ -94,7 +94,7 @@ abstract class SENE_Controller
     private function getJsFooterBasic()
     {
         if (file_exists($this->directories->app_view.'/'.$this->getTheme().'/'.$this->js_json)) {
-            return json_decode($this->fgc($this->directories->app_view.$this->getTheme().'/'..$this->js_json));
+            return json_decode($this->fgc($this->directories->app_view.$this->getTheme().'/'.$this->js_json));
         } else {
             return array();
         }

@@ -8,6 +8,13 @@ Seme Framework PHP MVC Framework for creating small and medium app that needed f
 
 Latest version of Seme Framework
 
+### Change Log
+
+here is the changelog :
+
+- remove assets directory from framework dependency
+- remove many configuration files only into single file configuration separated by environment type.
+
 ## Key Feature
 
 This framework suitable for Programmer that only know about Manual way of code. Not like this time, everything build up automatically through console. Seme Framework has taken different way of code, If you want build small app, why we need lots of library. Here is the key feature of Seme Framework:

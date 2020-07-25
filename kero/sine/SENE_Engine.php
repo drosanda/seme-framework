@@ -15,7 +15,6 @@ class SENE_Engine
     public $core_model = '';
     public $routes;
 
-
     public function __construct()
     {
         $this->directories = $GLOBALS['SEMEDIR'];
@@ -91,6 +90,7 @@ class SENE_Engine
         }
         $this->newRouteFolder();
     }
+
     private function defaultController()
     {
         $cname = $this->default."";
@@ -98,6 +98,7 @@ class SENE_Engine
         $cname = new $cname();
         $cname->index();
     }
+
     private function notFound($newpath="")
     {
         $cname = $this->notfound."";
@@ -109,6 +110,7 @@ class SENE_Engine
         $cname = new $cname();
         $cname->index();
     }
+
     private function globalHandlerCMSPage($path=array())
     {
         if (count($path)>1) {
@@ -135,6 +137,7 @@ class SENE_Engine
             }
         }
     }
+
     private function ovrRoutes($paths=array())
     {
         $path = strtolower(implode('/', $paths));
@@ -154,6 +157,7 @@ class SENE_Engine
         }
         return $paths;
     }
+    
     private function newRouteFolder()
     {
         $found=0;
