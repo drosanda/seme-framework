@@ -243,17 +243,17 @@ abstract class SENE_Controller
 
     /**
      * Inject view for left content
-     * @param  string $a          view file location wihtout .php suffix related to theme location
-     * @param  array  $b          data to passed
-     * @return object             this class
+     * @param  string $a                  view file location wihtout .php suffix related to theme location
+     * @param  array  $__forward          data to passed
+     * @return object                     this class
      */
-    protected function putThemeRightContent($a="", $b=array())
+    protected function putThemeRightContent($a="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$a;
         //die($v);
         if (file_exists($v.".php")) {
             $keytemp=md5(date("h:i:s"));
-            $_SESSION[$keytemp] = $b;
+            $_SESSION[$keytemp] = $__forward;
             //print_r($_SESSION);
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
@@ -273,17 +273,17 @@ abstract class SENE_Controller
 
     /**
      * Inject view for left content
-     * @param  string $a          view file location wihtout .php suffix related to theme location
-     * @param  array  $b          data to passed
-     * @return object             this class
+     * @param  string $a                  view file location wihtout .php suffix related to theme location
+     * @param  array  $__forward          data to passed
+     * @return object                     this class
      */
-    protected function putThemeLeftContent($a="", $b=array())
+    protected function putThemeLeftContent($a="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$a;
         //die($v);
         if (file_exists($v.".php")) {
             $keytemp=md5(date("h:i:s"));
-            $_SESSION[$keytemp] = $b;
+            $_SESSION[$keytemp] = $__forward;
             //print_r($_SESSION);
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
@@ -303,16 +303,16 @@ abstract class SENE_Controller
 
     /**
      * Inject javascript from php files
-     * @param  string $a          view file location wihtout .php suffix related to theme location
-     * @param  array  $b          data to passed
-     * @return object             this class
+     * @param  string $a                  view file location wihtout .php suffix related to theme location
+     * @param  array  $__forward          data to passed
+     * @return object                     this class
      */
     protected function putJsReady($a="", $b=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$a;
         if (file_exists($v.".php")) {
             $keytemp=md5(date("h:i:s"));
-            $_SESSION[$keytemp] = $b;
+            $_SESSION[$keytemp] = $__forward;
             //print_r($_SESSION);
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
@@ -363,13 +363,13 @@ abstract class SENE_Controller
     }
     /**
      * Inject javascript content from php files
-     * @param  string $tc        template location
-     * @param  array  $b         data
-     * @return object            this class
+     * @param  string $a                  template location
+     * @param  array  $__forward          data to passed
+     * @return object                     this class
      */
-    protected function putJsContent(string $tc="", $b=array())
+    protected function putJsContent(string $a="", $__forward=array())
     {
-        $v = $this->directories->app_view.$this->theme.'/'.$tc;
+        $v = $this->directories->app_view.$this->theme.'/'.$a;
         if (file_exists($v.".php")) {
             $keytemp=md5(date("h:i:s"));
             $_SESSION[$keytemp] = $__forward;
@@ -391,9 +391,15 @@ abstract class SENE_Controller
         return $this;
     }
 
-    protected function putBodyBefore($tc="", $__forward=array())
+    /**
+     * Inject html view before body
+     * @param  string $a                  template location
+     * @param  array  $__forward          data to passed
+     * @return object                     this class
+     */
+    protected function putBodyBefore($a="", $__forward=array())
     {
-        $v = $this->directories->app_view.$this->theme.'/'.$tc;
+        $v = $this->directories->app_view.$this->theme.'/'.$a;
         //die($v);
         if (file_exists($v.".php")) {
             $keytemp=md5(date("h:i:s"));
@@ -790,7 +796,14 @@ abstract class SENE_Controller
         return $this->theme;
     }
 
-    protected function getThemeView($el="", $comp='page', $__forward=array(), $cacheable=0)
+    /**
+     * Load html view by theme
+     * @param  string $el                 View theme element
+     * @param  array  $comp               Theme components
+     * @param  array  $__forward          data to passed
+     * @return object                     this class
+     */
+    protected function getThemeView($el="", $comp='page', $__forward=array())
     {
         if (!empty($el)) {
             $this->view($this->theme.'/'.$comp.'/'.$el, $__forward);
@@ -814,19 +827,19 @@ abstract class SENE_Controller
     /**
      * Loading html view relative to selected theme
      * - extract forwarded variable(s) from array to single variable
-     * @param  string $v         [description]
-     * @param  array  $__forward forwarded variable
+     * @param  string $v              [description]
+     * @param  array  $__forward      forwarded data
      */
-    private function view($v, $__forward=array())
+    private function view($a, $__forward=array())
     {
-        if (file_exists($this->directories->app_view.$v.".php")) {
+        if (file_exists($this->directories->app_view.$a.".php")) {
             $keytemp=md5(date("h:i:s"));
             $_SESSION[$keytemp] = $__forward;
             //print_r($_SESSION);
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
             ob_start();
-            require_once($this->directories->app_view.$v.".php");
+            require_once($this->directories->app_view.$a.".php");
             $this->__content = ob_get_contents();
             ob_end_clean();
         } else {
