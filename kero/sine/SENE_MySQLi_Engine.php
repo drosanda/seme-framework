@@ -158,7 +158,7 @@ class SENE_MySQLi_Engine
             $names = explode("from", strtolower($sql));
             if (isset($names[1])) {
                 $name = trim($names[1]);
-                $name = str_replace("`", "", $name);
+                $name = strtr($name,"`", "");
                 $names = explode(" ", $name);
 
                 if (isset($names[0])) {

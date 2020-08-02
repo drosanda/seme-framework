@@ -135,10 +135,10 @@ if (!is_dir($core_dir)) {
 }
 
 if (!defined('SEMEROOT')) {
-  define('SEMEROOT', str_replace("\\", "/", realpath("").'/'));
+  define('SEMEROOT', strtr(realpath("").'/',"\\", "/"));
 }
 if (!defined('SENEAPP')) {
-  define('SENEAPP', str_replace("\\", "/", $apps_dir));
+  define('SENEAPP', strtr($apps_dir, "\\", "/"));
 }
 if (!defined('SENEASSETS')) {
   define('SENEASSETS', $assets_dir);
