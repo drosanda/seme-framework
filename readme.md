@@ -4,6 +4,10 @@
 
 Seme Framework PHP MVC Framework for creating small and medium app that needed for fast delivery. At first version of Seme Framework used for building API (Middle Ware) for another Application such as android, iOS, etc. And now as increasing of requirement, Seme Framework has expand the limit for creating Small and Medium App.
 
+## Documentation
+
+Read the official [documentation of Seme Framework](https://seme.nyingspot.com/). Now only available in English.
+
 ## Version
 
 Latest version of Seme Framework
