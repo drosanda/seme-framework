@@ -40,7 +40,7 @@ $regdir = function ($directory, $name, $constant="") {
     if (!is_dir($directory)) {
         die("Missing ".$directory."");
     }
-    $GLOBALS['SEMEDIR']->$name = $directory;
+    $GLOBALS['SEMEDIR']->{$name} = $directory;
     if (strlen($constant)>0) {
         if (!defined(strtoupper($constant))) {
             define(strtoupper($constant), $directory);

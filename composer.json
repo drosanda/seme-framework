@@ -2,7 +2,7 @@
   "name": "seme/framework",
   "description": "Seme Framework",
   "type": "project",
-  "license": "gpl",
+  "license": "mit",
   "authors": [
     {
       "name": "Daeng Rosanda",

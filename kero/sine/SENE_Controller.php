@@ -46,7 +46,8 @@ abstract class SENE_Controller
     self::$__instance = $this;
 
     //get from global variable $db
-    $db = $GLOBALS['db'];
+    $db = array();
+    if(isset($GLOBALS['db'])) $db = $GLOBALS['db'];
 
     //set key encryption
     if (isset($db['enckey'])) {
