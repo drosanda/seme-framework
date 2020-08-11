@@ -4,18 +4,18 @@
  * Version 4.0.0
  */
 define('SEME_VERSION', '4.0.0');
-define("SEME_START", microtime(true));
-define("DS", DIRECTORY_SEPARATOR);
-define("EXT", ".php");
+define('SEME_START', microtime(true));
+define('DS', DIRECTORY_SEPARATOR);
+define('EXT', '.php');
 /*
 * Load var
 */
 session_start();
-ini_set("error_reporting", E_ALL);
+ini_set('error_reporting', E_ALL);
 
 //declare SEMEROOT
 if (!defined('SEMEROOT')) {
-    define('SEMEROOT', str_replace("\\", "/", realpath("").'/'));
+    define('SEMEROOT', strtr(realpath('').'/','\\', '/'));
 }
 // change directory from stdin
 if (defined('STDIN')) {
@@ -24,23 +24,22 @@ if (defined('STDIN')) {
 $SEMEDIR = new stdClass();
 
 /**
- * Register a directory into config or constant
- * @param  string $directory      directory name
- * @param  string $name           alias
- * @param  string $constant       constant name
+ * Register a direcotyr
+ * @param  string $directory directory name
+ * @param  string $name      alias
  */
-$regdir = function ($directory, $name, $constant="") {
+$regdir = function ($directory, $name, $constant='') {
     if (realpath($directory) !== false) {
         $directory = realpath($directory).'/';
     }
     if (!is_dir($directory)) {
-        die("Missing ".$directory."");
+        trigger_error('Missing '.$directory.'');
     }
     $directory = rtrim($directory, '/').'/';
     if (!is_dir($directory)) {
-        die("Missing ".$directory."");
+        trigger_error('Missing '.$directory.'');
     }
-    $GLOBALS['SEMEDIR']->{$name} = $directory;
+    $GLOBALS['SEMEDIR']->$name = $directory;
     if (strlen($constant)>0) {
         if (!defined(strtoupper($constant))) {
             define(strtoupper($constant), $directory);
@@ -57,7 +56,7 @@ $regdir('app/core', 'app_core');
 $regdir('app/model', 'app_model');
 $regdir('app/view', 'app_view');
 $regdir('kero', 'kero');
-$regdir('kero/lib', 'kero_lib','semelib');
+$regdir('kero/lib', 'kero_lib');
 $regdir('kero/sine', 'kero_sine');
 $regdir('kero/bin', 'kero_bin');
 
@@ -84,7 +83,7 @@ if (!isset($_SERVER['HTTP_HOST'])) {
 // find configuration files and loaded it
 $config_values = array();
 $config_file_found = 0;
-$config_file_array = array("development.php","staging.php","production.php");
+$config_file_array = array('development.php','staging.php','production.php');
 $semevar = array();
 $routes = array();
 foreach ($config_file_array as $cfa) {
@@ -96,7 +95,7 @@ foreach ($config_file_array as $cfa) {
     }
 }
 if (empty($config_file_found)) {
-    die("No settings file found in : ".$SEMEDIR->app_config);
+    die('No settings file found in : '.$SEMEDIR->app_config);
 }
 // apply configuration
 $config_values['baseurl'] = $site;
@@ -135,8 +134,8 @@ $GLOBALS['SEMECFG'] = $cv;
 unset($cv,$semevar,$core_model,$admin_secret_url);
 
 //include core file
-require_once $SEMEDIR->kero."Functions.php";
-require_once $SEMEDIR->kero_sine."SENE_Engine.php";
+require_once $SEMEDIR->kero.'Functions.php';
+require_once $SEMEDIR->kero_sine.'SENE_Engine.php';
 
 //instantiate object
 $se = new SENE_Engine();
