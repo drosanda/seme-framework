@@ -712,7 +712,7 @@ abstract class SENE_Controller
      */
     protected function getAdditional()
     {
-        if (count($this->additional)){
+        if (is_array($this->additional) && count($this->additional)){
             foreach ($this->additional as $key=>$a) {
                 if (is_string($a)) {
                   if(strpos($a,'{{base_url}}') !== false){
@@ -764,7 +764,7 @@ abstract class SENE_Controller
      */
     protected function getJsFooter()
     {
-      if(count($this->js_footer)){
+      if(is_array($this->js_footer) && count($this->js_footer)){
         foreach ($this->js_footer as $key=>$a) {
             if (is_string($a)) {
               if(strpos($a,'{{base_url}}') !== false){
