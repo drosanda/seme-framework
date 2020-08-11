@@ -2,7 +2,6 @@
 abstract class SENE_Controller
 {
   protected static $__instance;
-  public $admin_url = ADMIN_URL;
   public $input;
   public $db;
   public $lang = 'en';
