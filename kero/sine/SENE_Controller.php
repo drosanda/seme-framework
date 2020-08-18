@@ -455,7 +455,7 @@ abstract class SENE_Controller
         if ($ext) {
             $this->js_footer[] = '<script src="'.$src.'"></script>';
         } else {
-            $stype = rtrim($stype, '.js');
+            $stype = rtrim($src, '.js');
             $this->js_footer[] = '<script src="'.$src.'.js"></script>';
         }
         return $this;
