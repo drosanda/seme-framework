@@ -213,13 +213,13 @@ abstract class SENE_Controller
     protected function putThemeContent($u="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$u;
-        if (file_exists($v.".php")) {
+        if (file_exists($v.'.php')) {
             $keytemp=md5(strtotime('now'));
             $_SESSION[$keytemp] = $__forward;
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
             ob_start();
-            require_once($v.".php");
+            require_once($v.'.php');
             $this->__themeContent .= ob_get_contents();
             ob_end_clean();
             return 0;
@@ -227,7 +227,7 @@ abstract class SENE_Controller
             $v = strtr($v, '\\', '/');
             $v = strtr($v, '//', '/');
             $v = strtr(SEMEROOT, '', $v);
-            trigger_error("unable to putThemeContent ".$v.".php");
+            trigger_error("unable to putThemeContent ".$v.'.php');
             die();
         }
         return $this;
@@ -243,22 +243,21 @@ abstract class SENE_Controller
 
     /**
      * Inject view for left content
-     * @param  string $a                  view file location wihtout .php suffix related to theme location
+     * @param  string $u                  view file location wihtout .php suffix related to theme location
      * @param  array  $__forward          data to passed
      * @return object                     this class
      */
-    protected function putThemeRightContent($a="", $__forward=array())
+    protected function putThemeRightContent($u="", $__forward=array())
     {
-        $v = $this->directories->app_view.$this->theme.'/'.$a;
-        //die($v);
-        if (file_exists($v.".php")) {
+        $v = $this->directories->app_view.$this->theme.'/'.$u;
+        if (file_exists($v.'.php')) {
             $keytemp=md5(strtotime('now'));
             $_SESSION[$keytemp] = $__forward;
             //print_r($_SESSION);
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
             ob_start();
-            require_once($v.".php");
+            require_once($v.'.php');
             $this->__themeRightContent = ob_get_contents();
             ob_end_clean();
             return 0;
@@ -266,29 +265,28 @@ abstract class SENE_Controller
             $v = strtr($v, '\\', '/');
             $v = strtr($v, '//', '/');
             $v = strtr(SEMEROOT, '', $v);
-            trigger_error("unable to putThemeRightContent ".$v.".php");
+            trigger_error("unable to putThemeRightContent ".$v.'.php');
             die();
         }
     }
 
     /**
      * Inject view for left content
-     * @param  string $a                  view file location wihtout .php suffix related to theme location
+     * @param  string $u                  view file location wihtout .php suffix related to theme location
      * @param  array  $__forward          data to passed
      * @return object                     this class
      */
-    protected function putThemeLeftContent($a="", $__forward=array())
+    protected function putThemeLeftContent($u="", $__forward=array())
     {
-        $v = $this->directories->app_view.$this->theme.'/'.$a;
-        //die($v);
-        if (file_exists($v.".php")) {
+        $v = $this->directories->app_view.$this->theme.'/'.$u;
+        if (file_exists($v.'.php')) {
             $keytemp=md5(strtotime('now'));
             $_SESSION[$keytemp] = $__forward;
             //print_r($_SESSION);
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
             ob_start();
-            require_once($v.".php");
+            require_once($v.'.php');
             $this->__themeLeftContent .= ob_get_contents();
             ob_end_clean();
             return 0;
@@ -296,28 +294,28 @@ abstract class SENE_Controller
             $v = strtr($v, '\\', '/');
             $v = strtr($v, '//', '/');
             $v = strtr(SEMEROOT, '', $v);
-            trigger_error("unable to putThemeLeftContent ".$v.".php");
+            trigger_error("unable to putThemeLeftContent ".$v.'.php');
             die();
         }
     }
 
     /**
      * Inject javascript from php files
-     * @param  string $a                  view file location wihtout .php suffix related to theme location
+     * @param  string $u                  view file location wihtout .php suffix related to theme location
      * @param  array  $__forward          data to passed
      * @return object                     this class
      */
     protected function putJsReady($a="", $b=array())
     {
-        $v = $this->directories->app_view.$this->theme.'/'.$a;
-        if (file_exists($v.".php")) {
+        $v = $this->directories->app_view.$this->theme.'/'.$u;
+        if (file_exists($v.'.php')) {
             $keytemp=md5(strtotime('now'));
             $_SESSION[$keytemp] = $__forward;
             //print_r($_SESSION);
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
             ob_start();
-            require_once($v.".php");
+            require_once($v.'.php');
             $this->js_ready = ob_get_contents();
             ob_end_clean();
             return 0;
@@ -325,7 +323,7 @@ abstract class SENE_Controller
             $v = strtr($v, '\\', '/');
             $v = strtr($v, '//', '/');
             $v = strtr(SEMEROOT, '', $v);
-            trigger_error("putJsReady unable to load  ".$v.".php");
+            trigger_error("putJsReady unable to load  ".$v.'.php');
             die();
         }
     }
@@ -370,14 +368,14 @@ abstract class SENE_Controller
     protected function putJsContent(string $a="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$a;
-        if (file_exists($v.".php")) {
+        if (file_exists($v.'.php')) {
             $keytemp=md5(strtotime('now'));
             $_SESSION[$keytemp] = $__forward;
             //print_r($_SESSION);
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
             ob_start();
-            require_once($v.".php");
+            require_once($v.'.php');
             $this->__jsContent .= ob_get_contents();
             ob_end_clean();
             return 0;
@@ -385,7 +383,7 @@ abstract class SENE_Controller
             $v = strtr($v, '\\', '/');
             $v = strtr($v, '//', '/');
             $v = strtr(SEMEROOT, '', $v);
-            trigger_error("putJsContent unable to load  ".$v.".php");
+            trigger_error("putJsContent unable to load  ".$v.'.php');
             die();
         }
         return $this;
@@ -393,22 +391,22 @@ abstract class SENE_Controller
 
     /**
      * Inject html view before body
-     * @param  string $a                  template location
+     * @param  string $u                  template location
      * @param  array  $__forward          data to passed
      * @return object                     this class
      */
-    protected function putBodyBefore($a="", $__forward=array())
+    protected function putBodyBefore($u="", $__forward=array())
     {
-        $v = $this->directories->app_view.$this->theme.'/'.$a;
+        $v = $this->directories->app_view.$this->theme.'/'.$u;
         //die($v);
-        if (file_exists($v.".php")) {
+        if (file_exists($v.'.php')) {
             $keytemp=md5(strtotime('now'));
             $_SESSION[$keytemp] = $__forward;
             //print_r($_SESSION);
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
             ob_start();
-            require_once($v.".php");
+            require_once($v.'.php');
             $this->__bodyBefore .= ob_get_contents();
             ob_end_clean();
             return 0;
@@ -416,7 +414,7 @@ abstract class SENE_Controller
             $v = strtr($v, '\\', '/');
             $v = strtr($v, '//', '/');
             $v = strtr(SEMEROOT, '', $v);
-            trigger_error("putBodyBefore unable to load ".$v.".php");
+            trigger_error("putBodyBefore unable to load ".$v.'.php');
             die();
         }
     }
@@ -842,19 +840,19 @@ abstract class SENE_Controller
      */
     private function view($a, $__forward=array())
     {
-        if (file_exists($this->directories->app_view.$a.".php")) {
+        if (file_exists($this->directories->app_view.$a.'.php')) {
             $keytemp=md5(strtotime('now'));
             $_SESSION[$keytemp] = $__forward;
             //print_r($_SESSION);
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
             ob_start();
-            require_once($this->directories->app_view.$a.".php");
+            require_once($this->directories->app_view.$a.'.php');
             $this->__content = ob_get_contents();
             ob_end_clean();
         } else {
-            trigger_error("unable to load view ".$this->directories->app_view.$v.".php ", E_USER_ERROR);
-            die("unable to load view ".$this->directories->app_view.$v.".php");
+            trigger_error("unable to load view ".$this->directories->app_view.$a.".php ", E_USER_ERROR);
+            die("unable to load view ".$this->directories->app_view.$a.'.php');
         }
         return $this;
     }
@@ -870,7 +868,7 @@ abstract class SENE_Controller
     protected function lib($a, $b="", $c="lib")
     {
         if ($c=='lib') {
-            $lpath = strtr($this->directories->kero_lib.$a.".php","\\", "/");
+            $lpath = strtr($this->directories->kero_lib.$a.'.php',"\\", "/");
             if (file_exists(strtolower($lpath))) {
                 require_once(strtolower($lpath));
                 $cname = basename($lpath, '.php');
@@ -893,10 +891,10 @@ abstract class SENE_Controller
                 die("unable to load library on ".$lpath);
             }
         } else {
-            if (file_exists(strtolower($this->directories->kero_lib.$a.".php"))) {
-                require_once(strtolower($this->directories->kero_lib.$a.".php"));
-            } elseif (file_exists($this->directories->kero_lib.$a.".php")) {
-                require_once($this->directories->kero_lib.$a.".php");
+            if (file_exists(strtolower($this->directories->kero_lib.$a.'.php'))) {
+                require_once(strtolower($this->directories->kero_lib.$a.'.php'));
+            } elseif (file_exists($this->directories->kero_lib.$a.'.php')) {
+                require_once($this->directories->kero_lib.$a.'.php');
             } else {
                 die("unable to load library on ".strtolower($this->directories->kero_lib.$a.".php x"));
             }
