@@ -48,9 +48,6 @@ abstract class SENE_Controller
     /** @var string used by putLeftThemeContent */
     public $__themeLeftContent = "";
 
-    /** @var string used by putLeftThemeContent */
-    public $__themeRightMenu = "";
-
     /** @var string  */
     public $__bodyBefore = "";
 
@@ -68,6 +65,25 @@ abstract class SENE_Controller
         $this->__themeLeftContent = '';
         $this->__jsContent = '';
         self::$__instance = $this;
+    }
+
+    /**
+     * Helper method for loading a file
+     * @param  string $path       the path of a file
+     * @return string             JSON formatted string
+     */
+    private function fgc(string $path)
+    {
+        $x = json_encode(array());
+        if (file_exists($path)) {
+            $f = fopen($path, "r");
+            if (filesize($path)>0) {
+                $x = fread($f, filesize($path));
+            }
+            fclose($f);
+            unset($f);
+        }
+        return $x;
     }
 
     /**
@@ -181,11 +197,11 @@ abstract class SENE_Controller
     /**
      * For loading layout from a theme
      * Default file location app/view/front/page/
-     * @param  string $u          name of layout without .php suffix
+     * @param  string $a          name of layout without .php suffix
      * @param  array  $__forward  data that will be passed to
      * @return object             return this class
      */
-    protected function loadLayout($a, $__forward=array())
+    protected function loadLayout(string $a, $__forward=array())
     {
         if (empty($a)) {
             trigger_error("Layout not found. Please check layout file at ".$this->directories->app_view.$this->getTheme()."page/ executed", E_USER_ERROR);
@@ -210,7 +226,7 @@ abstract class SENE_Controller
      * @param  array  $__forward  data that will be passed to
      * @return object             return this class
      */
-    protected function putThemeContent($u="", $__forward=array())
+    protected function putThemeContent(string $u="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$u;
         if (file_exists($v.'.php')) {
@@ -224,21 +240,13 @@ abstract class SENE_Controller
             ob_end_clean();
             return 0;
         } else {
-            $v = strtr($v, '\\', '/');
-            $v = strtr($v, '//', '/');
-            $v = strtr(SEMEROOT, '', $v);
-            trigger_error("unable to putThemeContent ".$v.'.php');
+            $u = strtr($u, '\\', '/');
+            $u = strtr($u, '//', '/');
+            $u = strtr(SEMEROOT, '', $u);
+            trigger_error('unable to putThemeContent '.$u.'.php');
             die();
         }
         return $this;
-    }
-    protected function getRightMenuTitle()
-    {
-        return $this->__themeRightMenu;
-    }
-    protected function setRightMenuTitle($title="")
-    {
-        $this->__themeRightMenu = $title;
     }
 
     /**
@@ -247,7 +255,7 @@ abstract class SENE_Controller
      * @param  array  $__forward          data to passed
      * @return object                     this class
      */
-    protected function putThemeRightContent($u="", $__forward=array())
+    protected function putThemeRightContent(string $u="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$u;
         if (file_exists($v.'.php')) {
@@ -260,12 +268,12 @@ abstract class SENE_Controller
             require_once($v.'.php');
             $this->__themeRightContent = ob_get_contents();
             ob_end_clean();
-            return 0;
+            return $this;
         } else {
-            $v = strtr($v, '\\', '/');
-            $v = strtr($v, '//', '/');
-            $v = strtr(SEMEROOT, '', $v);
-            trigger_error("unable to putThemeRightContent ".$v.'.php');
+            $u = strtr($u, '\\', '/');
+            $u = strtr($u, '//', '/');
+            $u = strtr(SEMEROOT, '', $u);
+            trigger_error('unable to putThemeRightContent '.$u.'.php');
             die();
         }
     }
@@ -276,7 +284,7 @@ abstract class SENE_Controller
      * @param  array  $__forward          data to passed
      * @return object                     this class
      */
-    protected function putThemeLeftContent($u="", $__forward=array())
+    protected function putThemeLeftContent(string $u="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$u;
         if (file_exists($v.'.php')) {
@@ -289,12 +297,12 @@ abstract class SENE_Controller
             require_once($v.'.php');
             $this->__themeLeftContent .= ob_get_contents();
             ob_end_clean();
-            return 0;
+            return $this;
         } else {
-            $v = strtr($v, '\\', '/');
-            $v = strtr($v, '//', '/');
-            $v = strtr(SEMEROOT, '', $v);
-            trigger_error("unable to putThemeLeftContent ".$v.'.php');
+            $u = strtr($u, '\\', '/');
+            $u = strtr($u, '//', '/');
+            $u = strtr(SEMEROOT, '', $u);
+            trigger_error('unable to putThemeLeftContent '.$u.'.php');
             die();
         }
     }
@@ -305,7 +313,7 @@ abstract class SENE_Controller
      * @param  array  $__forward          data to passed
      * @return object                     this class
      */
-    protected function putJsReady($a="", $b=array())
+    protected function putJsReady(string $u="", $b=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$u;
         if (file_exists($v.'.php')) {
@@ -318,12 +326,12 @@ abstract class SENE_Controller
             require_once($v.'.php');
             $this->js_ready = ob_get_contents();
             ob_end_clean();
-            return 0;
+            return $this;
         } else {
-            $v = strtr($v, '\\', '/');
-            $v = strtr($v, '//', '/');
-            $v = strtr(SEMEROOT, '', $v);
-            trigger_error("putJsReady unable to load  ".$v.'.php');
+            $u = strtr($u, '\\', '/');
+            $u = strtr($u, '//', '/');
+            $u = strtr(SEMEROOT, '', $u);
+            trigger_error("putJsReady unable to load  ".$u.'.php');
             die();
         }
     }
@@ -361,13 +369,13 @@ abstract class SENE_Controller
     }
     /**
      * Inject javascript content from php files
-     * @param  string $a                  template location
+     * @param  string $u                  template location
      * @param  array  $__forward          data to passed
      * @return object                     this class
      */
-    protected function putJsContent(string $a="", $__forward=array())
+    protected function putJsContent(string $u="", $__forward=array())
     {
-        $v = $this->directories->app_view.$this->theme.'/'.$a;
+        $v = $this->directories->app_view.$this->theme.'/'.$u;
         if (file_exists($v.'.php')) {
             $keytemp=md5(strtotime('now'));
             $_SESSION[$keytemp] = $__forward;
@@ -378,12 +386,12 @@ abstract class SENE_Controller
             require_once($v.'.php');
             $this->__jsContent .= ob_get_contents();
             ob_end_clean();
-            return 0;
+            return $this;
         } else {
-            $v = strtr($v, '\\', '/');
-            $v = strtr($v, '//', '/');
-            $v = strtr(SEMEROOT, '', $v);
-            trigger_error("putJsContent unable to load  ".$v.'.php');
+            $u = strtr($u, '\\', '/');
+            $u = strtr($u, '//', '/');
+            $u = strtr(SEMEROOT, '', $u);
+            trigger_error('unable to load template location for putJsContent '.$u.'.php');
             die();
         }
         return $this;
@@ -409,39 +417,29 @@ abstract class SENE_Controller
             require_once($v.'.php');
             $this->__bodyBefore .= ob_get_contents();
             ob_end_clean();
-            return 0;
+            return $this;
         } else {
-            $v = strtr($v, '\\', '/');
-            $v = strtr($v, '//', '/');
-            $v = strtr(SEMEROOT, '', $v);
-            trigger_error("putBodyBefore unable to load ".$v.'.php');
+            $u = strtr($u, '\\', '/');
+            $u = strtr($u, '//', '/');
+            $u = strtr(SEMEROOT, '', $u);
+            trigger_error('unable to load template location for putBodyBefore'.$u.'.php');
             die();
         }
     }
+    /**
+     * Get JavaScript content injected from putBodyBefore
+     */
     protected function getBodyBefore()
     {
         echo $this->__bodyBefore;
     }
+
     /**
      * Get JavaScript content injected from putJsContent
      */
     protected function getJsContent()
     {
         echo $this->__jsContent;
-    }
-
-    private function fgc($path)
-    {
-        $x = json_encode(array());
-        if (file_exists($path)) {
-            $f = fopen($path, "r");
-            if (filesize($path)>0) {
-                $x = fread($f, filesize($path));
-            }
-            fclose($f);
-            unset($f);
-        }
-        return $x;
     }
 
     /**
@@ -914,7 +912,7 @@ abstract class SENE_Controller
 
     /**
      * Session get saved value
-     * @return mixed      Saved value(s) from session
+     * @return mixed      Saved value(s) from session, return false if error
      */
     protected function getKey()
     {
@@ -923,7 +921,6 @@ abstract class SENE_Controller
         } else {
             return 0;
         }
-        return $this;
     }
 
     /**
@@ -1016,8 +1013,8 @@ abstract class SENE_Controller
 
     /**
      * Get CDN URL if exist or fallback to base_url if not exists
-     * @param  string $url URL wihtout base_url
-     * @return string      URL with CDN URL
+     * @param  string $url      URL wihtout base_url
+     * @return string           URL with CDN URL
      */
     protected function cdn_url($url="")
     {
