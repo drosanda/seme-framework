@@ -74,6 +74,7 @@ class SENE_JSON_Engine
   public function out($data, $allowed="*")
   {
     header("Access-Control-Allow-Origin: ".$allowed);
+    header("Access-Control-Allow-Header: ".$allowed);
     header("Content-Type: application/json");
     header("charset: utf-8");
     $otp = $this->safe_json_encode($data);
