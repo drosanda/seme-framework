@@ -130,7 +130,7 @@ function seme_error_handling($errno, $errstr, $error_file, $error_line)
                 print 'Function: '.$e['function'].PHP_EOL;
             }
         }
-        print '=========== Seme Framework v'.SENE_VERSION.' ============'.PHP_EOL;
+        print '=========== Seme Framework v'.SEME_VERSION.' ============'.PHP_EOL;
         die();
     } else {
         header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
