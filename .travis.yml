@@ -4,4 +4,7 @@ php:
   - '7.2'
   - '7.3'
   - '7.4'
+before_script:
+  - mkdir -p /home/travis/build/drosanda/seme-framework/app/cache/
+  - chmod 775 /home/travis/build/drosanda/seme-framework/app/cache/
 script: phpunit --configuration phpunit.xml --coverage-text
