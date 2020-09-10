@@ -28,6 +28,13 @@ This framework suitable for Programmer that only know about Manual way of code. 
 - Admin Friendly. Seme Framework has re-routing feature for admin page, without refactoring the MVC.
 - Theme Engine. Seme Framework has feature who can PUSH the content inside the layout view. Also support theming engine, if you want change the Style, you just clone the original one and modified safely.
 
+## Testing
+To run the testing, please change to your framework working directory and then executed the command.
+
+```CLI
+phpunit --configuration phpunit.xml --testsuite Dev
+```
+
 ## License
 
 Seme Framework licensed under MIT License 2.0
