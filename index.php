@@ -22,6 +22,9 @@ if (defined('STDIN')) {
     chdir(dirname(__FILE__));
 }
 $SEMEDIR = new stdClass();
+if(!isset($GLOBALS['SEMEDIR'])){
+  $GLOBALS['SEMEDIR'] = new stdCLass();
+}
 
 /**
  * Register a direcotyr
@@ -87,15 +90,15 @@ $config_file_array = array('development.php','staging.php','production.php');
 $semevar = array();
 $routes = array();
 foreach ($config_file_array as $cfa) {
-    if (file_exists($SEMEDIR->app_config.$cfa) && is_readable($SEMEDIR->app_config.$cfa)) {
+    if (file_exists($GLOBALS['SEMEDIR']->app_config.$cfa) && is_readable($GLOBALS['SEMEDIR']->app_config.$cfa)) {
         $config_file_found++;
-        $config_values['file'] = $SEMEDIR->app_config.$cfa;
+        $config_values['file'] = $GLOBALS['SEMEDIR']->app_config.$cfa;
         $config_values['environment'] = rtrim($cfa, '.php');
-        require_once($SEMEDIR->app_config.$cfa);
+        require_once($GLOBALS['SEMEDIR']->app_config.$cfa);
     }
 }
 if (empty($config_file_found)) {
-    die('No settings file found in : '.$SEMEDIR->app_config);
+    die('No settings file found in : '.$GLOBALS['SEMEDIR']->app_config);
 }
 // apply configuration
 $config_values['baseurl'] = $site;
@@ -134,8 +137,8 @@ $GLOBALS['SEMECFG'] = $cv;
 unset($cv,$semevar,$core_model,$admin_secret_url);
 
 //include core file
-require_once $SEMEDIR->kero.'Functions.php';
-require_once $SEMEDIR->kero_sine.'SENE_Engine.php';
+require_once $GLOBALS['SEMEDIR']->kero.'Functions.php';
+require_once $GLOBALS['SEMEDIR']->kero_sine.'SENE_Engine.php';
 
 //instantiate object
 $se = new SENE_Engine();
