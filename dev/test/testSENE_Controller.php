@@ -8,7 +8,6 @@ define('ADMIN_URL','localhost');
 define('SENEVIEW','../../app/view');
 
 // Class yang mau di TEST.
-require_once "../../kero/sine/SENE_Controller.php";
 //require_once "../../kero/sine/SENE_Controller.php";
 
 // Class untuk run Testing.

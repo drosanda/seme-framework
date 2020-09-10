@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit bootstrap="index.php" colors="true" stopOnFailure="false">
   <testsuites>
-    <testsuite name="Core">
-      <directory>dev/test</directory>
+    <testsuite name="Dev">
+      <file>dev/test/testSENE_Controller.php</file>
     </testsuite>
   </testsuites>
 </phpunit>
