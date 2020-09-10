@@ -470,6 +470,7 @@ abstract class SENE_Controller
     protected function setContentLanguage($l="en")
     {
         $this->content_language = $l;
+        return $this;
     }
     protected function getContentLanguage()
     {
@@ -478,18 +479,22 @@ abstract class SENE_Controller
     protected function setLang($lang="en")
     {
         $this->lang = $lang;
+        return $this;
     }
     protected function setTitle($title="SEME FRAMEWORK")
     {
         $this->title = $title;
+        return $this;
     }
     protected function setDescription($description="en")
     {
         $this->description = $description;
+        return $this;
     }
     protected function setKeyword($keyword="lightweight,framework,php,api,generator")
     {
         $this->keyword = $keyword;
+        return $this;
     }
 
     /**
