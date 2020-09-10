@@ -120,7 +120,7 @@ abstract class SENE_Controller
      * Set theme location, relative to app/view
      * @param string $theme name of directory theme, e.g. front
      */
-    protected function setTheme(string $theme="front")
+    protected function setTheme($theme="front")
     {
         $theme = rtrim($theme, '/').'/';
         $this->theme = $theme;
