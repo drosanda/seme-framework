@@ -537,6 +537,7 @@ abstract class SENE_Controller
     protected function setAuthor($author="SEME Framework")
     {
         $this->author = $author;
+        return $this;
     }
 
     /**

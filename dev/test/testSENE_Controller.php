@@ -224,4 +224,25 @@ class testSENE_Controller extends TestCase
     $this->assertEquals('NOINDEX,NOFOLLOW', $this->invokeMethod($tc, 'getRobots', array()));
     $this->assertNotEquals(strtolower('NOINDEX,NOFOLLOW'), $this->invokeMethod($tc, 'getRobots', array()));
   }
+  public function testAuthor()
+  {
+    $tc = new mockSENE_Controller();
+    $ts = 'Seme Framework';
+    $this->invokeMethod($tc, 'setAuthor', array($ts));
+    $this->assertEquals($ts, $this->invokeMethod($tc, 'getAuthor', array()));
+  }
+  public function testIcon()
+  {
+    $tc = new mockSENE_Controller();
+    $ts = 'favicon.ico';
+    $this->invokeMethod($tc, 'setIcon', array($ts));
+    $this->assertEquals($ts, $this->invokeMethod($tc, 'getIcon', array()));
+  }
+  public function testShortcutIcon()
+  {
+    $tc = new mockSENE_Controller();
+    $ts = 'favicon.ico';
+    $this->invokeMethod($tc, 'setShortcutIcon', array($ts));
+    $this->assertEquals($ts, $this->invokeMethod($tc, 'getShortcutIcon', array()));
+  }
 }
