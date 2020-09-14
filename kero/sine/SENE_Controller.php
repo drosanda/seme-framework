@@ -313,7 +313,7 @@ abstract class SENE_Controller
      * @param  array  $__forward          data to passed
      * @return object                     this class
      */
-    protected function putJsReady(string $u="", $b=array())
+    protected function putJsReady(string $u="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$u;
         if (file_exists($v.'.php')) {
