@@ -240,10 +240,7 @@ abstract class SENE_Controller
             ob_end_clean();
             return 0;
         } else {
-            $u = strtr($u, '\\', '/');
-            $u = strtr($u, '//', '/');
-            $u = strtr(SEMEROOT, '', $u);
-            trigger_error('unable to putThemeContent '.$u.'.php');
+            trigger_error('unable to load putThemeContent for '.$v.'.php');
             die();
         }
         return $this;
@@ -270,10 +267,7 @@ abstract class SENE_Controller
             ob_end_clean();
             return $this;
         } else {
-            $u = strtr($u, '\\', '/');
-            $u = strtr($u, '//', '/');
-            $u = strtr(SEMEROOT, '', $u);
-            trigger_error('unable to putThemeRightContent '.$u.'.php');
+            trigger_error('unable to load putThemeRightContent for '.$v.'.php');
             die();
         }
     }
@@ -299,10 +293,7 @@ abstract class SENE_Controller
             ob_end_clean();
             return $this;
         } else {
-            $u = strtr($u, '\\', '/');
-            $u = strtr($u, '//', '/');
-            $u = strtr(SEMEROOT, '', $u);
-            trigger_error('unable to putThemeLeftContent '.$u.'.php');
+            trigger_error('unable to load putThemeLeftContent for '.$v.'.php');
             die();
         }
     }
@@ -328,10 +319,7 @@ abstract class SENE_Controller
             ob_end_clean();
             return $this;
         } else {
-            $u = strtr($u, '\\', '/');
-            $u = strtr($u, '//', '/');
-            $u = strtr(SEMEROOT, '', $u);
-            trigger_error("putJsReady unable to load  ".$u.'.php');
+            trigger_error('unable to load putJsReady for '.$v.'.php');
             die();
         }
     }
@@ -388,10 +376,7 @@ abstract class SENE_Controller
             ob_end_clean();
             return $this;
         } else {
-            $u = strtr($u, '\\', '/');
-            $u = strtr($u, '//', '/');
-            $u = strtr(SEMEROOT, '', $u);
-            trigger_error('unable to load template location for putJsContent '.$u.'.php');
+            trigger_error('unable to load putJsContent for '.$v.'.php');
             die();
         }
         return $this;
@@ -406,7 +391,6 @@ abstract class SENE_Controller
     protected function putBodyBefore($u="", $__forward=array())
     {
         $v = $this->directories->app_view.$this->theme.'/'.$u;
-        //die($v);
         if (file_exists($v.'.php')) {
             $keytemp=md5(strtotime('now'));
             $_SESSION[$keytemp] = $__forward;
@@ -419,10 +403,7 @@ abstract class SENE_Controller
             ob_end_clean();
             return $this;
         } else {
-            $u = strtr($u, '\\', '/');
-            $u = strtr($u, '//', '/');
-            $u = strtr(SEMEROOT, '', $u);
-            trigger_error('unable to load template location for putBodyBefore'.$u.'.php');
+            trigger_error('unable to load putBodyBefore for '.$v.'.php');
             die();
         }
     }
@@ -856,7 +837,7 @@ abstract class SENE_Controller
             ob_end_clean();
         } else {
             trigger_error("unable to load view ".$this->directories->app_view.$a.".php ", E_USER_ERROR);
-            die("unable to load view ".$this->directories->app_view.$a.'.php');
+            die();
         }
         return $this;
     }
