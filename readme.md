@@ -6,7 +6,7 @@ Seme Framework PHP MVC Framework for creating small and medium app that needed f
 
 ## Documentation
 
-Read the official [documentation of Seme Framework](https://seme.nyingspot.com/). Now only available in English.
+Read the official documentation at [seme.framework.web.id](https://seme.framework.web.id). Now only available in English.
 
 ## Version
 
