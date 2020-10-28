@@ -1473,7 +1473,7 @@ class SENE_MySQLi_Engine
         if ($multi_array) {
             $this->replace_multi($table, $datas, $is_debug);
         } else {
-            $sql = "REPLACE INTO `".$table."`(";
+            $sql = 'REPLACE INTO `'.$table.'`'.' (';
 
             foreach ($datas as $key=>$val) {
                 $sql .='`'.$key."`,";
@@ -1511,7 +1511,7 @@ class SENE_MySQLi_Engine
             trigger_error('Only accepted array!');
             die();
         }
-        $sql = "REPLACE INTO `".$table.'` '.'(';
+        $sql = 'REPLACE INTO `'.$table.'`'.' (';
 
         foreach ($datas as $data) {
             if (!is_array($data)) {
