@@ -5,7 +5,7 @@ if(!class_exists("FDPF")){
 define('FPDF_FONTPATH',__DIR__.DIRECTORY_SEPARATOR.'fpdf/font/');
 
 
-class Seme_FPDF extends FPDF {
+class Seme_Page_FPDF extends FPDF {
 	var $UHC_widths;
 
   var $NewPageGroup;   // variable indicating whether a new group was requested
@@ -515,17 +515,69 @@ class Seme_FPDF extends FPDF {
 		}
 	}
 
-  public function Header(){
 
+
+  public function Header(){
+    $this->Ln(5);
+    $this->setFont('Helvetica','B',12);
+    $this->setFillColor(255,255,255);
+    $this->cell(195,6,$this->judul,0,0,'C',1);
+
+    $this->Ln(5);
+    $this->setFont('Helvetica','',10);
+    $this->setFillColor(255,255,255);
+    $this->cell(195,6,$this->judul_sub,0,0,'C',1);
+
+		$this->Ln(10);
+		$this->setFont('Arial','B',9);
+		$this->setFillColor(254,212,211);
+    foreach($this->defObj as $d){
+    	$this->cell($d->width,5,$d->nama,1,0,'C',1);
+    }
+		$this->Ln();
   }
   public function Content(){
+    $ws = array();
+    $ls = array();
+    foreach($this->defObj as $d){
+      $ws[] = $d->width;
+      $ls[] = $d->align;
+    }
+    $this->SetWidths($ws);
+    $this->SetAligns($ls);
 
+    $this->setFont('Arial','',8);
+    $this->setFillColor(255,255,255);
+    foreach($this->data as $row){
+      $rs = array();
+      foreach($row as $k=>$v){
+        $rs[] = $v;
+      }
+      $this->Row($rs);
+      if($this->GetY() > 205){
+        $this->AddPage();
+      }
+    }
+    $this->data = array();
   }
   public function Footer(){
 		$this->SetY(-15);
+		$this->Line(10,$this->GetY(),210,$this->GetY());
 		$this->SetFont('Helvetica','I',9);
     $this->setTextColor(113,113,113);
+		$this->Cell(0,10,'Halaman '.$this->GroupPageNo().' dari '.$this->PageGroupAlias(),0,0,'R');
+		$this->SetY(-15);
 		$this->Line(10,$this->GetY(),210,$this->GetY());
 		$this->Cell(0,10,'Seme Framework '.SEME_VERSION.'',0,0,'L');
+  }
+
+  public function load_data($judul,$data,$defObj,$judul_sub=""){
+    $this->judul = $judul;
+    $this->judul_sub = $judul_sub;
+    $this->data = $data;
+    $this->defObj = $defObj;
+    $this->StartPageGroup();
+    $this->AddPage();
+    $this->Content();
   }
 }
