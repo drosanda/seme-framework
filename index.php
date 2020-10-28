@@ -15,7 +15,7 @@ ini_set('error_reporting', E_ALL);
 
 //declare SEMEROOT
 if (!defined('SEMEROOT')) {
-    define('SEMEROOT', strtr(realpath('').'/','\\', '/'));
+    define('SEMEROOT', __DIR__.DIRECTORY_SEPARATOR);
 }
 // change directory from stdin
 if (defined('STDIN')) {
