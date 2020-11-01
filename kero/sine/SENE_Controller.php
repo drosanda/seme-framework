@@ -667,79 +667,79 @@ abstract class SENE_Controller
         return $this->shortcut_icon;
     }
 
-    /**
-     * Get list of array CSS before default configration from theme.json
-     */
+    /*
+    * Get list of array CSS before default configration from theme.json
+    */
     protected function getAdditionalBefore()
     {
-        foreach ($this->additionalBefore as $key=>$a) {
-            if (is_string($a)) {
-                $a = strtr($a,"{{base_url}}", base_url());
-                $a = strtr($a,"{{base_url_admin}}", base_url_admin());
-                $cdn_url = '';
-                if(isset($this->config->cdn_url)){
-                  $cdn_url = $this->config->cdn_url;
-                }
-                if(strlen($cdn_url)>4){
-                    $a = strtr($a,"{{cdn_url}}", $cdn_url);
-                }else{
-                    $a = strtr($a,"{{cdn_url}}", base_url());
-                }
-                echo "\n\t".$a;
-            }
+      foreach ($this->additionalBefore as $key=>$a) {
+        if (is_string($a)) {
+          $a = str_replace("{{base_url}}", base_url(), $a);
+          $a = str_replace("{{base_url_admin}}", base_url_admin(),$a);
+          $cdn_url = '';
+          if(isset($this->config->cdn_url)){
+            $cdn_url = $this->config->cdn_url;
+          }
+          if(strlen($cdn_url)>4){
+            $a = str_replace("{{cdn_url}}", $cdn_url, $a);
+          }else{
+            $a = str_replace("{{cdn_url}}", base_url(), $a);
+          }
+          echo "\n\t".$a;
         }
+      }
     }
 
-    /**
-     * Get list of array CSS after default configration from theme.json
-     */
+   /**
+    * Get list of array CSS after default configration from theme.json
+    */
     protected function getAdditional()
     {
-        if (is_array($this->additional) && count($this->additional)){
-            foreach ($this->additional as $key=>$a) {
-                if (is_string($a)) {
-                  if(strpos($a,'{{base_url}}') !== false){
-                    $a = str_replace('{{base_url}}', base_url(),$a);
-                  }elseif(strpos($a,'{{base_url_admin}}') !== false){
-                    $a = str_replace('', base_url_admin(),$a);
-                  }elseif(strpos($a,'{{cdn_url}}') !== false){
-                    $cdn_url = '';
-                    if(isset($this->config->cdn_url)){
-                      $cdn_url = $this->config->cdn_url;
-                    }
-                    if(strlen($cdn_url)>4){
-                        $a = str_replace("{{cdn_url}}", $cdn_url,$a);
-                    }else{
-                        $a = str_replace("{{cdn_url}}", base_url(),$a);
-                    }
-                  }
-                    echo "\n\t".$a;
-                }
+      if (is_array($this->additional) && count($this->additional)){
+        foreach ($this->additional as $key=>$a) {
+          if (is_string($a)) {
+            if(strpos($a,'{{base_url}}') !== false){
+              $a = str_replace('{{base_url}}', base_url(),$a);
+            }elseif(strpos($a,'{{base_url_admin}}') !== false){
+              $a = str_replace('', base_url_admin(),$a);
+            }elseif(strpos($a,'{{cdn_url}}') !== false){
+              $cdn_url = '';
+              if(isset($this->config->cdn_url)){
+                $cdn_url = $this->config->cdn_url;
+              }
+              if(strlen($cdn_url)>4){
+                $a = str_replace("{{cdn_url}}", $cdn_url,$a);
+              }else{
+                $a = str_replace("{{cdn_url}}", base_url(),$a);
+              }
             }
+            echo "\n\t".$a;
+          }
         }
+      }
     }
 
-    /**
-     * Get list of array CSS after default configration from theme.json
-     */
+   /**
+    * Get list of array CSS after default configration from theme.json
+    */
     protected function getAdditionalAfter()
     {
-        foreach ($this->additionalAfter as $key=>$a) {
-            if (is_string($a)) {
-                $a = strtr($a,"{{base_url}}", base_url());
-                $a = strtr($a,"{{base_url_admin}}", base_url_admin());
-                $cdn_url = '';
-                if(isset($this->config->cdn_url)){
-                  $cdn_url = $this->config->cdn_url;
-                }
-                if(strlen($cdn_url)>4){
-                    $a = strtr($a,"{{cdn_url}}", $cdn_url);
-                }else{
-                    $a = strtr($a,"{{cdn_url}}", base_url());
-                }
-                echo "\n\t".$a;
-            }
+      foreach ($this->additionalAfter as $key=>$a) {
+        if (is_string($a)) {
+          $a = str_replace("{{base_url}}", base_url(), $a);
+          $a = str_replace("{{base_url_admin}}", base_url_admin(),$a);
+          $cdn_url = '';
+          if(isset($this->config->cdn_url)){
+            $cdn_url = $this->config->cdn_url;
+          }
+          if(strlen($cdn_url)>4){
+            $a = str_replace("{{cdn_url}}", $cdn_url, $a);
+          }else{
+            $a = str_replace("{{cdn_url}}", base_url(), $a);
+          }
+          echo "\n\t".$a;
         }
+      }
     }
 
     /**
