@@ -75,6 +75,13 @@ class Seme_Email
         $this->log = "Seme_Email: Flush Successfully".$this->eol;
         return $this;
     }
+
+    /**
+     * Set sender information
+     * @param  string $mail Email address
+     * @param  string $name User name
+     * @return object       this object
+     */
     public function from($mail, $name="")
     {
         $this->boundary = md5(uniqid(time()));
@@ -89,6 +96,12 @@ class Seme_Email
         return $this;
     }
 
+    /**
+     * Reply to information
+     * @param  string $name User name
+     * @param  string $mail Email address
+     * @return object       this object
+     */
     public function replyto($name, $mail)
     {
         $this->header .= "Reply-To: $name <$mail>".$this->eol;
@@ -96,6 +109,12 @@ class Seme_Email
         return $this;
     }
 
+    /**
+     * Send to information
+     * @param  string $mail Target Email address
+     * @param  string $name Target User name
+     * @return object       this object
+     */
     public function to($mail, $name="")
     {
         if (!empty($name)) {
@@ -110,6 +129,11 @@ class Seme_Email
         return $this;
     }
 
+    /**
+     * Set Email CC Information
+     * @param  string $mail Target Email address
+     * @return object       this object
+     */
     public function cc($mail)
     {
         $this->cc[] = $mail;
@@ -117,6 +141,11 @@ class Seme_Email
         return $this;
     }
 
+    /**
+     * Set Email BCC Information
+     * @param  string $mail Target Email address
+     * @return object       this object
+     */
     public function bcc($mail)
     {
         $this->bcc[] = $mail;
@@ -124,7 +153,11 @@ class Seme_Email
         return $this;
     }
 
-
+    /**
+     * Set Email subject
+     * @param  string $mail Target Email address
+     * @return object       this object
+     */
     public function subject($subject)
     {
         $this->subject = $subject;
@@ -132,6 +165,11 @@ class Seme_Email
         return $this;
     }
 
+    /**
+     * Set Email body text
+     * @param  string $text Text body content
+     * @return object       this object
+     */
     public function text($text)
     {
         $this->body = "Content-Type: text/plain; charset=ISO-8859-1".$this->eol;
@@ -141,6 +179,11 @@ class Seme_Email
         return $this;
     }
 
+    /**
+     * Set Email body HTML
+     * @param  string $text HTML body content
+     * @return object       this object
+     */
     public function html($html, $type="windows")
     {
         if ($type=="windows") {
@@ -155,7 +198,7 @@ class Seme_Email
         return $this;
     }
     /**
-     * Mengatur lokasi email template
+     * Set template email
      * @param  string $template relative path terhadap directory template email
      * @return object           this object
      */
@@ -179,7 +222,7 @@ class Seme_Email
         return $this;
     }
     /**
-     * Memproses variabel dari template
+     * Replace the variable inside email template
      * @param  array $replacer array of name value pair yang akan menggantikan isi dari variabel di template email
      * @return void
      */
