@@ -205,11 +205,11 @@ class Seme_Email
     public function template($template)
     {
         $this->log .= "Loading template: ".$template." \n";
-        $basetemp = SENELIB.'/seme_email/';
+        $basetemp = SEMELIB.'/seme_email/';
         if (!is_dir($basetemp)) {
             mkdir($basetemp);
         }
-        $basetemp = SENELIB.'/seme_email/template/';
+        $basetemp = SEMELIB.'/seme_email/template/';
         if (!is_dir($basetemp)) {
             mkdir($basetemp);
         }
