@@ -122,8 +122,10 @@ abstract class SENE_Controller
      */
     protected function setTheme(string $theme="front")
     {
-        $theme = rtrim($theme, '/').'/';
-        $this->theme = $theme;
+        $this->theme = rtrim($theme, '/').'/';
+        if(!is_dir($this->directories->app_view.$this->theme.'/')){
+            trigger_error($theme.' directory does not exists');
+        }
         $this->additional = $this->getThemeConfig();
         $this->js_footer = $this->getJsFooterBasic();
         return $this;
@@ -961,7 +963,7 @@ abstract class SENE_Controller
     }
 
     /**
-     * Render buffered view to browser
+     * Render buffered view content into browser
      * @param  integer $cacheable true or false
      * @return void
      */
