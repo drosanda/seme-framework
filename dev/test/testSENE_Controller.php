@@ -245,4 +245,26 @@ class testSENE_Controller extends TestCase
     $this->invokeMethod($tc, 'setShortcutIcon', array($ts));
     $this->assertEquals($ts, $this->invokeMethod($tc, 'getShortcutIcon', array()));
   }
+  public function testKeyword()
+  {
+    $tc = new mockSENE_Controller();
+    $ts = 'Seme Framework';
+    $this->invokeMethod($tc, 'setKeyword', array($ts));
+    $this->assertEquals($ts, $this->invokeMethod($tc, 'getKeyword', array()));
+  }
+  public function testSession()
+  {
+    $tc = new mockSENE_Controller();
+    $ts = 'Seme Framework';
+    $this->invokeMethod($tc, 'setKey', array($ts));
+    $this->assertEquals($ts, $this->invokeMethod($tc, 'getKey', array()));
+  }
+  public function testCookie()
+  {
+    $tc = new mockSENE_Controller();
+    $ts = 'is_login';
+    $td = '1';
+    $this->invokeMethod($tc, 'setcookie', array($ts,$td));
+    $this->assertEquals($td, $this->invokeMethod($tc, 'getcookie', array($ts)));
+  }
 }
