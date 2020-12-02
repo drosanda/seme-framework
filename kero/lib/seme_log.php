@@ -2,7 +2,7 @@
 /**
  * Seme Framework logging class
  * Default log file name is seme.log
- * Default location 
+ * Default location
  * - root if write permission enable
  * - app/cache if write permission enable
  */
@@ -12,7 +12,7 @@ class Seme_Log {
   var $path = '';
 
   public function __construct(){
-    $this->directory = SENEROOT;
+    $this->directory = SEMEROOT;
     $this->path = $this->directory.DIRECTORY_SEPARATOR.$this->filename;
     if(!file_exists($this->path)) touch($this->path);
     if(!is_writable($this->path)){
@@ -21,7 +21,7 @@ class Seme_Log {
       if(is_writable($this->path)) touch($this->path);
     }
   }
-  
+
   /**
    * Change filename of log file
    * @param  string $filename new file name
@@ -29,7 +29,7 @@ class Seme_Log {
    */
   public function changeFilename($filename){
     $this->filename = $filename;
-    $this->directory = SENEROOT;
+    $this->directory = SEMEROOT;
     $this->path = $this->directory.DIRECTORY_SEPARATOR.$this->filename;
     if(!file_exists($this->path)) touch($this->path);
     if(!is_writable($this->path)){
@@ -39,7 +39,7 @@ class Seme_Log {
     }
     return $this;
   }
-  
+
   /**
    * Write message to log
    * @param  string $str      log message
@@ -52,7 +52,7 @@ class Seme_Log {
     fclose($f);
     return $this;
   }
-  
+
   /**
    * Get path of log file
    * @return string           full path

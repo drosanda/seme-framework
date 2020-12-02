@@ -63,8 +63,8 @@ class SENE_JSON_Engine
   }
   private function log($str){
     $p = 'json.log';
-    if(defined('SENEROOT')){
-      $p = SENEROOT.'seme.log';
+    if(defined('SEMEROOT')){
+      $p = SEMEROOT.'seme.log';
     }
     $f = fopen($p,'a+');
     fwrite($f,date("Y-m-d H:i:s").' - ');
