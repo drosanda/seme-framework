@@ -923,21 +923,33 @@ abstract class SENE_Controller
         return $this;
     }
 
-    protected function getcookie($var="")
+    /**
+     * Get the cookie with supplied key
+     * @param  string $k    Key for cookie
+     * @return mixed        Return the value or empty
+     */
+    protected function getcookie($k="")
     {
-        if (empty($var)) {
+        if (empty($k)) {
             return 0;
         }
-        if (isset($_COOKIE[$var])) {
-            return $_COOKIE[$var];
+        if (isset($_COOKIE[$k])) {
+            return $_COOKIE[$k];
         } else {
             return 0;
         }
     }
 
-    protected function setcookie($var="", $val="0")
+    /**
+     * Set the cookie with supplied key and value
+     * @param  string $k    Key for cookie
+     * @param  mixed $val   The value
+     * @return object       this object
+     */
+    protected function setcookie($k="", $val="0")
     {
-        $_COOKIE[$var] = $val;
+        $_COOKIE[$k] = $val;
+        return $this;
     }
 
     /**
