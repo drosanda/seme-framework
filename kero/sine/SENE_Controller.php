@@ -434,15 +434,7 @@ abstract class SENE_Controller
         }
         return $this;
     }
-    protected function setCanonical($l="")
-    {
-        $this->canonical = $l;
-        return $this;
-    }
-    protected function getCanonical()
-    {
-        return $this->canonical;
-    }
+
     protected function setContentLanguage($l="en")
     {
         $this->content_language = $l;
@@ -517,7 +509,20 @@ abstract class SENE_Controller
     }
 
     /**
+     * Set canonical URL
+     * @param  string   $l  canonical url
+     * @return object       this object
+     */
+    protected function setCanonical($l="")
+    {
+        $this->canonical = $l;
+        return $this;
+    }
+
+    /**
      * Set additional CSS files
+     * @param mixed     $val    mixed value
+     * @return object           this object
      */
     protected function setAdditional($val)
     {
@@ -525,6 +530,7 @@ abstract class SENE_Controller
         $key = (int)key($this->additional);
         $key = $key+1;
         $this->additional[$key] = $val;
+        return $this;
     }
 
     /**
@@ -660,6 +666,18 @@ abstract class SENE_Controller
     protected function getShortcutIcon($shortcut_icon="favicon.png")
     {
         return $this->shortcut_icon;
+    }
+
+    /**
+     * get Canonical URL
+     * @return string canonical url
+     */
+    protected function getCanonical()
+    {
+      if(strlen($this->canonical)<4){
+        return rtrim((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]",'/').'/';
+      }
+      return rtrim($this->canonical,'/').'/';
     }
 
     /*
