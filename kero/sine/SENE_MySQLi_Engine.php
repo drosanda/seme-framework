@@ -49,7 +49,7 @@ class SENE_MySQLi_Engine
             $this->__mysqli->connect($this->config->database->host, $this->config->database->user, $this->config->database->pass, $this->config->database->name, $port);
         } catch (Exception $e) {
           if($this->config->environment == 'development'){
-            trigger_error('Tidak dapat tersambung ke database.');
+            trigger_error('Cannot connect to database server using the supplied settings.', E_USER_ERROR);
             die();
           }else if($this->config->environment == 'staging'){
             if ($this->__mysqli->connect_errno) {
@@ -134,7 +134,7 @@ class SENE_MySQLi_Engine
             return 1;
         } else {
             if ($this->is_debug) {
-                trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
+                trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql, E_USER_NOTICE);
             }
             return 0;
         }
@@ -218,7 +218,7 @@ class SENE_MySQLi_Engine
                     return $dataz;
                 } else {
                     $this->debug($sql);
-                    trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
+                    trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql, E_USER_NOTICE);
                     return $this->fieldvalue;
                 }
             }
@@ -249,7 +249,7 @@ class SENE_MySQLi_Engine
                 return $dataz;
             } else {
                 $this->debug($sql);
-                trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
+                trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql,E_USER_NOTICE);
                 return $this->fieldvalue;
             }
         }
@@ -839,7 +839,7 @@ class SENE_MySQLi_Engine
     public function from($table, $as="")
     {
         if (empty($table)) {
-            trigger_error("tabel name required");
+            trigger_error('tabel name required', E_USER_ERROR);
             die();
         }
         if (!empty($as)) {
@@ -862,7 +862,7 @@ class SENE_MySQLi_Engine
     public function setTableAlias($as)
     {
         if (empty($as)) {
-            trigger_error("table alias required");
+            trigger_error("table alias required",E_USER_WARNING);
         }
         $this->as_from[$as] = $this->table;
         return $this;
@@ -950,7 +950,7 @@ class SENE_MySQLi_Engine
                     }
                 }
             } else {
-                trigger_error('Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");');
+                trigger_error('Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
                 die();
             }
         } else {
@@ -968,7 +968,7 @@ class SENE_MySQLi_Engine
                     $sql .= '`'.$j->table.'` '.$j->table_as.' ON '.$j->on.' ';
                 }
             } else {
-                trigger_error('JOIN MULTI: Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");');
+                trigger_error('JOIN MULTI: Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
                 die();
             }
         }
@@ -1044,7 +1044,7 @@ class SENE_MySQLi_Engine
                   }
               }
           } else {
-              trigger_error('Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");');
+              trigger_error('Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
               die();
           }
         } else {
@@ -1062,7 +1062,7 @@ class SENE_MySQLi_Engine
                     $sql .= '`'.$j->table.'` '.$j->table_as.' ON '.$j->on.' ';
                 }
             } else {
-                trigger_error('JOIN MULTI: Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");');
+                trigger_error('JOIN MULTI: Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
                 die();
             }
         }
