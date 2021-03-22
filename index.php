@@ -142,4 +142,4 @@ require_once $GLOBALS['SEMEDIR']->kero_sine.'SENE_Engine.php';
 
 //instantiate object
 $se = new SENE_Engine();
-$se->SENE_Engine();
+$se->run();

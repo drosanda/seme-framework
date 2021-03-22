@@ -82,7 +82,7 @@ class Seme_DateIndo
             default:
                 $this->hari = 'Minggu';
         }
-        $utype == strtolower($utype);
+        $utype = strtolower($utype);
         if ($utype=="hari") {
             return $this->hari;
         }

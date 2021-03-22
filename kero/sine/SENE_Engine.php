@@ -13,7 +13,6 @@ class SENE_Engine
     public $core_prefix = 'SM_';
     public $core_controller = '';
     public $core_model = '';
-    public $routes;
 
     public function __construct()
     {
@@ -28,8 +27,8 @@ class SENE_Engine
 
         $rs = array();
         foreach ($this->config->routes as $key=>$val) {
-            $key = trim($key, "/");
-            $val = trim($val, "/");
+            $key = trim($key, '/');
+            $val = trim($val, '/');
             $rs[$key] = $val;
         }
         $this->config->routes = $rs;
@@ -64,7 +63,7 @@ class SENE_Engine
     /**
      * Run the framework
      */
-    public function SENE_Engine()
+    public function run()
     {
         if (strlen($this->config->core_prefix)) {
             if (strlen($this->config->core_controller)) {
@@ -93,15 +92,15 @@ class SENE_Engine
 
     private function defaultController()
     {
-        $cname = $this->default."";
+        $cname = $this->default.'';
         require_once $this->directories->app_controller.$this->default.".php";
         $cname = new $cname();
         $cname->index();
     }
 
-    private function notFound($newpath="")
+    private function notFound($newpath='')
     {
-        $cname = $this->notfound."";
+        $cname = $this->notfound.'';
         if (file_exists($newpath.$this->notfound.".php")) {
             require_once($newpath.$this->notfound.".php");
         } else {
@@ -115,12 +114,11 @@ class SENE_Engine
     {
         if (count($path)>1) {
             $slug_parent = $path[1];
-            $slug_child = "";
+            $slug_child = '';
             if (isset($path[2])) {
                 $slug_child = $path[2];
             }
             $filename = realpath($this->directories->app_controller."cms_handler.php");
-            //die($filename);
             if (is_file($filename) && !empty($slug_parent)) {
                 require_once $filename;
                 $cname = basename($filename, ".php");
@@ -145,15 +143,15 @@ class SENE_Engine
         $target = '';
         $routes = $this->config->routes;
         foreach ($routes as $key=>$val) {
-            $key = strtolower(trim($key, "/"));
-            $val = strtolower(trim($val, "/"));
+            $key = strtolower(trim($key, '/'));
+            $val = strtolower(trim($val, '/'));
             $key = str_replace(array(':any', ':num'), array('[^/]+', '[0-9]+'), $key);
             if (preg_match('#^'.$key.'$#', $path, $matches)) {
                 $target = '/'.preg_replace('#^'.$key.'$#', $val, $path);
             }
         }
         if (!empty($target)) {
-            return explode("/", $target);
+            return explode('/', $target);
         }
         return $paths;
     }
@@ -164,14 +162,13 @@ class SENE_Engine
         $sene_method = $this->config->method;
         if (isset($_SERVER[$sene_method])) {
             $path = $_SERVER[$sene_method];
-            $path = strtr($path,"//", "/");
-            $path = explode("/", strtr($path,"//", "/"));
+            $path = strtr($path,'//', '/');
+            $path = explode('/', strtr($path,'//', '/'));
             $i=0;
             foreach ($path as $p) {
                 if (strlen($p)>0) {
                     $pos = strpos($p, '?');
                     if ($pos !== false) {
-                        //echo "pos: ".$pos;
                         unset($path[$i]);
                     }
                 }
@@ -183,7 +180,7 @@ class SENE_Engine
                 $path[1] = '';
             }
             $path[1] = strtr($path[1],'-', '_');
-            if ((!empty($path[1]))) {
+            if (!empty($path[1])) {
                 if ($path[1] == "admin" && $this->config->baseurl_admin !="admin") {
                     $newpath = realpath($this->directories->app_controller.$path[1]);
                     $this->notFound($newpath);
@@ -206,7 +203,7 @@ class SENE_Engine
                     }
                     $dirn = $newpath.'/'.$path[2];
                     $filename = realpath($newpath.''.$path[2].".php");
-                    //var_dump($filename);
+
                     if (is_dir($dirn)) {
                         $dirn = rtrim($dirn, '/');
                         $dirn = $dirn.'/';
@@ -297,7 +294,6 @@ class SENE_Engine
                             $this->notFound($newpath);
                         }
                     } else {
-                        //die("wdnlknl");
                         $this->notFound($newpath);
                     }
                 } else {
@@ -338,7 +334,6 @@ class SENE_Engine
                                 $this->notFound();
                             }
                         } else {
-                            //echo 'controller not found';
                             $this->notFound();
                         }
                     } else {

@@ -1,6 +1,6 @@
 language: php
 php:
-  - '7.2.34'
+  - '7.2.22'
   - '7.3.23'
   - '7.4.15'
 before_script:
