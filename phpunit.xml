@@ -18,7 +18,11 @@
 
     <coverage processUncoveredFiles="true">
         <include>
-            <directory suffix=".php">dev/test</directory>
+            <file>index.php</file>
+            <file>kero/sine/SENE_Controller.php</file>
+            <file>kero/sine/SENE_Engine.php</file>
+            <file>kero/sine/SENE_Model.php</file>
+            <file>kero/sine/SENE_MySQLi_Engine.php</file>
         </include>
     </coverage>
 </phpunit>
