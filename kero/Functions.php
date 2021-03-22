@@ -68,7 +68,10 @@ function seme_error_handling($errno, $errstr, $error_file, $error_line)
         $backtraces = debug_backtrace();
         $bct = array();
         $fls = array();
-        //$fls = array('index.php','sene_controller.php','sene_model.php','sene_engine.php','sene_mysqli_engine.php','runner_controller.php');
+
+        if(!defined('SEME_VERBOSE')){
+          $fls = array('index.php','sene_controller.php','sene_model.php','sene_engine.php','sene_mysqli_engine.php','runner_controller.php');
+        }
 
         $ef = explode('/', str_replace('\\', '/', $error_file));
         if (isset($ef[count($ef)-1])) {
@@ -137,7 +140,9 @@ function seme_error_handling($errno, $errstr, $error_file, $error_line)
         $backtraces = debug_backtrace();
         $bct = array();
         $fls = array();
-        //$fls = array('index.php','sene_controller.php','sene_model.php','sene_engine.php','sene_mysqli_engine.php');
+        if(!defined('SEME_VERBOSE')){
+          $fls = array('index.php','sene_controller.php','sene_model.php','sene_engine.php','sene_mysqli_engine.php');
+        }
 
         $ef = explode('/', str_replace('\\', '/', $error_file));
         if (isset($ef[count($ef)-1])) {

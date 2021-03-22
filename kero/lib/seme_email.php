@@ -304,8 +304,6 @@ class Seme_Email
             $this->header .= "Content-Type: text/html; charset=\"UTF-8\"".$this->eol;
         }
 
-        //if($atc) $this->header .= "Content-Transfer-Encoding: 8bit".$this->eol;
-        //$this->header .= "Content-Transfer-Encoding: quoted-printable".$this->eol;
         if (!empty($this->template)) {
             $this->log .= "Template loaded: $this->template  \n";
             $f = fopen($this->template, 'r');

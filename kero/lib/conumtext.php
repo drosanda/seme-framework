@@ -7,18 +7,12 @@ class Conumtext
     private $key='';
     private $alpha='QX2B3C4D5E6F7G8H9I0JKLMNOP1RWAYZSTUV';
     private $beta='';
-    private $charlie;
-    private $str;
 
     public function __construct($key="")
     {
         $this->key=$key;
     }
-    private function moveElement(&$array, $a, $b)
-    {
-        $out = array_splice($array, $a, 1);
-        array_splice($array, $b, 0, $out);
-    }
+
     private function init()
     {
         $this->beta = str_split($this->alpha, 1);
@@ -66,14 +60,13 @@ class Conumtext
                 $str .= $x;
             }
         } else {
-            $alpha = $this->alpha;
             if (empty($max)) {
-                $max = strlen($alpha);
+                $max = strlen($this->alpha);
             }
 
             for ($i=0;$i<=$min;$i++) {
                 $x = rand(0, ($max-1));
-                $str .= $alpha[$x];
+                $str .= $this->alpha[$x];
             }
         }
         return $str;
