@@ -247,10 +247,14 @@ final class testSENE_Controller extends TestCase
     $this->invokeMethod($tc, 'setRobots', array($ts));
     $this->assertEquals($ts, $this->invokeMethod($tc, 'getRobots', array()));
     $this->assertNotEquals(strtolower($ts), $this->invokeMethod($tc, 'getRobots', array()));
-    $ts = 'anything';
+    $ts = 'INDEX,NOFOLLOW';
     $this->invokeMethod($tc, 'setRobots', array($ts));
-    $this->assertEquals('NOINDEX,NOFOLLOW', $this->invokeMethod($tc, 'getRobots', array()));
-    $this->assertNotEquals(strtolower('NOINDEX,NOFOLLOW'), $this->invokeMethod($tc, 'getRobots', array()));
+    $this->assertEquals('INDEX,NOFOLLOW', $this->invokeMethod($tc, 'getRobots', array()));
+    $this->assertNotEquals(strtolower($ts), $this->invokeMethod($tc, 'getRobots', array()));
+    $ts = 'INDEX';
+    $this->invokeMethod($tc, 'setRobots', array($ts));
+    $this->assertEquals('INDEX', $this->invokeMethod($tc, 'getRobots', array()));
+    $this->assertNotEquals(strtolower(''), $this->invokeMethod($tc, 'getRobots', array()));
   }
 
   /**

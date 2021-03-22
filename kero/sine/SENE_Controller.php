@@ -112,7 +112,6 @@ abstract class SENE_Controller
         } else {
             return array();
         }
-        return $this;
     }
 
     /**
@@ -230,7 +229,7 @@ abstract class SENE_Controller
     {
         $v = $this->directories->app_view.$this->theme.'/'.$u;
         if (file_exists($v.'.php')) {
-            $keytemp=md5(strtotime('now'));
+            $keytemp = microtime();
             $_SESSION[$keytemp] = $__forward;
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
@@ -255,7 +254,7 @@ abstract class SENE_Controller
     {
         $v = $this->directories->app_view.$this->theme.'/'.$u;
         if (file_exists($v.'.php')) {
-            $keytemp=md5(strtotime('now'));
+            $keytemp = microtime();
             $_SESSION[$keytemp] = $__forward;
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
@@ -279,7 +278,7 @@ abstract class SENE_Controller
     {
         $v = $this->directories->app_view.$this->theme.'/'.$u;
         if (file_exists($v.'.php')) {
-            $keytemp=md5(strtotime('now'));
+            $keytemp = microtime();
             $_SESSION[$keytemp] = $__forward;
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
@@ -303,7 +302,7 @@ abstract class SENE_Controller
     {
         $v = $this->directories->app_view.$this->theme.'/'.$u;
         if (file_exists($v.'.php')) {
-            $keytemp=md5(strtotime('now'));
+            $keytemp = microtime();
             $_SESSION[$keytemp] = $__forward;
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
@@ -358,7 +357,7 @@ abstract class SENE_Controller
     {
         $v = $this->directories->app_view.$this->theme.'/'.$u;
         if (file_exists($v.'.php')) {
-            $keytemp=md5(strtotime('now'));
+            $keytemp = microtime();
             $_SESSION[$keytemp] = $__forward;
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
@@ -383,7 +382,7 @@ abstract class SENE_Controller
     {
         $v = $this->directories->app_view.$this->theme.'/'.$u;
         if (file_exists($v.'.php')) {
-            $keytemp=md5(strtotime('now'));
+            $keytemp = microtime();
             $_SESSION[$keytemp] = $__forward;
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);
@@ -863,7 +862,7 @@ abstract class SENE_Controller
     private function view($a, $__forward=array())
     {
         if (file_exists($this->directories->app_view.$a.'.php')) {
-            $keytemp=md5(strtotime('now'));
+            $keytemp = microtime();
             $_SESSION[$keytemp] = $__forward;
             extract($_SESSION[$keytemp]);
             unset($_SESSION[$keytemp]);

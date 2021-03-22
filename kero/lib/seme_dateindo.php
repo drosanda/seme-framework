@@ -98,11 +98,8 @@ class Seme_DateIndo
         if ($utype=="tanggal_jam") {
             return ''.date('d', $stt).' '.$this->bulan.' '.date('Y H:i', $stt).' WIB';
         }
-        if ($utype=="hari_tanggal") {
-            return $hari.', '.date('d', $stt).' '.$this->bulan.' '.date('Y', $stt);
-        }
         if ($utype=="hari_tanggal_jam") {
-            return $hari.', '.date('d', $stt).' '.$this->bulan.' '.date('Y H:i', $stt).' WIB';
+            return $this->hari.', '.date('d', $stt).' '.$this->bulan.' '.date('Y H:i', $stt).' WIB';
         }
     }
     public function getBulan()
