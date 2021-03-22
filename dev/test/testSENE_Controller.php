@@ -8,9 +8,11 @@ define('ADMIN_URL','localhost');
 define('SENEVIEW','../../app/view');
 
 // Class yang mau di TEST.
-//require_once "../../kero/sine/SENE_Controller.php";
 
-// Class untuk run Testing.
+/**
+ * Class mock untuk run Testing.
+ * require_once "../../kero/sine/SENE_Controller.php";
+ */
 class mockSENE_Controller extends SENE_Controller {
   public function __construct(){
     parent::__construct();
@@ -19,8 +21,10 @@ class mockSENE_Controller extends SENE_Controller {
 
   }
 }
-
-class testSENE_Controller extends TestCase
+/**
+ * @covers SENE_Controller
+ */
+final class testSENE_Controller extends TestCase
 {
   public function __construct(){
     parent::__construct();
@@ -184,6 +188,12 @@ class testSENE_Controller extends TestCase
     $method->setAccessible(true);
     return $method->invokeArgs($object, $parameters);
   }
+
+  /**
+   * @uses testSENE_Controller
+   * @uses mockSENE_Controller
+   * @covers SENE_Controller
+   */
   public function testTitle()
   {
     $tc = new mockSENE_Controller();
@@ -192,6 +202,12 @@ class testSENE_Controller extends TestCase
     $this->assertEquals($ts, $this->invokeMethod($tc, 'getTitle', array()));
     $this->assertNotEquals(strtolower($ts), $this->invokeMethod($tc, 'getTitle', array()));
   }
+
+  /**
+   * @uses testSENE_Controller
+   * @uses mockSENE_Controller
+   * @covers SENE_Controller
+   */
   public function testDescription()
   {
     $tc = new mockSENE_Controller();
@@ -200,6 +216,12 @@ class testSENE_Controller extends TestCase
     $this->assertEquals($ts, $this->invokeMethod($tc, 'getDescription', array()));
     $this->assertNotEquals(strtolower($ts), $this->invokeMethod($tc, 'getDescription', array()));
   }
+
+  /**
+   * @uses testSENE_Controller
+   * @uses mockSENE_Controller
+   * @covers SENE_Controller
+   */
   public function testLang()
   {
     $tc = new mockSENE_Controller();
@@ -208,6 +230,12 @@ class testSENE_Controller extends TestCase
     $this->assertEquals($ts, $this->invokeMethod($tc, 'getLang', array()));
     $this->assertNotEquals(strtolower($ts), $this->invokeMethod($tc, 'getLang', array()));
   }
+
+  /**
+   * @uses testSENE_Controller
+   * @uses mockSENE_Controller
+   * @covers SENE_Controller
+   */
   public function testRobots()
   {
     $tc = new mockSENE_Controller();
@@ -224,6 +252,12 @@ class testSENE_Controller extends TestCase
     $this->assertEquals('NOINDEX,NOFOLLOW', $this->invokeMethod($tc, 'getRobots', array()));
     $this->assertNotEquals(strtolower('NOINDEX,NOFOLLOW'), $this->invokeMethod($tc, 'getRobots', array()));
   }
+
+  /**
+   * @uses testSENE_Controller
+   * @uses mockSENE_Controller
+   * @covers SENE_Controller
+   */
   public function testAuthor()
   {
     $tc = new mockSENE_Controller();
@@ -231,6 +265,12 @@ class testSENE_Controller extends TestCase
     $this->invokeMethod($tc, 'setAuthor', array($ts));
     $this->assertEquals($ts, $this->invokeMethod($tc, 'getAuthor', array()));
   }
+
+  /**
+   * @uses testSENE_Controller
+   * @uses mockSENE_Controller
+   * @covers SENE_Controller
+   */
   public function testIcon()
   {
     $tc = new mockSENE_Controller();
@@ -238,6 +278,12 @@ class testSENE_Controller extends TestCase
     $this->invokeMethod($tc, 'setIcon', array($ts));
     $this->assertEquals($ts, $this->invokeMethod($tc, 'getIcon', array()));
   }
+
+  /**
+   * @uses testSENE_Controller
+   * @uses mockSENE_Controller
+   * @covers SENE_Controller
+   */
   public function testShortcutIcon()
   {
     $tc = new mockSENE_Controller();
@@ -245,6 +291,12 @@ class testSENE_Controller extends TestCase
     $this->invokeMethod($tc, 'setShortcutIcon', array($ts));
     $this->assertEquals($ts, $this->invokeMethod($tc, 'getShortcutIcon', array()));
   }
+
+  /**
+   * @uses testSENE_Controller
+   * @uses mockSENE_Controller
+   * @covers SENE_Controller
+   */
   public function testKeyword()
   {
     $tc = new mockSENE_Controller();
@@ -252,6 +304,12 @@ class testSENE_Controller extends TestCase
     $this->invokeMethod($tc, 'setKeyword', array($ts));
     $this->assertEquals($ts, $this->invokeMethod($tc, 'getKeyword', array()));
   }
+
+  /**
+   * @uses testSENE_Controller
+   * @uses mockSENE_Controller
+   * @covers SENE_Controller
+   */
   public function testSession()
   {
     $tc = new mockSENE_Controller();
@@ -259,6 +317,12 @@ class testSENE_Controller extends TestCase
     $this->invokeMethod($tc, 'setKey', array($ts));
     $this->assertEquals($ts, $this->invokeMethod($tc, 'getKey', array()));
   }
+
+  /**
+   * @uses testSENE_Controller
+   * @uses mockSENE_Controller
+   * @covers SENE_Controller
+   */
   public function testCookie()
   {
     $tc = new mockSENE_Controller();
