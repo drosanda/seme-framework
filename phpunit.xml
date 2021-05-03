@@ -1,28 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
-         bootstrap="index.php"
-         executionOrder="depends,defects"
-         forceCoversAnnotation="true"
-         beStrictAboutCoversAnnotation="true"
-         beStrictAboutOutputDuringTests="true"
-         beStrictAboutTodoAnnotatedTests="true"
-         failOnRisky="true"
-         failOnWarning="true"
-         verbose="true">
-    <testsuites>
-        <testsuite name="Dev">
-            <file>dev/test/testSENE_Controller.php</file>
-        </testsuite>
-    </testsuites>
+  xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+  bootstrap="dev/test/SeneTestCase.php"
+  executionOrder="depends,defects"
+  forceCoversAnnotation="true"
+  beStrictAboutCoversAnnotation="true"
+  beStrictAboutOutputDuringTests="true"
+  beStrictAboutTodoAnnotatedTests="true"
+  failOnRisky="true"
+  failOnWarning="true"
+  verbose="true">
+  <testsuites>
+    <testsuite name="Dev">
+      <directory>dev/test</directory>
+    </testsuite>
+  </testsuites>
 
-    <coverage processUncoveredFiles="true">
-        <include>
-            <file>index.php</file>
-            <file>kero/sine/SENE_Controller.php</file>
-            <file>kero/sine/SENE_Engine.php</file>
-            <file>kero/sine/SENE_Model.php</file>
-            <file>kero/sine/SENE_MySQLi_Engine.php</file>
-        </include>
-    </coverage>
+  <coverage processUncoveredFiles="false">
+    <include>
+      <directory>kero/sine</directory>
+      <directory>app/view</directory>
+      <directory>app/model</directory>
+      <directory>app/controller</directory>
+    </include>
+  </coverage>
 </phpunit>
