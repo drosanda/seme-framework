@@ -11,15 +11,11 @@ if (!defined('SEMEROOT')) {
   define('SEMEROOT', __DIR__.'/../..');
 }
 
-if (!defined('ADMIN_URL')) {
-  define('ADMIN_URL','localhost');
-}
-
 if (!defined('SENEVIEW')) {
   define('SENEVIEW',SEMEROOT.'/app/view');
 }
 
-//global object
+/** global objects */
 $GLOBALS['SEMEDIR'] = new stdClass();
 
 /**
@@ -117,7 +113,7 @@ $routes = array();
 $semevar = array();
 
 // apply configuration
-$config_values['baseurl'] = 'https://localhost';
+$config_values['baseurl'] = 'https://localhost/';
 $config_values['method'] = 'PATH_INFO';
 $config_values['baseurl_admin'] = 'admin';
 $config_values['cdn_url'] = '';
@@ -152,8 +148,57 @@ unset($config_values,$k,$v);
 $GLOBALS['SEMECFG'] = $cv;
 unset($cv,$semevar,$core_model,$admin_secret_url);
 
-//include core file
+
+/** global functions */
+
+/**
+ * Get relatives base url
+ * @param  string $url addtional url
+ * @return string      full base url
+ */
+function base_url($url="")
+{
+    return rtrim($GLOBALS['SEMECFG']->baseurl.$url,'/').'/';
+}
+/**
+ * Set admin secret base url
+ * @param  string $url addtional url
+ * @return string      full url
+ */
+function base_url_admin($url="")
+{
+    return rtrim($GLOBALS['SEMECFG']->baseurl.$GLOBALS['SEMECFG']->baseurl_admin.'/'.$url,'/').'/';
+}
+
+/**
+ * Redirect to target url
+ * @param  string  $url  target full qualified url
+ * @param  integer $time delay time
+ * @param  integer $type type of redirection, 1> html, 0 http header
+ */
+function redir($url, $time=0, $type=0)
+{
+    if ($type=="1" || $type==1) {
+        if ($time) {
+            echo '<meta http-equiv="refresh" content="'.$time.';URL=\''.$url.'\'" />';
+        } else {
+            echo '<meta http-equiv="refresh" content="1;URL=\''.$url.'\'" />';
+        }
+    } else {
+        if ($time>1) {
+            header('HTTP/1.1 301 Moved Permanently');
+            header("Refresh:".$time."; url=".$url);
+        } else {
+            header('HTTP/1.1 301 Moved Permanently');
+            header('Location: ' . $url);
+        }
+    }
+}
+
+/** require_once core files */
 //require_once $GLOBALS['SEMEDIR']->kero.'Functions.php';
+
+/** loads kero/sine modules */
 require_once $GLOBALS['SEMEDIR']->kero_sine.'SENE_Engine.php';
 require_once $GLOBALS['SEMEDIR']->kero_sine.'SENE_Input.php';
 
