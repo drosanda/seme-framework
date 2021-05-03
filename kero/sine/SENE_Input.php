@@ -1,5 +1,11 @@
 <?php
 /**
+ * @author: Daeng Rosanda
+ * @package SemeFramework
+ * @since SemeFramework 4.0.0
+ */
+
+/**
  * Input class helper
  */
 class SENE_Input
@@ -17,7 +23,7 @@ class SENE_Input
             return 0;
         }
     }
-    
+
     /**
      * Get value from $_GET payload
      * @param  string $k    keyname of GET
@@ -31,7 +37,7 @@ class SENE_Input
             return 0;
         }
     }
-    
+
     /**
      * Get value from $_REQUEST payload
      * @param  string $k    keyname of GET
@@ -45,7 +51,7 @@ class SENE_Input
             return 0;
         }
     }
-    
+
     public function file($var)
     {
         if (isset($_FILES[$var])) {

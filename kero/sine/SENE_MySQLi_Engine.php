@@ -1,5 +1,12 @@
 <?php
 /**
+ * @author: Daeng Rosanda
+ * @package SemeFramework
+ * @since SemeFramework 2.0.0
+*/
+
+
+/**
  * Class model for  MySQLi connection
  */
 class SENE_MySQLi_Engine

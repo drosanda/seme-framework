@@ -1,5 +1,12 @@
 <?php
 /**
+ * @author: Daeng Rosanda
+ * @package SemeFramework
+ * @since SemeFramework 3.0.0
+ */
+
+
+/**
  * Abstract class for Sene_Model
  */
 abstract class SENE_Model

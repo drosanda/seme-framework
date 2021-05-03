@@ -1,5 +1,11 @@
 <?php
 /**
+ * @author: Daeng Rosanda
+ * @package SemeFramework
+ * @since SemeFramework 3.0.0
+ */
+
+/**
  * Abstract class for controller wrapper
  */
 abstract class SENE_Controller

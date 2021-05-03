@@ -1,6 +1,12 @@
 <?php
 /**
- * Main Engine of seme framework
+ * @author: Daeng Rosanda
+ * @package SemeFramework
+ * @since SemeFramework 3.0.0
+ */
+
+/**
+ * Main Engine Class of seme framework
  */
 class SENE_Engine
 {
