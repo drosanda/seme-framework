@@ -552,7 +552,7 @@ abstract class SENE_Controller
     protected function setAdditional($val)
     {
         end($this->additional);
-        $key = (int)key($this->additional);
+        $key = (int) key($this->additional);
         $key = $key+1;
         $this->additional[$key] = $val;
         return $this;
@@ -700,7 +700,7 @@ abstract class SENE_Controller
     protected function getCanonical()
     {
       if(strlen($this->canonical)<4){
-        return rtrim((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]",'/').'/';
+        return rtrim(base_url()."".$_SERVER['REQUEST_URI']."",'/').'/';
       }
       return rtrim($this->canonical,'/').'/';
     }
