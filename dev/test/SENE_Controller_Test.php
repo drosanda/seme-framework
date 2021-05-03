@@ -185,4 +185,111 @@ final class SENE_Controller_Test extends TestCase
     $this->invokeMethod($tc, 'setcookie', array($ts,$td));
     $this->assertEquals($td, $this->invokeMethod($tc, 'getcookie', array($ts)));
   }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
+  public function testCanonicalEmpty()
+  {
+    $tc = new SENE_Controller_Mock();
+    $td = '';
+    $ts = base_url('');
+    $this->invokeMethod($tc, 'setcanonical', array($td));
+    $this->assertEquals($ts, $this->invokeMethod($tc, 'getcanonical', array()));
+
+    $td = '/';
+    $ts = base_url('');
+    $this->invokeMethod($tc, 'setcanonical', array($td));
+    $this->assertEquals($ts, $this->invokeMethod($tc, 'getcanonical', array()));
+
+    $td = 'home';
+    $ts = ('home/');
+    $this->invokeMethod($tc, 'setcanonical', array($td));
+    $this->assertEquals($ts, $this->invokeMethod($tc, 'getcanonical', array()));
+
+    $td = 'home';
+    $ts = ('home/');
+    $this->invokeMethod($tc, 'setcanonical', array($td));
+    $this->assertEquals($ts, $this->invokeMethod($tc, 'getcanonical', array()));
+  }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
+  public function testSetAdditionalCss()
+  {
+    $tc = new SENE_Controller_Mock();
+
+    $td = 'test1.css';
+    $this->invokeMethod($tc, 'setadditional', array($td));
+    $this->assertContains($td, $tc->additional);
+  }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
+  public function testGetAdditionalCssPlain()
+  {
+    $tc = new SENE_Controller_Mock();
+
+    $td = 'skin/front/test2.css';
+    $ts = 'skin/front/test2.css';
+    $this->expectOutputRegex(preg_quote(''.$ts.''),'/');
+    $this->invokeMethod($tc, 'setadditional', array($td));
+    $this->invokeMethod($tc, 'getcanonical', array());
+  }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
+  public function testGetAdditionalCssBaseUrl()
+  {
+    $tc = new SENE_Controller_Mock();
+
+    $td = '{{base_url}}test3.css';
+    $ts = base_url().'test3.css';
+    $this->expectOutputRegex(preg_quote(''.$ts.''),'/');
+    $this->invokeMethod($tc, 'setadditional', array($td));
+    $this->invokeMethod($tc, 'getcanonical', array());
+  }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
+  public function testGetAdditionalCssBaseUrlAdmin()
+  {
+    $tc = new SENE_Controller_Mock();
+
+    $td = '{{base_url_admin}}test4.css';
+    $ts = base_url_admin().'test4.css';
+    $this->expectOutputRegex(preg_quote(''.$ts.''),'/');
+    $this->invokeMethod($tc, 'setadditional', array($td));
+    $this->invokeMethod($tc, 'getcanonical', array());
+  }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
+  public function testGetAdditionalCssCdnUrl()
+  {
+    $tc = new SENE_Controller_Mock();
+
+    $td = '{{cdn_url}}test5.css';
+    $ts = $this->invokeMethod($tc, 'cdn_url', array()).'test5.css';
+    $this->expectOutputRegex(preg_quote(''.$ts.''),'/');
+    $this->invokeMethod($tc, 'setadditional', array($td));
+    $this->invokeMethod($tc, 'getcanonical', array());
+  }
 }
