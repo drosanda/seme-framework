@@ -40,7 +40,7 @@ class SENE_MySQLi_Engine
     public $query_last;
     public $is_debug;
 
-    public function __construct($db)
+    public function __construct()
     {
         $this->directories = $GLOBALS['SEMEDIR'];
         $this->config = $GLOBALS['SEMECFG'];
