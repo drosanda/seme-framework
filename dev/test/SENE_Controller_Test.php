@@ -653,4 +653,33 @@ final class SENE_Controller_Test extends TestCase
     $this->invokeMethod($tc, 'putjsfooter', array($td));
     $this->invokeMethod($tc, 'getjsfooter', array());
   }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
+  public function testThemeScript()
+  {
+    $tc = new SENE_Controller_Mock();
+    $ts = 'admin';
+    $dir = $GLOBALS['SEMEDIR']->app_view.$ts;
+    $file = $dir.'/'.$tc->js_json;
+    $script = "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js\"></script>";
+    $json = array(
+      $script,
+      "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.5/jquery.min.js\"></script>"
+    );
+    if(is_dir($dir)) rmdir($dir);
+    if(!is_dir($dir) && !file_exists($dir)) mkdir($dir);
+
+    $this->invokeMethod($tc, 'setTheme', array($ts));
+    $fh = fopen($file, "w");
+    fwrite($fh,json_encode($json));
+    fclose($fh);
+
+    $this->assertContains($script, $this->invokeMethod($tc, 'getJsFooterBasic', array()));
+    if(is_file($file)) unlink($file);
+    if(is_dir($dir)) rmdir($dir);
+  }
 }

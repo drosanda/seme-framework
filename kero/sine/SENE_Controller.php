@@ -126,7 +126,7 @@ abstract class SENE_Controller
     {
         $this->theme = rtrim($theme, '/').'/';
         if(!is_dir($this->directories->app_view.$this->theme.'/')){
-            trigger_error('Missing theme directory for '.$theme.'', E_USER_ERROR);
+            trigger_error(TEM_ERR.': Missing theme directory for '.$theme.'', E_USER_ERROR);
         }
         $this->additional = $this->getThemeConfig();
         $this->js_footer = $this->getJsFooterBasic();
