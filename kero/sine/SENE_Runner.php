@@ -238,7 +238,7 @@ if (!defined('WEBSITE_VIEW_ID')) {
 $routing = array();
 
 require_once "app/config/config.php";
-function base_url($url)
+function base_url($url='')
 {
   return $GLOBALS['base_url'].$url;
 }
