@@ -56,8 +56,8 @@ class SENE_MySQLi_Engine
             $this->__mysqli->connect($this->config->database->host, $this->config->database->user, $this->config->database->pass, $this->config->database->name, $port);
         } catch (Exception $e) {
           if($this->config->environment == 'development'){
-            trigger_error('Cannot connect to database server using the supplied settings.', E_USER_ERROR);
-            die();
+            trigger_error(TEM_ERR.': Cannot connect to database server using the supplied settings.', E_USER_ERROR);
+            return;
           }else if($this->config->environment == 'staging'){
             if ($this->__mysqli->connect_errno) {
                 header("content-type: application/json");
@@ -67,7 +67,7 @@ class SENE_MySQLi_Engine
                 $data['message'] = 'Failed to connect to Database: '.$this->__mysqli->connect_error;
                 $data['data'] = array();
                 echo json_encode($data);
-                die();
+                return;
             }
           }
         }
@@ -139,7 +139,7 @@ class SENE_MySQLi_Engine
             return 1;
         } else {
             if ($this->is_debug) {
-                trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql, E_USER_NOTICE);
+                trigger_error(TEM_ERR.': '.$this->__mysqli->error.'. '.$sql, E_USER_NOTICE);
             }
             return 0;
         }
@@ -223,7 +223,7 @@ class SENE_MySQLi_Engine
                     return $dataz;
                 } else {
                     $this->debug($sql);
-                    trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql, E_USER_NOTICE);
+                    trigger_error(TEM_ERR.': '.$this->__mysqli->error.'. '.$sql, E_USER_NOTICE);
                     return $this->fieldvalue;
                 }
             }
@@ -254,7 +254,7 @@ class SENE_MySQLi_Engine
                 return $dataz;
             } else {
                 $this->debug($sql);
-                trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql,E_USER_NOTICE);
+                trigger_error(TEM_ERR.': '.$this->__mysqli->error.'. '.$sql, E_USER_NOTICE);
                 return $this->fieldvalue;
             }
         }
@@ -844,14 +844,14 @@ class SENE_MySQLi_Engine
     public function from($table, $as="")
     {
         if (empty($table)) {
-            trigger_error('tabel name required', E_USER_ERROR);
+            trigger_error(TEM_ERR.': table name required', E_USER_ERROR);
             die();
         }
         if (!empty($as)) {
             $as = strtolower($as);
             if (isset($this->as_from[$as])) {
                 if ($this->as_from[$as] != $table) {
-                    trigger_error('Table alias "'.$as.'" for "'.$this->as_from[$as].'" has been used, please change!');
+                    trigger_error(TEM_ERR.': Table alias "'.$as.'" for "'.$this->as_from[$as].'" has been used, please change!');
                     foreach ($this->as_from as $k=>$v) {
                         trigger_error($k.': '.$v);
                     }
@@ -867,7 +867,7 @@ class SENE_MySQLi_Engine
     public function setTableAlias($as)
     {
         if (empty($as)) {
-            trigger_error("table alias required",E_USER_WARNING);
+            trigger_error(TEM_ERR.': table alias required.',E_USER_WARNING);
         }
         $this->as_from[$as] = $this->table;
         return $this;
@@ -955,7 +955,7 @@ class SENE_MySQLi_Engine
                     }
                 }
             } else {
-                trigger_error('Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
+                trigger_error(TEM_ERR.': Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
                 die();
             }
         } else {
@@ -973,7 +973,7 @@ class SENE_MySQLi_Engine
                     $sql .= '`'.$j->table.'` '.$j->table_as.' ON '.$j->on.' ';
                 }
             } else {
-                trigger_error('JOIN MULTI: Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
+                trigger_error(TEM_ERR.': Please use alias for main table first in JOIN MULTI, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
                 die();
             }
         }
@@ -1049,7 +1049,7 @@ class SENE_MySQLi_Engine
                   }
               }
           } else {
-              trigger_error('Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
+              trigger_error(TEM_ERR.': Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
               die();
           }
         } else {
@@ -1067,7 +1067,7 @@ class SENE_MySQLi_Engine
                     $sql .= '`'.$j->table.'` '.$j->table_as.' ON '.$j->on.' ';
                 }
             } else {
-                trigger_error('JOIN MULTI: Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
+                trigger_error(TEM_ERR.': Please use alias for main table first in JOIN MULTI, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
                 die();
             }
         }
@@ -1148,14 +1148,14 @@ class SENE_MySQLi_Engine
     public function insert_multi($table, $datas=array(), $is_debug=0)
     {
         if (!is_array($datas)) {
-            trigger_error('Only accepted array!');
+            trigger_error(TEM_ERR.': Only accepted array!');
             die();
         }
         $sql = 'INSERT INTO `'.$table.'`'.' (';
 
         foreach ($datas as $data) {
             if (!is_array($data)) {
-                trigger_error('Only accepted array!');
+                trigger_error(TEM_ERR.' Only accepted array!');
                 die();
             }
             foreach ($data as $key=>$val) {
@@ -1193,14 +1193,14 @@ class SENE_MySQLi_Engine
         //$multi_array=0;
 
         if (!is_array($datas)) {
-            trigger_error('Only accepted array!');
+            trigger_error(TEM_ERR.': Only accepted array!');
             die();
         }
         $sql = 'INSERT IGNORE INTO `'.$table.'`'.'(';
 
         foreach ($datas as $data) {
             if (!is_array($data)) {
-                trigger_error('Only accepted array!');
+                trigger_error(TEM_ERR.': Only accepted array!');
                 die();
             }
             foreach ($data as $key=>$val) {
@@ -1238,7 +1238,7 @@ class SENE_MySQLi_Engine
         //$multi_array=0;
         $this->last_id = 0;
         if (!is_array($datas)) {
-            trigger_error('Only accepted array!');
+            trigger_error(TEM_ERR.': Only accepted array!');
             die();
         }
         if ($multi_array) {
@@ -1277,7 +1277,7 @@ class SENE_MySQLi_Engine
     public function update($table, $datas=array(), $is_debug=0)
     {
         if (!is_array($datas)) {
-            trigger_error('Only accepted array!');
+            trigger_error(TEM_ERR.': Only accepted array!');
             die();
         }
 
@@ -1314,7 +1314,7 @@ class SENE_MySQLi_Engine
     public function delete($table, $is_debug=0)
     {
         if (empty($table)) {
-            trigger_error("Missing table name while deleting");
+            trigger_error(TEM_ERR.': Missing table name while deleting');
             die();
         }
 
@@ -1406,7 +1406,7 @@ class SENE_MySQLi_Engine
 
         //building composite
         if (!is_array($composites)) {
-            trigger_error("JOIN_COMPOSITE the composites parameter must be array");
+            trigger_error(TEM_ERR.': JOIN_COMPOSITE the composites parameter must be array!');
         }
         $composites_count = count($composites);
         $composite_i = 0;
@@ -1472,7 +1472,7 @@ class SENE_MySQLi_Engine
         //$multi_array=0;
         $this->last_id = 0;
         if (!is_array($datas)) {
-            trigger_error('Only accepted array!');
+            trigger_error(TEM_ERR.': Only accepted array!');
             die();
         }
         if ($multi_array) {
@@ -1513,14 +1513,14 @@ class SENE_MySQLi_Engine
         //$multi_array=0;
 
         if (!is_array($datas)) {
-            trigger_error('Only accepted array!');
+            trigger_error(TEM_ERR.': Only accepted array!');
             die();
         }
         $sql = 'REPLACE INTO `'.$table.'`'.' (';
 
         foreach ($datas as $data) {
             if (!is_array($data)) {
-                trigger_error('Only accepted array!');
+                trigger_error(TEM_ERR.': Only accepted array!');
                 die();
             }
             foreach ($data as $key=>$val) {
@@ -1585,7 +1585,7 @@ class SENE_MySQLi_Engine
     {
         $res = $this->__mysqli->character_set_name();
         if (!$res) {
-            trigger_error('Cant get charset '.$char_set.' to database.');
+            trigger_error(TEM_ERR.': Cant get charset '.$char_set.' to database.');
         }
         return $res;
     }
@@ -1593,7 +1593,7 @@ class SENE_MySQLi_Engine
     {
         $res = $this->__mysqli->set_charset($char_set);
         if (!$res) {
-            trigger_error('Cant change charset from '.$this->__mysqli->character_set_name().' to '.$char_set.' to database.');
+            trigger_error(TEM_ERR.': Cant change charset from '.$this->__mysqli->character_set_name().' to '.$char_set.' to database.');
         }
         return 1;
     }
