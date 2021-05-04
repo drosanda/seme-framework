@@ -1,12 +1,10 @@
 <?php
 /**
+ * Abstract class for controller wrapper
+ *
  * @author: Daeng Rosanda
  * @package SemeFramework
  * @since SemeFramework 3.0.0
- */
-
-/**
- * Abstract class for controller wrapper
  */
 abstract class SENE_Controller
 {
@@ -586,7 +584,6 @@ abstract class SENE_Controller
         if (is_array($val)) {
             foreach ($val as $v) {
                 $this->additionalAfter[] = $v;
-                $i++;
             }
         } elseif (is_string($val)) {
             $this->additionalAfter[] = $val;
