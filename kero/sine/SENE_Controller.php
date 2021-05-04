@@ -613,7 +613,9 @@ abstract class SENE_Controller
      */
     protected function removeAdditional($key)
     {
-        if(isset($this->additional[$key])) unset($this->additional[$key]);
+        if(isset($this->additional[$key])){
+          unset($this->additional[$key]);
+        }
         return $this;
     }
 
