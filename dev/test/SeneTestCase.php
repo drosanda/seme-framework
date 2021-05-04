@@ -14,6 +14,7 @@ if (!defined('SEMEROOT')) {
 if (!defined('SENEVIEW')) {
   define('SENEVIEW',SEMEROOT.'/app/view');
 }
+define(TEM_ERR, 'Error');
 
 /** global objects */
 $GLOBALS['SEMEDIR'] = new stdClass();
