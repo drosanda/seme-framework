@@ -9,3 +9,12 @@ before_script:
 script: phpunit --configuration phpunit.xml --coverage-clover coverage.xml --testsuite Dev
 after_success:
     - bash <(curl -s https://codecov.io/bash)
+addons:
+  sonarcloud:
+    organization: "drosanda"
+    token:
+      secure: "gC9I5qDFP/As7V4O4pAUOG0Xj5pPufmhDFY07Uan2LYmS0VWL2B1dta+HQnGv+nrv1rpFE2BR3H4lC3CdIjrpnqudmWsTDUBm2cMI+vbGWUIJFsP9vK9JCk0dGugOWhPWodtzR/vPufCypVby6QR3sjMtcfIANWcuSPLUi3kYiBUAft/sovjBi36OzlWMRmyhqPocO0cPJo2W3ukL7O4unj1LKNnNq2bnPx6I2mNsx9iyv2R3dynhpkZvAtYNGzzZ9V/HUd+uv356Tja4i1erFjqBH72DrtuGJl2ZGF+ZlapkMqCCMUq/b32Y57uiadm06FJotKF4sNGnfGJxyJwKeYzkq0kG8f9QzzHJptHknXTnj7IsCLKPYoaqMevc0R3GaIUrNDSJVXFvuVt3LuopjFxAJYebRDJEoyWFtJr+0FLx/UbBLMJhoXd6/9ZXYs+4zOIscWgu332sno7M4/dmJdD9Ry8QGWn232X5CRjfsCzLV/c8ioU/XS0s0xy7M8ZcPaiW2Ae8XIZ95wEhlAJgV/jf/NoiX7irg+Rk44MOLFlXUPyXo7+NAkh9G+6RLo8/Wl9jNH/sG+9/YC/DvfoDs3xfNt17yi4mO6tEIOJqstenQD+er1R3FsRZcvQuYi/ux9r0wxTAMPB3hPsuHKMO9A0SaMAQAsB4PiEKeaxwVc=" # encrypted value of your token
+
+script:
+  # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
+  - sonar-scanner
