@@ -5,6 +5,10 @@
  * @since SemeFramework 3.2.0
  */
 
+/** Constants */
+if(!defined('HTML_BR'){
+  define('HTML_BR','<br />');
+}
 
 /**
 * Class Controller for runner
@@ -67,36 +71,37 @@ if (realpath($core_dir) !== false) {
   $core_dir = realpath($core_dir).'/';
 }
 if (!is_dir($apps_dir)) {
-  die("missing apps dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+  trigger_error("missing apps dir: ".pathinfo(__FILE__, PATHINFO_BASENAME)); return;
 }
 if (!is_dir($assets_dir)) {
-  die("missing assets dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+  trigger_error("missing assets dir: ".pathinfo(__FILE__, PATHINFO_BASENAME)); return;
 }
 if (!is_dir($ssys_dir)) {
-  die("missing ssys dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+  trigger_error("missing ssys dir: ".pathinfo(__FILE__, PATHINFO_BASENAME)); return;
 }
 if (!is_dir($kerosine_dir)) {
-  die("missing apps dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+  trigger_error("missing apps dir: ".pathinfo(__FILE__, PATHINFO_BASENAME)); return;
 }
 if (!is_dir($library_dir)) {
-  die("missing library dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+  trigger_error("missing library dir: ".pathinfo(__FILE__, PATHINFO_BASENAME)); return;
 }
 if (!is_dir($config_dir)) {
-  die("missing config dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+  trigger_error("missing config dir: ".pathinfo(__FILE__, PATHINFO_BASENAME)); return;
 }
 if (!is_dir($cache_dir)) {
-  die("missing cache dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+  trigger_error("missing cache dir: ".pathinfo(__FILE__, PATHINFO_BASENAME)); return;
 }
 if (!is_dir($model_dir)) {
-  die("missing nodel dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
-} if (!is_dir($view_dir)) {
-  die("missing view dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+  trigger_error("missing nodel dir: ".pathinfo(__FILE__, PATHINFO_BASENAME)); return;
+}
+if (!is_dir($view_dir)) {
+  trigger_error("missing view dir: ".pathinfo(__FILE__, PATHINFO_BASENAME)); return;
 }
 if (!is_dir($controller_dir)) {
-  die("missing controller dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+  trigger_error("missing controller dir: ".pathinfo(__FILE__, PATHINFO_BASENAME)); return;
 }
 if (!is_dir($core_dir)) {
-  die("missing core dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+  trigger_error("missing core dir: ".pathinfo(__FILE__, PATHINFO_BASENAME)); return;
 }
 
 $apps_dir = rtrim($apps_dir, '/').'/';
@@ -294,23 +299,21 @@ class SENE_Runner
       if (is_dir($filename)) {
         $this->directory_list[] =  $filename;
       } else {
-        echo "$filename size " . filesize($filename) . "<br />";
-        $kelas_path = pathinfo($filename);
+        echo "$filename size " . filesize($filename).HTML_BR;
         $kelas_nama = $this->__getClass($filename);
-        echo 'Class: '.$kelas_nama.'<br />';
+        echo 'Class: '.$kelas_nama.HTML_BR;
         $methods = get_class_methods($kelas_nama);
         $i=1;
         foreach ($methods as $method) {
-          echo $i.'. Method: '.$method.'<br />';
+          echo $i.'. Method: '.$method.HTML_BR;
           $i++;
         }
       }
     }
   }
 }
-echo '---<br />';
-//$sr = new SENE_Runner();
-//$sr->scan();
+echo '---'.HTML_BR;
+
 $methods = get_class_methods("Apikey");
 echo '<pre>';
 var_dump($methods);
