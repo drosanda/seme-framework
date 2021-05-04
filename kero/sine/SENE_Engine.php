@@ -54,20 +54,18 @@ class SENE_Engine
         $this->config->routes = $rs;
 
         $sene_method = $this->config->method;
-        if (isset($_SERVER['argv'])) {
-            if (count($_SERVER['argv'])>1) {
-                $i=0;
-                $_SERVER[$sene_method] = '';
-                foreach ($_SERVER['argv'] as $argv) {
-                    $i++;
-                    if ($i==1) {
-                        continue;
-                    }
-                    $_SERVER[$sene_method] .= '/'.$argv;
+        if (isset($_SERVER['argv']) && count($_SERVER['argv'])>1) {
+            $i=0;
+            $_SERVER[$sene_method] = '';
+            foreach ($_SERVER['argv'] as $argv) {
+                $i++;
+                if ($i==1) {
+                    continue;
                 }
-                unset($i);
-                unset($argv);
+                $_SERVER[$sene_method] .= '/'.$argv;
             }
+            unset($i);
+            unset($argv);
         }
         unset($sene_method);
         self::$__instance = $this;
