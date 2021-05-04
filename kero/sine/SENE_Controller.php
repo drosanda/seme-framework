@@ -172,6 +172,7 @@ abstract class SENE_Controller
                 trigger_error(TEM_ERR.': could not find library '.$a.'  on '.$mfile, E_USER_ERROR);
             }
         } else {
+            $mfile = $this->directories->kero_lib.$a.'.php';
             if (file_exists($this->directories->kero_lib.$a.'.php')) {
                 require_once $this->directories->kero_lib.$a.'.php';
             } else {
