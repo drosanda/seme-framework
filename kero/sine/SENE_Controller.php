@@ -699,7 +699,7 @@ abstract class SENE_Controller
     protected function getCanonical()
     {
       if(strlen($this->canonical)<4){
-        return rtrim(base_url()."".$_SERVER['REQUEST_URI']."",'/').'/';
+        return rtrim(base_url('')."".$_SERVER['REQUEST_URI']."",'/').'/';
       }
       return rtrim($this->canonical,'/').'/';
     }
@@ -712,7 +712,7 @@ abstract class SENE_Controller
       foreach ($this->additionalBefore as $a) {
         if (is_string($a)) {
           if(strpos($a,'{{base_url}}') !== false){
-            $a = str_replace('{{base_url}}', base_url(),$a);
+            $a = str_replace('{{base_url}}', base_url(''),$a);
           }elseif(strpos($a,'{{base_url_admin}}') !== false){
             $a = str_replace('{{base_url_admin}}', base_url_admin(),$a);
           }elseif(strpos($a,'{{cdn_url}}') !== false){
@@ -723,7 +723,7 @@ abstract class SENE_Controller
             if(strlen($cdn_url)>4){
               $a = str_replace('{{cdn_url}}', $cdn_url,$a);
             }else{
-              $a = str_replace('{{cdn_url}}', base_url(),$a);
+              $a = str_replace('{{cdn_url}}', base_url(''),$a);
             }
           }
           echo "\n\t".$a;
@@ -741,7 +741,7 @@ abstract class SENE_Controller
         foreach ($this->additional as $a) {
           if (is_string($a)) {
             if(strpos($a,'{{base_url}}') !== false){
-              $a = str_replace('{{base_url}}', base_url(),$a);
+              $a = str_replace('{{base_url}}', base_url(''),$a);
             }elseif(strpos($a,'{{base_url_admin}}') !== false){
               $a = str_replace('{{base_url_admin}}', base_url_admin(),$a);
             }elseif(strpos($a,'{{cdn_url}}') !== false){
@@ -752,7 +752,7 @@ abstract class SENE_Controller
               if(strlen($cdn_url)>4){
                 $a = str_replace('{{cdn_url}}', $cdn_url,$a);
               }else{
-                $a = str_replace('{{cdn_url}}', base_url(),$a);
+                $a = str_replace('{{cdn_url}}', base_url(''),$a);
               }
             }
             echo "\n\t".$a;
@@ -770,7 +770,7 @@ abstract class SENE_Controller
       foreach ($this->additionalAfter as $a) {
         if (is_string($a)) {
           if(strpos($a,'{{base_url}}') !== false){
-            $a = str_replace('{{base_url}}', base_url(),$a);
+            $a = str_replace('{{base_url}}', base_url(''),$a);
           }elseif(strpos($a,'{{base_url_admin}}') !== false){
             $a = str_replace('{{base_url_admin}}', base_url_admin(),$a);
           }elseif(strpos($a,'{{cdn_url}}') !== false){
@@ -781,7 +781,7 @@ abstract class SENE_Controller
             if(strlen($cdn_url)>4){
               $a = str_replace('{{cdn_url}}', $cdn_url,$a);
             }else{
-              $a = str_replace('{{cdn_url}}', base_url(),$a);
+              $a = str_replace('{{cdn_url}}', base_url(''),$a);
             }
           }
           echo "\n\t".$a;
@@ -799,7 +799,7 @@ abstract class SENE_Controller
         foreach ($this->js_footer as $a) {
           if (is_string($a)) {
             if(strpos($a,'{{base_url}}') !== false){
-              $a = str_replace('{{base_url}}', base_url(),$a);
+              $a = str_replace('{{base_url}}', base_url(''),$a);
             }elseif(strpos($a,'{{base_url_admin}}') !== false){
               $a = str_replace('{{base_url_admin}}', base_url_admin(),$a);
             }elseif(strpos($a,'{{cdn_url}}') !== false){
@@ -810,7 +810,7 @@ abstract class SENE_Controller
               if(strlen($cdn_url)>4){
                   $a = str_replace('{{cdn_url}}', $cdn_url,$a);
               }else{
-                  $a = str_replace('{{cdn_url}}', base_url(),$a);
+                  $a = str_replace('{{cdn_url}}', base_url(''),$a);
               }
             }
             echo "\n\t".$a;
