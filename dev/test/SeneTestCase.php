@@ -14,7 +14,9 @@ if (!defined('SEMEROOT')) {
 if (!defined('SENEVIEW')) {
   define('SENEVIEW',SEMEROOT.'/app/view');
 }
-define(TEM_ERR, 'Error');
+if (!defined('SENEVIEW')) {
+  define(TEM_ERR, 'Error');
+}
 
 /** global objects */
 $GLOBALS['SEMEDIR'] = new stdClass();
@@ -157,7 +159,7 @@ unset($cv,$semevar,$core_model,$admin_secret_url);
  * @param  string $url addtional url
  * @return string      full base url
  */
-function base_url($url="")
+function base_url($url='')
 {
     return rtrim($GLOBALS['SEMECFG']->baseurl.$url,'/').'/';
 }
@@ -166,7 +168,7 @@ function base_url($url="")
  * @param  string $url addtional url
  * @return string      full url
  */
-function base_url_admin($url="")
+function base_url_admin($url='')
 {
     return rtrim($GLOBALS['SEMECFG']->baseurl.$GLOBALS['SEMECFG']->baseurl_admin.'/'.$url,'/').'/';
 }

@@ -8,7 +8,7 @@
  * @param  string $url addtional url
  * @return string      full base url
  */
-function base_url($url="")
+function base_url($url='')
 {
     return $GLOBALS['SEMECFG']->baseurl.$url;
 }
@@ -17,7 +17,7 @@ function base_url($url="")
  * @param  string $url addtional url
  * @return string      full url
  */
-function base_url_admin($url="")
+function base_url_admin($url='')
 {
     return  $GLOBALS['SEMECFG']->baseurl.$GLOBALS['SEMECFG']->baseurl_admin.'/'.$url;
 }
