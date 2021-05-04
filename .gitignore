@@ -6,3 +6,5 @@ docs/*
 .phpdoc
 .scannerwork/*
 dev/logs/*
+clover.xml
+junit.xml
