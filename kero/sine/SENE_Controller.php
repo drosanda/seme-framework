@@ -714,7 +714,7 @@ abstract class SENE_Controller
           if(strpos($a,'{{base_url}}') !== false){
             $a = str_replace('{{base_url}}', base_url(''),$a);
           }elseif(strpos($a,'{{base_url_admin}}') !== false){
-            $a = str_replace('{{base_url_admin}}', base_url_admin(),$a);
+            $a = str_replace('{{base_url_admin}}', base_url_admin(''),$a);
           }elseif(strpos($a,'{{cdn_url}}') !== false){
             $cdn_url = '';
             if(isset($this->config->cdn_url)){
@@ -743,7 +743,7 @@ abstract class SENE_Controller
             if(strpos($a,'{{base_url}}') !== false){
               $a = str_replace('{{base_url}}', base_url(''),$a);
             }elseif(strpos($a,'{{base_url_admin}}') !== false){
-              $a = str_replace('{{base_url_admin}}', base_url_admin(),$a);
+              $a = str_replace('{{base_url_admin}}', base_url_admin(''),$a);
             }elseif(strpos($a,'{{cdn_url}}') !== false){
               $cdn_url = '';
               if(isset($this->config->cdn_url)){
@@ -772,7 +772,7 @@ abstract class SENE_Controller
           if(strpos($a,'{{base_url}}') !== false){
             $a = str_replace('{{base_url}}', base_url(''),$a);
           }elseif(strpos($a,'{{base_url_admin}}') !== false){
-            $a = str_replace('{{base_url_admin}}', base_url_admin(),$a);
+            $a = str_replace('{{base_url_admin}}', base_url_admin(''),$a);
           }elseif(strpos($a,'{{cdn_url}}') !== false){
             $cdn_url = '';
             if(isset($this->config->cdn_url)){
@@ -801,7 +801,7 @@ abstract class SENE_Controller
             if(strpos($a,'{{base_url}}') !== false){
               $a = str_replace('{{base_url}}', base_url(''),$a);
             }elseif(strpos($a,'{{base_url_admin}}') !== false){
-              $a = str_replace('{{base_url_admin}}', base_url_admin(),$a);
+              $a = str_replace('{{base_url_admin}}', base_url_admin(''),$a);
             }elseif(strpos($a,'{{cdn_url}}') !== false){
               $cdn_url = '';
               if(isset($this->config->cdn_url)){
