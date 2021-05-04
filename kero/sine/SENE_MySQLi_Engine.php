@@ -58,8 +58,7 @@ class SENE_MySQLi_Engine
           if($this->config->environment == 'development'){
             trigger_error(TEM_ERR.': Cannot connect to database server using the supplied settings.', E_USER_ERROR);
             return;
-          }else if($this->config->environment == 'staging'){
-            if ($this->__mysqli->connect_errno) {
+          }else if($this->config->environment == 'staging' && $this->__mysqli->connect_errno) {
                 header("content-type: application/json");
                 http_response_code(200);
                 $data = array();
@@ -144,7 +143,7 @@ class SENE_MySQLi_Engine
             return 0;
         }
     }
-    public function select_as($skey, $sval="", $escape=1)
+    public function select_as($skey, $sval="")
     {
         if (is_array($skey)) {
             foreach ($skey as $k=>$v) {
@@ -175,8 +174,7 @@ class SENE_MySQLi_Engine
             if (!empty($name)) {
                 $cache=$name."-".md5($sql).".json";
             }
-            //die(SENECACHE.'/'.$cache);
-            //var_dump($cache_enabled);
+
             if (isset($GLOBALS['semeflush'])) {
                 $flushcache = $GLOBALS['semeflush'];
             }
@@ -184,7 +182,6 @@ class SENE_MySQLi_Engine
                 $cache_enabled = $GLOBALS['semecache'];
             }
             if ($flushcache) {
-                //die("deleted");
                 if (file_exists(SENECACHE.'/'.$cache)) {
                     unlink(SENECACHE.'/'.$cache);
                 }
@@ -228,12 +225,10 @@ class SENE_MySQLi_Engine
                 }
             }
         } else {
-            //die("else");
             $res = $this->__mysqli->query($sql);
             if ($res) {
                 $dataz=array();
                 if ($type=="array") {
-                    //die($type);
                     while ($data=$res->fetch_array()) {
                         array_push($dataz, $data);
                     }
@@ -259,6 +254,7 @@ class SENE_MySQLi_Engine
             }
         }
     }
+
     public function select($sql="", $cache_enabled=0, $flushcache=0, $type="object")
     {
         //
