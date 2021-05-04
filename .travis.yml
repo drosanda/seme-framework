@@ -8,6 +8,7 @@ before_script:
   - chmod 775 /home/travis/build/drosanda/seme-framework/app/cache/
 after_success:
     - bash <(curl -s https://codecov.io/bash)
+    - sonar-scanner
 addons:
   sonarcloud:
     organization: "drosanda"
@@ -17,5 +18,3 @@ addons:
 script:
   # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
   - phpunit --configuration phpunit.xml --coverage-clover coverage.xml --testsuite Dev
-  # only use sonarqube scanner
-  - sonar-scanner
