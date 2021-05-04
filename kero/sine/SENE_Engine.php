@@ -6,7 +6,9 @@
  */
 
 /** CONSTANTS */
-define(TEM_ERR, 'Error');
+if (!defined('SENEVIEW')) {
+  define(TEM_ERR, 'Error');
+}
 
 /**
  * Main Engine Class of seme framework
