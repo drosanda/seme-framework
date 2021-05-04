@@ -73,10 +73,8 @@ class SENE_MySQLi_Engine
         }
 
         $cs = 'utf8';
-        if(isset($this->config->database->charset)){
-          if(strlen($this->config->database->port)>0){
-            $cs = $this->config->database->charset;
-          }
+        if(isset($this->config->database->charset) && strlen($this->config->database->port)>0){
+          $cs = $this->config->database->charset;
         }
         $this->__mysqli->set_charset($cs);
 
