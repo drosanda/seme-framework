@@ -110,8 +110,8 @@ $db['engine'] = 'mysqli';
 $core_prefix = '';
 $core_controller = '';
 $core_model = '';
-$controller_main = '';
-$controller_404 = '';
+$controller_main = 'home';
+$controller_404 = 'notfound';
 $routes = array();
 $semevar = array();
 
