@@ -42,32 +42,31 @@ class SENE_MySQLi_Engine
 
     public function __construct()
     {
-        $this->directories = $GLOBALS['SEMEDIR'];
-        $this->config = $GLOBALS['SEMECFG'];
-        $port = 3306;
-        if(isset($this->config->database->port)){
-          if(strlen($this->config->database->port)>0){
-            $port = $this->config->database->port;
-          }
+      $this->directories = $GLOBALS['SEMEDIR'];
+      $this->config = $GLOBALS['SEMECFG'];
+      $port = 3306;
+      if(isset($this->config->database->port)){
+        if(strlen($this->config->database->port)>0){
+          $port = $this->config->database->port;
         }
-        mysqli_report(MYSQLI_REPORT_STRICT);
-        $this->__mysqli = new mysqli();
-        try {
-            $this->__mysqli->connect($this->config->database->host, $this->config->database->user, $this->config->database->pass, $this->config->database->name, $port);
-        } catch (Exception $e) {
-          if($this->config->environment == 'development'){
-            trigger_error(TEM_ERR.': Cannot connect to database server using the supplied settings.', E_USER_ERROR);
-            return;
-          }else if($this->config->environment == 'staging' && $this->__mysqli->connect_errno) {
-                header("content-type: application/json");
-                http_response_code(200);
-                $data = array();
-                $data['status'] = $this->__mysqli->connect_errno;
-                $data['message'] = 'Failed to connect to Database: '.$this->__mysqli->connect_error;
-                $data['data'] = array();
-                echo json_encode($data);
-                return;
-            }
+      }
+      mysqli_report(MYSQLI_REPORT_STRICT);
+      $this->__mysqli = new mysqli();
+      try {
+          $this->__mysqli->connect($this->config->database->host, $this->config->database->user, $this->config->database->pass, $this->config->database->name, $port);
+      } catch (Exception $e) {
+        if($this->config->environment == 'development'){
+          trigger_error(TEM_ERR.': Cannot connect to database server using the supplied settings.', E_USER_ERROR);
+          return;
+        }else if($this->config->environment == 'staging' && $this->__mysqli->connect_errno) {
+              header("content-type: application/json");
+              http_response_code(200);
+              $data = array();
+              $data['status'] = $this->__mysqli->connect_errno;
+              $data['message'] = 'Failed to connect to Database: '.$this->__mysqli->connect_error;
+              $data['data'] = array();
+              echo json_encode($data);
+              return;
           }
         }
 
@@ -98,6 +97,7 @@ class SENE_MySQLi_Engine
         $this->query_last = "";
         $this->is_debug = 1;
     }
+
     public static function getInstance()
     {
         return self::$_instance;
@@ -1619,7 +1619,7 @@ class SENE_MySQLi_Engine
      */
     public function __encrypt($s)
     {
-        return 'AES_ENCRYPT('.$this->db->esc($s).',"'.$this->db->enckey.'")';
+        return 'AES_ENCRYPT('.$this->db->esc($s).',"'.$this->config->database->enckey.'")';
     }
 
     /**
@@ -1629,6 +1629,6 @@ class SENE_MySQLi_Engine
      */
     public function __decrypt($s)
     {
-        return 'AES_DECRYPT('.$s.',"'.$this->db->enckey.'")';
+        return 'AES_DECRYPT('.$s.',"'.$this->config->database->enckey.'")';
     }
 }
