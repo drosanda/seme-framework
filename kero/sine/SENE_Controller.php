@@ -569,7 +569,6 @@ abstract class SENE_Controller
         if (is_array($val)) {
             foreach ($val as $v) {
                 $this->additionalBefore[] = $v;
-                $i++;
             }
         } elseif (is_string($val)) {
             $this->additionalBefore[] = $val;
