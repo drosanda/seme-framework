@@ -252,6 +252,10 @@ require_once "kero/sine/SENE_Model.php";
 require_once "app/core/JI_Controller.php";
 require_once "app/controller/api_mobile/apikey.php";
 
+/**
+*
+* @codeCoverageIgnore
+*/
 class SENE_Runner
 {
   public $root = '';
