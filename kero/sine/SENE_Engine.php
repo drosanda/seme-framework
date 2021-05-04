@@ -164,7 +164,6 @@ class SENE_Engine
 
     private function newRouteFolder()
     {
-        $found=0;
         $sene_method = $this->config->method;
         if (isset($_SERVER[$sene_method])) {
             $path = $_SERVER[$sene_method];

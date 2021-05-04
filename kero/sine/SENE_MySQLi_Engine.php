@@ -93,8 +93,8 @@ class SENE_MySQLi_Engine
         $this->cache_save = 0;
         $this->cache_flush = 0;
         $this->tis_limit = 0;
-        $in_join=0;
-        $in_join_mutli=0;
+        $this->in_join=0;
+        $this->in_join_multi=0;
         $this->as_from = array();
         $this->join = array();
         $this->join_multi = array();
