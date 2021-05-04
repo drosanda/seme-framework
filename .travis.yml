@@ -8,12 +8,6 @@ before_script:
   - chmod 775 /home/travis/build/drosanda/seme-framework/app/cache/
 after_success:
     - bash <(curl -s https://codecov.io/bash)
-addons:
-  sonarcloud:
-    organization: "drosanda"
-    token:
-      secure: "xKuRn1dE0n8ZbrHNJc6GPUyxqstuh4FhDrnjadp9xIn5c1ajYgTIoNlrh/PcJ7smgHSTy3LWnTxirrVuJMdJiWsvKzU0WBVYiF8DFRD1F1egX5R1vxciRM6EKvcq/9u72kjAe5cAW2bWJ1QQokpyG1hK0N7BK0gG0WEaQhRlXbpdKYCVmXw01ExnDMOVB2cbp6R2eU93/0Dy5h8rPLKWJDjB0wn0PdRHONuVZh6tyKCwmqPq8b8MsTkET7wFHtGfOc80QRQEVj3pY7nuaD9tY8cBKCitLPaEm6jnzu0K65tEgbKq2Z3UtH0Q5LIs0W3wZfgUxKIYhnIwYsW79L0TT3HsgOZr/G5rL8F8PnOvqQ3ISK4Wl86DXV8HwTrGiU6CRZ5RNRWeCX0r/X6og/h8Uo6BG1EQAgjwn6n/FL/MBSw4/8QwF42jCksRM5nGw15kgHY3HqmCNQ4N4u8p84t8kcWABvvW+BGWSotdNOqyTLAMgi1IP39hM7Nv4fdAcVGfyC3LJulAxV90a4MbeyEjWBzPBpnvmziV0xNoDqD0kwBXkMXSGhPPy/rQCyBeBd1KbELF3vzinmqqcZ6y8tEvug/xFMHEEK/fEKpDhHfVGWxq9hJK96Ok0JuuqI6bJwPzWeZsjNd8gcmIAW8tBLIvTuW0AqkrcDyWV/sD/aJ6WBU=" # encrypted value of your token
-
 script:
   # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
   - phpunit --configuration phpunit.xml --coverage-clover coverage.xml --testsuite Dev
