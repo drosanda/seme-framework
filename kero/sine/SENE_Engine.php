@@ -21,6 +21,8 @@ if (!defined('LBL_CDN_URL')) {
 
 /**
  * Main Engine Class of seme framework
+ *
+ * @codeCoverageIgnore
  */
 class SENE_Engine
 {
@@ -41,9 +43,9 @@ class SENE_Engine
         $this->default = $this->config->controller_main;
         $this->notfound = $this->config->controller_404;
 
-        require_once $this->directories->kero_sine."SENE_Input.php";
-        require_once $this->directories->kero_sine."SENE_Controller.php";
-        require_once $this->directories->kero_sine."SENE_Model.php";
+        require_once $this->directories->kero_sine.'SENE_Input.php';
+        require_once $this->directories->kero_sine.'SENE_Controller.php';
+        require_once $this->directories->kero_sine.'SENE_Model.php';
 
         $rs = array();
         foreach ($this->config->routes as $key=>$val) {
@@ -201,7 +203,7 @@ class SENE_Engine
                 if ($path[1] == "admin" && $this->config->baseurl_admin !="admin") {
                     $newpath = realpath($this->directories->app_controller.$path[1]);
                     $this->notFound($newpath);
-                    die();
+                    return;
                 }
 
                 if ($this->config->baseurl_admin==$path[1]) {
@@ -237,7 +239,7 @@ class SENE_Engine
                             $cname = strtr($cname,'-', '_');
                             if (!class_exists($cname, false)) {
                                 trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".$this->directories->app_controller.$path[2].'/'.$path[3].".php", E_USER_ERROR);
-                                die();
+                                return;
                             }
                             $cname = new $cname();
                             $func = "index";
@@ -278,7 +280,7 @@ class SENE_Engine
                         $cname = strtr($cname,'-', '_');
                         if (!class_exists($cname, false)) {
                             trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".$this->directories->app_controller." triggered ", E_USER_ERROR);
-                            die();
+                            return;
                         }
                         $cname = new $cname();
                         $func = "index";
