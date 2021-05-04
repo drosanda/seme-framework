@@ -428,7 +428,7 @@ abstract class SENE_Controller
         if (!empty($ext)) {
             $this->js_footer[] = '<script src="'.$src.'"></script>';
         } else {
-            $stype = rtrim($src, '.js');
+            $src = rtrim($src, '.js');
             $this->js_footer[] = '<script src="'.$src.'.js"></script>';
         }
         return $this;
@@ -712,16 +712,20 @@ abstract class SENE_Controller
     {
       foreach ($this->additionalBefore as $a) {
         if (is_string($a)) {
-          $a = str_replace('{{base_url}}', base_url(), $a);
-          $a = str_replace('{{base_url_admin}}', base_url_admin(),$a);
-          $cdn_url = '';
-          if(isset($this->config->cdn_url)){
-            $cdn_url = $this->config->cdn_url;
-          }
-          if(strlen($cdn_url)>4){
-            $a = str_replace('{{cdn_url}}', $cdn_url, $a);
-          }else{
-            $a = str_replace('{{cdn_url}}', base_url(), $a);
+          if(strpos($a,'{{base_url}}') !== false){
+            $a = str_replace('{{base_url}}', base_url(),$a);
+          }elseif(strpos($a,'{{base_url_admin}}') !== false){
+            $a = str_replace('{{base_url_admin}}', base_url_admin(),$a);
+          }elseif(strpos($a,'{{cdn_url}}') !== false){
+            $cdn_url = '';
+            if(isset($this->config->cdn_url)){
+              $cdn_url = $this->config->cdn_url;
+            }
+            if(strlen($cdn_url)>4){
+              $a = str_replace('{{cdn_url}}', $cdn_url,$a);
+            }else{
+              $a = str_replace('{{cdn_url}}', base_url(),$a);
+            }
           }
           echo "\n\t".$a;
         }
@@ -740,7 +744,7 @@ abstract class SENE_Controller
             if(strpos($a,'{{base_url}}') !== false){
               $a = str_replace('{{base_url}}', base_url(),$a);
             }elseif(strpos($a,'{{base_url_admin}}') !== false){
-              $a = str_replace('', base_url_admin(),$a);
+              $a = str_replace('{{base_url_admin}}', base_url_admin(),$a);
             }elseif(strpos($a,'{{cdn_url}}') !== false){
               $cdn_url = '';
               if(isset($this->config->cdn_url)){
@@ -766,16 +770,20 @@ abstract class SENE_Controller
     {
       foreach ($this->additionalAfter as $a) {
         if (is_string($a)) {
-          $a = str_replace('{{base_url}}', base_url(), $a);
-          $a = str_replace('{{base_url_admin}}', base_url_admin(),$a);
-          $cdn_url = '';
-          if(isset($this->config->cdn_url)){
-            $cdn_url = $this->config->cdn_url;
-          }
-          if(strlen($cdn_url)>4){
-            $a = str_replace('{{cdn_url}}', $cdn_url, $a);
-          }else{
-            $a = str_replace('{{cdn_url}}', base_url(), $a);
+          if(strpos($a,'{{base_url}}') !== false){
+            $a = str_replace('{{base_url}}', base_url(),$a);
+          }elseif(strpos($a,'{{base_url_admin}}') !== false){
+            $a = str_replace('{{base_url_admin}}', base_url_admin(),$a);
+          }elseif(strpos($a,'{{cdn_url}}') !== false){
+            $cdn_url = '';
+            if(isset($this->config->cdn_url)){
+              $cdn_url = $this->config->cdn_url;
+            }
+            if(strlen($cdn_url)>4){
+              $a = str_replace('{{cdn_url}}', $cdn_url,$a);
+            }else{
+              $a = str_replace('{{cdn_url}}', base_url(),$a);
+            }
           }
           echo "\n\t".$a;
         }
@@ -794,7 +802,7 @@ abstract class SENE_Controller
             if(strpos($a,'{{base_url}}') !== false){
               $a = str_replace('{{base_url}}', base_url(),$a);
             }elseif(strpos($a,'{{base_url_admin}}') !== false){
-              $a = str_replace('', base_url_admin(),$a);
+              $a = str_replace('{{base_url_admin}}', base_url_admin(),$a);
             }elseif(strpos($a,'{{cdn_url}}') !== false){
               $cdn_url = '';
               if(isset($this->config->cdn_url)){
@@ -810,6 +818,16 @@ abstract class SENE_Controller
           }
         }
       }
+    }
+
+    /**
+     * Set meta content value
+     * @param string $content_type content type value
+     */
+    protected function setContentType($content_type)
+    {
+        $this->content_type = $content_type;
+        return $this;
     }
 
     /**
