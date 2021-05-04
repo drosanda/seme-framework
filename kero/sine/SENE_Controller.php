@@ -157,25 +157,25 @@ abstract class SENE_Controller
                 }
                 $this->{$b} = new $cname();
             } else {
-                trigger_error('could not find model '.$a.'  on '.$mfile, E_USER_ERROR);
+                trigger_error(TEM_ERR.': could not find model '.$a.'  on '.$mfile, E_USER_ERROR);
             }
         } elseif ($c=="lib") {
             $mfile = $this->directories->kero_lib.$a.'.php';
             if (empty($b)) {
-                $b = $cname;
+                $b = basename($mfile, '.php');
             }
             $b = strtolower($b);
             if (file_exists($mfile)) {
                 require_once $mfile;
                 $this->$b = new $b();
             } else {
-                trigger_error('could not find library '.$a.'  on '.$mfile, E_USER_ERROR);
+                trigger_error(TEM_ERR.': could not find library '.$a.'  on '.$mfile, E_USER_ERROR);
             }
         } else {
             if (file_exists($this->directories->kero_lib.$a.'.php')) {
                 require_once $this->directories->kero_lib.$a.'.php';
             } else {
-                trigger_error('could not find require_once library '.$a.' on '.$mfile, E_USER_ERROR);
+                trigger_error(TEM_ERR.': could not find require_once library '.$a.' on '.$mfile, E_USER_ERROR);
             }
         }
         return $this;
