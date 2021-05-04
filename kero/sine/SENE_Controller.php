@@ -208,9 +208,9 @@ abstract class SENE_Controller
     protected function loadLayout(string $a, $__forward=array())
     {
         if (empty($a)) {
-            trigger_error('Layout not found. Please check layout file at '.$this->directories->app_view.$this->getTheme().'page/ executed', E_USER_ERROR);
+            trigger_error(TEM_ERR.': Layout not found. Please check layout file at '.$this->directories->app_view.$this->getTheme().'page/ executed', E_USER_ERROR);
         }
-        $this->view($this->getTheme()."page/".$a, $__forward);
+        $this->view($this->getTheme().'page/'.$a, $__forward);
         return $this;
     }
 
@@ -317,7 +317,7 @@ abstract class SENE_Controller
             ob_end_clean();
             return $this;
         } else {
-            trigger_error('unable to load putJsReady for '.$v.'.php', E_USER_ERROR);
+            trigger_error(TEM_ERR.': unable to load putJsReady for '.$v.'.php', E_USER_ERROR);
         }
     }
 
@@ -372,7 +372,7 @@ abstract class SENE_Controller
             ob_end_clean();
             return $this;
         } else {
-            trigger_error('unable to load putJsContent for '.$v.'.php', E_USER_ERROR);
+            trigger_error(TEM_ERR.': unable to load putJsContent for '.$v.'.php', E_USER_ERROR);
         }
         return $this;
     }
@@ -397,9 +397,10 @@ abstract class SENE_Controller
             ob_end_clean();
             return $this;
         } else {
-            trigger_error('unable to load putBodyBefore for '.$v.'.php', E_USER_ERROR);
+            trigger_error(TEM_ERR.': unable to load putBodyBefore for '.$v.'.php', E_USER_ERROR);
         }
     }
+    
     /**
      * Get JavaScript content injected from putBodyBefore
      */

@@ -682,4 +682,173 @@ final class SENE_Controller_Test extends TestCase
     if(is_file($file)) unlink($file);
     if(is_dir($dir)) rmdir($dir);
   }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
+  public function testResetThemeContent()
+  {
+    $tc = new SENE_Controller_Mock();
+    $ts = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+    $tc->__themeContent = $ts;
+    $this->invokeMethod($tc, 'resetThemeContent', array());
+    $this->assertNotEquals($ts, $tc->__themeContent);
+    $this->assertEquals('', $tc->__themeContent);
+  }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
+  public function testGetThemeContent()
+  {
+    $tc = new SENE_Controller_Mock();
+    $ts = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+    $tc->__themeContent = $ts;
+    $this->invokeMethod($tc, 'getThemeContent', array());
+    $this->expectOutputString($ts);
+  }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
+  public function testGetThemeRightContent()
+  {
+    $tc = new SENE_Controller_Mock();
+    $ts = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+    $tc->__themeRightContent = $ts;
+    $this->invokeMethod($tc, 'getThemeRightContent', array());
+    $this->expectOutputString($ts);
+  }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
+  public function testGetThemeLeftContent()
+  {
+    $tc = new SENE_Controller_Mock();
+    $ts = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+    $tc->__themeLeftContent = $ts;
+    $this->invokeMethod($tc, 'getThemeLeftContent', array());
+    $this->expectOutputString($ts);
+  }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
+  public function testGetBodyBefore()
+  {
+    $tc = new SENE_Controller_Mock();
+    $ts = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+    $tc->__bodyBefore = $ts;
+    $this->invokeMethod($tc, 'getBodyBefore', array());
+    $this->expectOutputString($ts);
+  }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
+  public function testGetJsContent()
+  {
+    $tc = new SENE_Controller_Mock();
+    $ts = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+    $tc->__jsContent = $ts;
+    $this->invokeMethod($tc, 'getJsContent', array());
+    $this->expectOutputString($ts);
+  }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
+  public function testCdnUrl()
+  {
+    $tc = new SENE_Controller_Mock();
+    $tc->config->environment = '';
+    $tc->config->cdn_url = 'https://seme-framework.b-cdn.net/';
+    $ts = '';
+    $td = base_url();
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
+
+    $ts = 'media/skin/avatar1.png';
+    $td = base_url($ts);
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
+
+    $tc->config->environment = 'development';
+    $ts = '';
+    $td = base_url();
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
+
+    $ts = 'media/skin/avatar2.png';
+    $td = base_url($ts);
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
+
+    $tc->config->environment = 'staging';
+    $ts = '';
+    $td = $tc->config->cdn_url;
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
+
+    $ts = 'media/skin/avatar3.png';
+    $td = $tc->config->cdn_url.$ts;
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
+
+    $tc->config->environment = 'production';
+    $ts = '';
+    $td = $tc->config->cdn_url;
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
+
+    $ts = 'media/skin/avatar4.png';
+    $td = $tc->config->cdn_url.$ts;
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
+
+
+    $tc->config->environment = '';
+    $tc->config->cdn_url = '123456';
+    $ts = '';
+    $td = base_url();
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
+
+    $ts = 'media/skin/avatar1a.png';
+    $td = base_url($ts);
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
+
+    $tc->config->environment = 'development';
+    $ts = '';
+    $td = base_url();
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
+
+    $ts = 'media/skin/avatar2a.png';
+    $td = base_url($ts);
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
+
+    $tc->config->environment = 'staging';
+    $ts = '';
+    $td = base_url();
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
+
+    $ts = 'media/skin/avatar3a.png';
+    $td = base_url($ts);
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
+
+    $tc->config->environment = 'production';
+    $ts = '';
+    $td = base_url();
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
+
+    $ts = 'media/skin/avatar4a.png';
+    $td = base_url($ts);
+    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
+  }
 }
