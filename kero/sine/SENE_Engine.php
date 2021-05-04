@@ -5,6 +5,9 @@
  * @since SemeFramework 3.0.0
  */
 
+/** CONSTANTS */
+define(TEM_ERR, 'Error');
+
 /**
  * Main Engine Class of seme framework
  */
