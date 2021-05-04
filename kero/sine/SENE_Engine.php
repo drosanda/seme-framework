@@ -6,8 +6,17 @@
  */
 
 /** CONSTANTS */
-if (!defined('SENEVIEW')) {
-  define(TEM_ERR, 'Error');
+if (!defined('TEM_ERR')) {
+  define('TEM_ERR', 'Error');
+}
+if (!defined('LBL_BASE_URL')) {
+  define('LBL_BASE_URL', '{{base_url}}');
+}
+if (!defined('LBL_BASE_URL_ADMIN')) {
+  define('LBL_BASE_URL_ADMIN', '{{base_url_admin}}');
+}
+if (!defined('LBL_CDN_URL')) {
+  define('LBL_CDN_URL', '{{cdn_url}}');
 }
 
 /**

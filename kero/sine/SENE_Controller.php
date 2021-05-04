@@ -710,19 +710,19 @@ abstract class SENE_Controller
     {
       foreach ($this->additionalBefore as $a) {
         if (is_string($a)) {
-          if(strpos($a,'{{base_url}}') !== false){
-            $a = str_replace('{{base_url}}', base_url(''),$a);
-          }elseif(strpos($a,'{{base_url_admin}}') !== false){
-            $a = str_replace('{{base_url_admin}}', base_url_admin(''),$a);
-          }elseif(strpos($a,'{{cdn_url}}') !== false){
+          if(strpos($a,LBL_BASE_URL) !== false){
+            $a = str_replace(LBL_BASE_URL, base_url(''),$a);
+          }elseif(strpos($a,LBL_BASE_URL_ADMIN) !== false){
+            $a = str_replace(LBL_BASE_URL_ADMIN, base_url_admin(''),$a);
+          }elseif(strpos($a,LBL_CDN_URL) !== false){
             $cdn_url = '';
             if(isset($this->config->cdn_url)){
               $cdn_url = $this->config->cdn_url;
             }
             if(strlen($cdn_url)>4){
-              $a = str_replace('{{cdn_url}}', $cdn_url,$a);
+              $a = str_replace(LBL_CDN_URL, $cdn_url,$a);
             }else{
-              $a = str_replace('{{cdn_url}}', base_url(''),$a);
+              $a = str_replace(LBL_CDN_URL, base_url(''),$a);
             }
           }
           echo "\n\t".$a;
@@ -739,19 +739,19 @@ abstract class SENE_Controller
       if (is_array($this->additional)){
         foreach ($this->additional as $a) {
           if (is_string($a)) {
-            if(strpos($a,'{{base_url}}') !== false){
-              $a = str_replace('{{base_url}}', base_url(''),$a);
-            }elseif(strpos($a,'{{base_url_admin}}') !== false){
-              $a = str_replace('{{base_url_admin}}', base_url_admin(''),$a);
-            }elseif(strpos($a,'{{cdn_url}}') !== false){
+            if(strpos($a,LBL_BASE_URL) !== false){
+              $a = str_replace(LBL_BASE_URL, base_url(''),$a);
+            }elseif(strpos($a,LBL_BASE_URL_ADMIN) !== false){
+              $a = str_replace(LBL_BASE_URL_ADMIN, base_url_admin(''),$a);
+            }elseif(strpos($a,LBL_CDN_URL) !== false){
               $cdn_url = '';
               if(isset($this->config->cdn_url)){
                 $cdn_url = $this->config->cdn_url;
               }
               if(strlen($cdn_url)>4){
-                $a = str_replace('{{cdn_url}}', $cdn_url,$a);
+                $a = str_replace(LBL_CDN_URL, $cdn_url,$a);
               }else{
-                $a = str_replace('{{cdn_url}}', base_url(''),$a);
+                $a = str_replace(LBL_CDN_URL, base_url(''),$a);
               }
             }
             echo "\n\t".$a;
@@ -768,19 +768,19 @@ abstract class SENE_Controller
     {
       foreach ($this->additionalAfter as $a) {
         if (is_string($a)) {
-          if(strpos($a,'{{base_url}}') !== false){
-            $a = str_replace('{{base_url}}', base_url(''),$a);
-          }elseif(strpos($a,'{{base_url_admin}}') !== false){
-            $a = str_replace('{{base_url_admin}}', base_url_admin(''),$a);
-          }elseif(strpos($a,'{{cdn_url}}') !== false){
+          if(strpos($a,LBL_BASE_URL) !== false){
+            $a = str_replace(LBL_BASE_URL, base_url(''),$a);
+          }elseif(strpos($a,LBL_BASE_URL_ADMIN) !== false){
+            $a = str_replace(LBL_BASE_URL_ADMIN, base_url_admin(''),$a);
+          }elseif(strpos($a,LBL_CDN_URL) !== false){
             $cdn_url = '';
             if(isset($this->config->cdn_url)){
               $cdn_url = $this->config->cdn_url;
             }
             if(strlen($cdn_url)>4){
-              $a = str_replace('{{cdn_url}}', $cdn_url,$a);
+              $a = str_replace(LBL_CDN_URL, $cdn_url,$a);
             }else{
-              $a = str_replace('{{cdn_url}}', base_url(''),$a);
+              $a = str_replace(LBL_CDN_URL, base_url(''),$a);
             }
           }
           echo "\n\t".$a;
@@ -797,19 +797,19 @@ abstract class SENE_Controller
       if(is_array($this->js_footer)){
         foreach ($this->js_footer as $a) {
           if (is_string($a)) {
-            if(strpos($a,'{{base_url}}') !== false){
-              $a = str_replace('{{base_url}}', base_url(''),$a);
-            }elseif(strpos($a,'{{base_url_admin}}') !== false){
-              $a = str_replace('{{base_url_admin}}', base_url_admin(''),$a);
-            }elseif(strpos($a,'{{cdn_url}}') !== false){
+            if(strpos($a,LBL_BASE_URL) !== false){
+              $a = str_replace(LBL_BASE_URL, base_url(''),$a);
+            }elseif(strpos($a,LBL_BASE_URL_ADMIN) !== false){
+              $a = str_replace(LBL_BASE_URL_ADMIN, base_url_admin(''),$a);
+            }elseif(strpos($a,LBL_CDN_URL) !== false){
               $cdn_url = '';
               if(isset($this->config->cdn_url)){
                 $cdn_url = $this->config->cdn_url;
               }
               if(strlen($cdn_url)>4){
-                  $a = str_replace('{{cdn_url}}', $cdn_url,$a);
+                  $a = str_replace(LBL_CDN_URL, $cdn_url,$a);
               }else{
-                  $a = str_replace('{{cdn_url}}', base_url(''),$a);
+                  $a = str_replace(LBL_CDN_URL, base_url(''),$a);
               }
             }
             echo "\n\t".$a;

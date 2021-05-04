@@ -14,8 +14,8 @@ if (!defined('SEMEROOT')) {
 if (!defined('SENEVIEW')) {
   define('SENEVIEW',SEMEROOT.'/app/view');
 }
-if (!defined('SENEVIEW')) {
-  define(TEM_ERR, 'Error');
+if (!defined('TEM_ERR')) {
+  define('TEM_ERR', 'Error');
 }
 
 /** global objects */
