@@ -6,8 +6,8 @@ php:
 before_script:
   - mkdir -p /home/travis/build/drosanda/seme-framework/app/cache/
   - chmod 775 /home/travis/build/drosanda/seme-framework/app/cache/
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS seme_framework;'
-  - mysql -u root --default-character-set=utf8 seme_framework < sql/seme_framework.sql
+  - sudo mysql -e 'CREATE DATABASE IF NOT EXISTS seme_framework;'
+  - sudo mysql -u root --default-character-set=utf8 seme_framework < sql/seme_framework.sql
 after_success:
     - bash <(curl -s https://codecov.io/bash)
     # - sonar-scanner
@@ -15,7 +15,7 @@ script:
   # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
   - phpunit --configuration phpunit.xml --coverage-clover coverage.xml --log-junit junit.xml --testsuite Dev
 addons:
-  mariadb: '10.4'
+  mysql: '5.6'
   sonarcloud:
     organization: "drosanda"
     token:
