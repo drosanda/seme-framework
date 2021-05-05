@@ -9,6 +9,7 @@ require_once $GLOBALS['SEMEDIR']->kero_sine.'SENE_Model.php';
 class SENE_Model_Mock extends SENE_Model {
   public $db;
   public $config;
+  public $__mysqli;
   public function __construct(){
     parent::__construct();
   }
@@ -40,6 +41,30 @@ final class SENE_Model_Test extends TestCase
     $method = $reflection->getMethod($methodName);
     $method->setAccessible(true);
     return $method->invokeArgs($object, $parameters);
+  }
+
+  /**
+   * @uses SENE_Model_Test
+   * @uses SENE_Model_Mock
+   * @covers SENE_Model
+   * @covers SENE_MySQLi_Engine
+   */
+  public function testDBConnection()
+  {
+    $tc = new SENE_Model_Mock();
+    $this->assertEquals(0,$tc->db->__mysqli->connect_errno);
+  }
+
+  /**
+   * @uses SENE_Model_Test
+   * @uses SENE_Model_Mock
+   * @covers SENE_Model
+   * @covers SENE_MySQLi_Engine
+   */
+  public function testDBError()
+  {
+    $tc = new SENE_Model_Mock();
+    $this->assertEquals(0,$tc->db->__mysqli->errno);
   }
 
   /**

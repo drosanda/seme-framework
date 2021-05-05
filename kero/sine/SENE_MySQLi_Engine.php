@@ -12,7 +12,7 @@
 class SENE_MySQLi_Engine
 {
     protected static $__instance;
-    protected $__mysqli;
+    public $__mysqli;
     protected $koneksi;
     protected $fieldname = array();
     protected $fieldvalue = array();
@@ -54,21 +54,21 @@ class SENE_MySQLi_Engine
       $this->__mysqli = new mysqli();
       try {
           $this->__mysqli->connect($this->config->database->host, $this->config->database->user, $this->config->database->pass, $this->config->database->name, $port);
-      } catch (Exception $e) {
+      } catch (mysqli_sql_exception $e) {
         if($this->config->environment == 'development'){
           trigger_error(TEM_ERR.': Cannot connect to database server using the supplied settings.', E_USER_ERROR);
-          return;
+          throw $e;
         }else if($this->config->environment == 'staging' && $this->__mysqli->connect_errno) {
-              header("content-type: application/json");
-              http_response_code(200);
-              $data = array();
-              $data['status'] = $this->__mysqli->connect_errno;
-              $data['message'] = 'Failed to connect to Database: '.$this->__mysqli->connect_error;
-              $data['data'] = array();
-              echo json_encode($data);
-              return;
-          }
+          header("content-type: application/json");
+          http_response_code(200);
+          $data = array();
+          $data['status'] = $this->__mysqli->connect_errno;
+          $data['message'] = 'Failed to connect to Database: '.$this->__mysqli->connect_error;
+          $data['data'] = array();
+          echo json_encode($data);
+          return;
         }
+      }
 
         $cs = 'utf8';
         if(isset($this->config->database->charset) && strlen($this->config->database->port)>0){
