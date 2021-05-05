@@ -6,8 +6,8 @@
  */
 
 /** Constants */
-if(!defined('HTML_BR'){
-  define('HTML_BR','<br />');
+if(!defined('HTML_BR')){
+  define('HTML_BR', '<br />');
 }
 
 /**
