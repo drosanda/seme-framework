@@ -6,6 +6,8 @@ php:
 before_script:
   - mkdir -p /home/travis/build/drosanda/seme-framework/app/cache/
   - chmod 775 /home/travis/build/drosanda/seme-framework/app/cache/
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS seme_framework;'
+  - mysql -u root --default-character-set=utf8 seme_framework < sql/seme_framework.sql
 after_success:
     - bash <(curl -s https://codecov.io/bash)
     # - sonar-scanner
