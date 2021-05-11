@@ -17,17 +17,17 @@ class SENE_MySQLi_Engine
     protected $fieldname = array();
     protected $fieldvalue = array();
     public $last_id = 0;
-    public $in_select = "";
-    public $in_where = "";
-    public $in_order = "";
-    public $in_group = "";
-    public $table = "";
-    public $is_flush = "";
-    public $is_cache = "";
-    public $page = "";
-    public $pagesize = "";
-    public $cache_save = "";
-    public $cache_flush = "";
+    public $in_select = '';
+    public $in_where = '';
+    public $in_order = '';
+    public $in_group = '';
+    public $table = '';
+    public $is_flush = '';
+    public $is_cache = '';
+    public $page = '';
+    public $pagesize = '';
+    public $cache_save = '';
+    public $cache_flush = '';
     public $is_limit=0;
     public $tis_limit=0;
     public $limit_a=0;
@@ -78,10 +78,10 @@ class SENE_MySQLi_Engine
 
         self::$__instance = $this;
 
-        $this->in_select = "";
-        $this->in_where = "";
-        $this->in_order = "";
-        $this->table = "";
+        $this->in_select = '';
+        $this->in_where = '';
+        $this->in_order = '';
+        $this->table = '';
         $this->is_flush = 0;
         $this->is_cache = 0;
         $this->page = 0;
@@ -94,7 +94,7 @@ class SENE_MySQLi_Engine
         $this->as_from = array();
         $this->join = array();
         $this->join_multi = array();
-        $this->query_last = "";
+        $this->query_last = '';
         $this->is_debug = 1;
     }
 
@@ -122,7 +122,7 @@ class SENE_MySQLi_Engine
     {
         return $this->__mysqli->savepoint($sp);
     }
-    public function debug($sql="")
+    public function debug($sql='')
     {
         $this->fieldname[] = 'error';
         $this->fieldname[] = 'code';
@@ -143,7 +143,7 @@ class SENE_MySQLi_Engine
             return 0;
         }
     }
-    public function select_as($skey, $sval="")
+    public function select_as($skey, $sval='')
     {
         if (is_array($skey)) {
             foreach ($skey as $k=>$v) {
@@ -158,11 +158,11 @@ class SENE_MySQLi_Engine
     {
         //die($sql);
         if ($cache_enabled) {
-            $name = "";
+            $name = '';
             $names = explode("from", strtolower($sql));
             if (isset($names[1])) {
                 $name = trim($names[1]);
-                $name = strtr($name,'`', "");
+                $name = strtr($name,'`', '');
                 $names = explode(' ', $name);
 
                 if (isset($names[0])) {
@@ -255,7 +255,7 @@ class SENE_MySQLi_Engine
         }
     }
 
-    public function select($sql="", $cache_enabled=0, $flushcache=0, $type="object")
+    public function select($sql='', $cache_enabled=0, $flushcache=0, $type="object")
     {
         //
         $exp1 = 0;
@@ -331,7 +331,7 @@ class SENE_MySQLi_Engine
     *            bisa juga not like%,%like,%like%
     * -----------------------------------------------------------
     */
-    public function where($params, $params2="", $operand="AND", $comp="=", $bracket=0, $bracket2=0)
+    public function where($params, $params2='', $operand="AND", $comp="=", $bracket=0, $bracket2=0)
     {
         //die("params: ".$params);
         //die("params2: ".$params2);
@@ -392,37 +392,37 @@ class SENE_MySQLi_Engine
                         break;
                     case "%notlike":
                         $c= "NOT LIKE";
-                        $val = '%'.$v."";
+                        $val = '%'.$v.'';
                         $val = $this->esc($val);
                         break;
                     case "!=":
                         $c= "<>";
-                        $val = ''.$v."";
+                        $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     case "<>":
                         $c= "<>";
-                        $val = ''.$v."";
+                        $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     case ">=":
                         $c= ">=";
-                        $val = ''.$v."";
+                        $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     case "<=":
                         $c= "<=";
-                        $val = ''.$v."";
+                        $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     case ">":
                         $c= ">";
-                        $val = ''.$v."";
+                        $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     case "<":
                         $c= "<";
-                        $val = ''.$v."";
+                        $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     default:
@@ -490,7 +490,7 @@ class SENE_MySQLi_Engine
                     break;
                 case '%like':
                     $c= "LIKE";
-                    $val = '%'.$v."";
+                    $val = '%'.$v.'';
                     $val = $this->esc($val);
                     break;
                 case 'like%%':
@@ -524,43 +524,43 @@ class SENE_MySQLi_Engine
                     break;
                 case "%notlike":
                     $c= "NOT LIKE";
-                    $val = '%'.$v."";
+                    $val = '%'.$v.'';
                     $val = $this->esc($val);
                     break;
                 case "!=":
                     $c= "<>";
-                    $val = ''.$v."";
+                    $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
                 case "<>":
                     $c= "<>";
-                    $val = ''.$v."";
+                    $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
                 case ">=":
                     $c= ">=";
-                    $val = ''.$v."";
+                    $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
                 case "<=":
                     $c= "<=";
-                    $val = ''.$v."";
+                    $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
                 case ">":
                     $c= ">";
-                    $val = ''.$v."";
+                    $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
                 case "<":
                     $c= "<";
-                    $val = ''.$v."";
+                    $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
                 default:
                     if ($v=="IS NULL" || $v=="is null") {
                         $v = strtoupper($v);
-                        $c = "";
+                        $c = '';
                         $val = $v;
                     } else {
                         $c = "=";
@@ -580,7 +580,7 @@ class SENE_MySQLi_Engine
         }
         return $this;
     }
-    public function where_as($params, $params2="", $operand="AND", $comp="=", $bracket=0, $bracket2=0)
+    public function where_as($params, $params2='', $operand="AND", $comp="=", $bracket=0, $bracket2=0)
     {
         $comp = strtolower($comp);
         $c="=";
@@ -642,32 +642,32 @@ class SENE_MySQLi_Engine
                         break;
                     case "!=":
                         $c= "<>";
-                        $val = ''.$v."";
+                        $val = ''.$v.'';
                         $val = ($val);
                         break;
                     case "<>":
                         $c= "<>";
-                        $val = ''.$v."";
+                        $val = ''.$v.'';
                         $val = ($val);
                         break;
                     case ">=":
                         $c= ">=";
-                        $val = ''.$v."";
+                        $val = ''.$v.'';
                         $val = ($val);
                         break;
                     case "<=":
                         $c= "<=";
-                        $val = ''.$v."";
+                        $val = ''.$v.'';
                         $val = ($val);
                         break;
                     case ">":
                         $c= ">";
-                        $val = ''.$v."";
+                        $val = ''.$v.'';
                         $val = ($val);
                         break;
                     case "<":
                         $c= "<";
-                        $val = ''.$v."";
+                        $val = ''.$v.'';
                         $val = ($val);
                         break;
                     default:
@@ -678,10 +678,10 @@ class SENE_MySQLi_Engine
                 if ($bracket) {
                     $this->in_where .= " ( ";
                 }
-                $this->in_where .= ''.$k."";
+                $this->in_where .= ''.$k.'';
                 unset($kst);
 
-                $this->in_where .= ' '.$c.' '.$val."";
+                $this->in_where .= ' '.$c.' '.$val.'';
                 if ($bracket2) {
                     $this->in_where .= " ) ";
                 }
@@ -707,7 +707,7 @@ class SENE_MySQLi_Engine
                 }
                 $this->in_where = rtrim($this->in_where, ".");
             } else {
-                $this->in_where .= ''.$params."";
+                $this->in_where .= ''.$params.'';
                 unset($kst);
             }
 
@@ -763,48 +763,48 @@ class SENE_MySQLi_Engine
                     break;
                 case "!=":
                     $c= "<>";
-                    $val = ''.$v."";
+                    $val = ''.$v.'';
                     $val = ($val);
                     break;
                 case "<>":
                     $c= "<>";
-                    $val = ''.$v."";
+                    $val = ''.$v.'';
                     $val = ($val);
                     break;
                 case ">":
                     $c= ">";
-                    $val = ''.$v."";
+                    $val = ''.$v.'';
                     $val = ($val);
                     break;
                 case ">=":
                     $c= ">=";
-                    $val = ''.$v."";
+                    $val = ''.$v.'';
                     $val = ($val);
                     break;
                 case "<":
                     $c= "<";
-                    $val = ''.$v."";
+                    $val = ''.$v.'';
                     $val = ($val);
                     break;
                 case "<=":
                     $c= "<=";
-                    $val = ''.$v."";
+                    $val = ''.$v.'';
                     $val = ($val);
                     break;
                 case ">":
                     $c= ">";
-                    $val = ''.$v."";
+                    $val = ''.$v.'';
                     $val = ($val);
                     break;
                 case "<":
                     $c= "<";
-                    $val = ''.$v."";
+                    $val = ''.$v.'';
                     $val = ($val);
                     break;
                 default:
                     if ($v=="IS NULL" || $v=="is null") {
                         $v = strtoupper($v);
-                        $c = "";
+                        $c = '';
                         $val = $v;
                     } else {
                         $c = "=";
@@ -837,7 +837,7 @@ class SENE_MySQLi_Engine
         }
         return $this;
     }
-    public function from($table, $as="")
+    public function from($table, $as='')
     {
         if (empty($table)) {
             trigger_error(TEM_ERR.': table name required', E_USER_ERROR);
@@ -894,7 +894,7 @@ class SENE_MySQLi_Engine
         $this->limit_b = 0;
         return $this;
     }
-    public function limit($a, $b="")
+    public function limit($a, $b='')
     {
         $this->is_limit=1;
         if (empty($b) && !empty($a)) {
@@ -905,7 +905,7 @@ class SENE_MySQLi_Engine
         $this->limit_b=$b;
         return $this;
     }
-    public function page($page, $page_size="")
+    public function page($page, $page_size='')
     {
         if (!empty($page_size) && empty($page)) {
             $this->is_limit=1;
@@ -932,7 +932,7 @@ class SENE_MySQLi_Engine
         $this->pagesize = $pagesize;
         return $this;
     }
-    public function get($tipe="object", $is_debug="")
+    public function get($tipe="object", $is_debug='')
     {
         $this->in_select = rtrim($this->in_select, ", ");
         if (empty($this->in_select)) {
@@ -1026,7 +1026,7 @@ class SENE_MySQLi_Engine
         return $res;
     }
 
-    public function get_first($tipe="object", $is_debug="")
+    public function get_first($tipe="object", $is_debug='')
     {
         $this->in_select = rtrim($this->in_select, ", ");
         if (empty($this->in_select)) {
@@ -1113,10 +1113,10 @@ class SENE_MySQLi_Engine
     }
     public function flushQuery()
     {
-        $this->in_select = "";
-        $this->in_where = "";
-        $this->in_order = "";
-        $this->in_group = "";
+        $this->in_select = '';
+        $this->in_where = '';
+        $this->in_order = '';
+        $this->in_group = '';
         $this->pagesize = 0;
         $this->page = 0;
         $this->is_limit = 0;
@@ -1370,7 +1370,7 @@ class SENE_MySQLi_Engine
         $composite->bracket_close = $bracket_close;
         return $composite;
     }
-    public function join_composite($table, $table_alias, $composites=array(), $method="")
+    public function join_composite($table, $table_alias, $composites=array(), $method='')
     {
         $method = strtoupper($method);
         switch ($method) {
@@ -1387,7 +1387,7 @@ class SENE_MySQLi_Engine
                 $method = 'RIGHT';
                 break;
             default:
-                $method="";
+                $method='';
                 break;
         }
         //set table alias
@@ -1442,11 +1442,11 @@ class SENE_MySQLi_Engine
     public function between($key, $val1, $val2, $is_not=0)
     {
         $this->in_where .= '(';
-        $this->in_where .= ' '.$key."";
+        $this->in_where .= ' '.$key.'';
         if ($is_not) {
             $this->in_where .= " NOT ";
         }
-        $this->in_where .= " BETWEEN ".$val1." AND ".$val2."";
+        $this->in_where .= " BETWEEN ".$val1." AND ".$val2.'';
         $this->in_where .= ") AND ";
         return $this;
     }
