@@ -82,4 +82,108 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     $this->assertEquals(0,$tc->limit_b);
     $this->assertEquals(array(),$tc->as_from);
   }
+
+  /**
+   * @uses SENE_MySQLi_Engine_Mock
+   * @covers SENE_MySQLi_Engine
+   */
+  public function testWhereIsNull()
+  {
+    $tc = new SENE_MySQLi_Engine_Mock();
+    $this->invokeMethod($tc, 'flushQuery', array());
+    $this->invokeMethod($tc, 'select', array('*'));
+    $this->invokeMethod($tc, 'from', array('tabel'));
+    $this->invokeMethod($tc, 'where', array('name','IS NULL'));
+    $this->assertEquals('`name`  IS NULL  AND ',$tc->in_where);
+
+    $this->invokeMethod($tc, 'flushQuery', array());
+    $this->invokeMethod($tc, 'select', array('*'));
+    $this->invokeMethod($tc, 'from', array('tabel'));
+    $this->invokeMethod($tc, 'where', array('name','Is nUlL'));
+    $this->assertEquals('`name`  IS NULL  AND ',$tc->in_where);
+
+    $this->invokeMethod($tc, 'flushQuery', array());
+    $this->invokeMethod($tc, 'select', array('*'));
+    $this->invokeMethod($tc, 'from', array('tabel'));
+    $this->invokeMethod($tc, 'where', array('name','is null'));
+    $this->assertEquals('`name`  IS NULL  AND ',$tc->in_where);
+  }
+
+  /**
+   * @uses SENE_MySQLi_Engine_Mock
+   * @covers SENE_MySQLi_Engine
+   */
+  public function testWhereIsNotNull()
+  {
+    $tc = new SENE_MySQLi_Engine_Mock();
+    $this->invokeMethod($tc, 'flushQuery', array());
+    $this->invokeMethod($tc, 'select', array('*'));
+    $this->invokeMethod($tc, 'from', array('tabel'));
+    $this->invokeMethod($tc, 'where', array('name','IS NOT NULL'));
+    $this->assertEquals('`name`  IS NOT NULL  AND ',$tc->in_where);
+
+    $this->invokeMethod($tc, 'flushQuery', array());
+    $this->invokeMethod($tc, 'select', array('*'));
+    $this->invokeMethod($tc, 'from', array('tabel'));
+    $this->invokeMethod($tc, 'where', array('name','Is not nUlL'));
+    $this->assertEquals('`name`  IS NOT NULL  AND ',$tc->in_where);
+
+    $this->invokeMethod($tc, 'flushQuery', array());
+    $this->invokeMethod($tc, 'select', array('*'));
+    $this->invokeMethod($tc, 'from', array('tabel'));
+    $this->invokeMethod($tc, 'where', array('name','is not null'));
+    $this->assertEquals('`name`  IS NOT NULL  AND ',$tc->in_where);
+  }
+
+  /**
+   * @uses SENE_MySQLi_Engine_Mock
+   * @covers SENE_MySQLi_Engine
+   */
+  public function testWhereAsIsNull()
+  {
+    $tc = new SENE_MySQLi_Engine_Mock();
+    $this->invokeMethod($tc, 'flushQuery', array());
+    $this->invokeMethod($tc, 'select', array('*'));
+    $this->invokeMethod($tc, 'from', array('tabel'));
+    $this->invokeMethod($tc, 'where_as', array('name','IS NULL'));
+    $this->assertEquals('name  IS NULL  AND ',$tc->in_where);
+
+    $this->invokeMethod($tc, 'flushQuery', array());
+    $this->invokeMethod($tc, 'select', array('*'));
+    $this->invokeMethod($tc, 'from', array('tabel'));
+    $this->invokeMethod($tc, 'where_as', array('name','Is nUlL'));
+    $this->assertEquals('name  IS NULL  AND ',$tc->in_where);
+
+    $this->invokeMethod($tc, 'flushQuery', array());
+    $this->invokeMethod($tc, 'select', array('*'));
+    $this->invokeMethod($tc, 'from', array('tabel'));
+    $this->invokeMethod($tc, 'where_as', array('name','is null'));
+    $this->assertEquals('name  IS NULL  AND ',$tc->in_where);
+  }
+
+  /**
+   * @uses SENE_MySQLi_Engine_Mock
+   * @covers SENE_MySQLi_Engine
+   */
+  public function testWhereAsIsNotNull()
+  {
+    $tc = new SENE_MySQLi_Engine_Mock();
+    $this->invokeMethod($tc, 'flushQuery', array());
+    $this->invokeMethod($tc, 'select', array('*'));
+    $this->invokeMethod($tc, 'from', array('tabel'));
+    $this->invokeMethod($tc, 'where_as', array('name','IS NOT NULL'));
+    $this->assertEquals('name  IS NOT NULL  AND ',$tc->in_where);
+
+    $this->invokeMethod($tc, 'flushQuery', array());
+    $this->invokeMethod($tc, 'select', array('*'));
+    $this->invokeMethod($tc, 'from', array('tabel'));
+    $this->invokeMethod($tc, 'where_as', array('name','Is not nUlL'));
+    $this->assertEquals('name  IS NOT NULL  AND ',$tc->in_where);
+
+    $this->invokeMethod($tc, 'flushQuery', array());
+    $this->invokeMethod($tc, 'select', array('*'));
+    $this->invokeMethod($tc, 'from', array('tabel'));
+    $this->invokeMethod($tc, 'where_as', array('name','is not null'));
+    $this->assertEquals('name  IS NOT NULL  AND ',$tc->in_where);
+  }
 }

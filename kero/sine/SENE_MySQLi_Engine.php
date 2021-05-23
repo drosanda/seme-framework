@@ -42,37 +42,37 @@ class SENE_MySQLi_Engine
 
     public function __construct()
     {
-      $this->directories = $GLOBALS['SEMEDIR'];
-      $this->config = $GLOBALS['SEMECFG'];
-      $port = 3306;
-      if(isset($this->config->database->port)){
-        if(strlen($this->config->database->port)>0){
-          $port = $this->config->database->port;
+        $this->directories = $GLOBALS['SEMEDIR'];
+        $this->config = $GLOBALS['SEMECFG'];
+        $port = 3306;
+        if (isset($this->config->database->port)) {
+            if (strlen($this->config->database->port)>0) {
+                $port = $this->config->database->port;
+            }
         }
-      }
-      mysqli_report(MYSQLI_REPORT_STRICT);
-      $this->__mysqli = new mysqli();
-      try {
-          $this->__mysqli->connect($this->config->database->host, $this->config->database->user, $this->config->database->pass, $this->config->database->name, $port);
-      } catch (mysqli_sql_exception $e) {
-        if($this->config->environment == 'development'){
-          trigger_error(TEM_ERR.': Cannot connect to database server using the supplied settings.', E_USER_ERROR);
-          throw $e;
-        }else if($this->config->environment == 'staging' && $this->__mysqli->connect_errno) {
-          header("content-type: application/json");
-          http_response_code(200);
-          $data = array();
-          $data['status'] = $this->__mysqli->connect_errno;
-          $data['message'] = 'Failed to connect to Database: '.$this->__mysqli->connect_error;
-          $data['data'] = array();
-          echo json_encode($data);
-          return;
+        mysqli_report(MYSQLI_REPORT_STRICT);
+        $this->__mysqli = new mysqli();
+        try {
+            $this->__mysqli->connect($this->config->database->host, $this->config->database->user, $this->config->database->pass, $this->config->database->name, $port);
+        } catch (mysqli_sql_exception $e) {
+            if ($this->config->environment == 'development') {
+                trigger_error(TEM_ERR.': Cannot connect to database server using the supplied settings.', E_USER_ERROR);
+                throw $e;
+            } elseif ($this->config->environment == 'staging' && $this->__mysqli->connect_errno) {
+                header("content-type: application/json");
+                http_response_code(200);
+                $data = array();
+                $data['status'] = $this->__mysqli->connect_errno;
+                $data['message'] = 'Failed to connect to Database: '.$this->__mysqli->connect_error;
+                $data['data'] = array();
+                echo json_encode($data);
+                return;
+            }
         }
-      }
 
         $cs = 'utf8';
-        if(isset($this->config->database->charset) && strlen($this->config->database->port)>0){
-          $cs = $this->config->database->charset;
+        if (isset($this->config->database->charset) && strlen($this->config->database->port)>0) {
+            $cs = $this->config->database->charset;
         }
         $this->__mysqli->set_charset($cs);
 
@@ -156,13 +156,12 @@ class SENE_MySQLi_Engine
     }
     public function query($sql, $cache_enabled=0, $flushcache=0, $type="object")
     {
-        //die($sql);
         if ($cache_enabled) {
             $name = '';
             $names = explode("from", strtolower($sql));
             if (isset($names[1])) {
                 $name = trim($names[1]);
-                $name = strtr($name,'`', '');
+                $name = strtr($name, '`', '');
                 $names = explode(' ', $name);
 
                 if (isset($names[0])) {
@@ -187,7 +186,6 @@ class SENE_MySQLi_Engine
                 }
             }
             if (file_exists(SENECACHE.'/'.$cache)) {
-                //die("wololo");
                 $fp = fopen(SENECACHE.'/'.$cache, "r");
                 $str = fread($fp, filesize(SENECACHE.'/'.$cache));
                 fclose($fp);
@@ -198,7 +196,6 @@ class SENE_MySQLi_Engine
                 if ($res) {
                     $dataz=array();
                     if ($type=="array") {
-                        //die($type);
                         while ($data=$res->fetch_array()) {
                             array_push($dataz, $data);
                         }
@@ -213,7 +210,6 @@ class SENE_MySQLi_Engine
                     }
                     $res->free();
                     $str = json_encode($dataz);
-                    //die($str);
                     $fp = fopen(SENECACHE.'/'.$cache, "w+");
                     fwrite($fp, $str);
                     fclose($fp);
@@ -257,7 +253,6 @@ class SENE_MySQLi_Engine
 
     public function select($sql='', $cache_enabled=0, $flushcache=0, $type="object")
     {
-        //
         $exp1 = 0;
         $exp2 = 0;
         if (!is_array($sql)) {
@@ -331,20 +326,15 @@ class SENE_MySQLi_Engine
     *            bisa juga not like%,%like,%like%
     * -----------------------------------------------------------
     */
-    public function where($params, $params2='', $operand="AND", $comp="=", $bracket=0, $bracket2=0)
+    public function where($params, $params2='', $operand="AND", $comp='=', $bracket=0, $bracket2=0)
     {
-        //die("params: ".$params);
-        //die("params2: ".$params2);
-        //die("operand: ".$operand);
-        //die("comp: ".$comp);
         $comp = strtolower($comp);
-        $c="=";
+        $c='=';
         $operand = strtoupper($operand);
         if (is_array($params)) {
             $comp = $operand;
             $comp = strtolower($comp);
             $operand = $params2;
-            //die("comp: ".$comp);
             foreach ($params as $k=>$v) {
                 switch ($comp) {
                     case "like":
@@ -395,38 +385,38 @@ class SENE_MySQLi_Engine
                         $val = '%'.$v.'';
                         $val = $this->esc($val);
                         break;
-                    case "!=":
-                        $c= "<>";
+                    case '!=':
+                        $c= '<>';
                         $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
-                    case "<>":
-                        $c= "<>";
+                    case '<>':
+                        $c= '<>';
                         $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
-                    case ">=":
-                        $c= ">=";
+                    case '>=':
+                        $c= '>=';
                         $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
-                    case "<=":
-                        $c= "<=";
+                    case '<=':
+                        $c= '<=';
                         $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
-                    case ">":
-                        $c= ">";
+                    case '>':
+                        $c= '>';
                         $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
-                    case "<":
-                        $c= "<";
+                    case '<':
+                        $c= '<';
                         $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     default:
-                        $c = "=";
+                        $c = '=';
                         $val = $this->esc($v);
                 }
 
@@ -484,9 +474,7 @@ class SENE_MySQLi_Engine
                 case 'like%':
                     $c= "LIKE";
                     $val = ''.$v.'%';
-                    //die($val);
                     $val = $this->esc($val);
-                    //die($val);
                     break;
                 case '%like':
                     $c= "LIKE";
@@ -527,43 +515,42 @@ class SENE_MySQLi_Engine
                     $val = '%'.$v.'';
                     $val = $this->esc($val);
                     break;
-                case "!=":
-                    $c= "<>";
+                case '!=':
+                    $c= '<>';
                     $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
-                case "<>":
-                    $c= "<>";
+                case '<>':
+                    $c= '<>';
                     $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
-                case ">=":
-                    $c= ">=";
+                case '>=':
+                    $c= '>=';
                     $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
-                case "<=":
-                    $c= "<=";
+                case '<=':
+                    $c= '<=';
                     $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
-                case ">":
-                    $c= ">";
+                case '>':
+                    $c= '>';
                     $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
-                case "<":
-                    $c= "<";
+                case '<':
+                    $c= '<';
                     $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
                 default:
-                    if ($v=="IS NULL" || $v=="is null") {
-                        $v = strtoupper($v);
+                    if (strtoupper(trim($v)) == "IS NULL" || strtoupper(trim($v)) == "IS NOT NULL") {
                         $c = '';
-                        $val = $v;
+                        $val = strtoupper($v);
                     } else {
-                        $c = "=";
+                        $c = '=';
                         $val = $this->esc($v);
                     }
             }
@@ -580,16 +567,15 @@ class SENE_MySQLi_Engine
         }
         return $this;
     }
-    public function where_as($params, $params2='', $operand="AND", $comp="=", $bracket=0, $bracket2=0)
+    public function where_as($params, $params2='', $operand="AND", $comp='=', $bracket=0, $bracket2=0)
     {
         $comp = strtolower($comp);
-        $c="=";
+        $c='=';
         $operand = strtoupper($operand);
         if (is_array($params)) {
             $comp = $operand;
             $comp = strtolower($comp);
             $operand = $params2;
-            //die("comp: ".$comp);
             foreach ($params as $k=>$v) {
                 switch ($comp) {
                     case "like":
@@ -640,38 +626,38 @@ class SENE_MySQLi_Engine
                         $val = '\'%'.$v.'\'';
                         $val = ($val);
                         break;
-                    case "!=":
-                        $c= "<>";
+                    case '!=':
+                        $c= '<>';
                         $val = ''.$v.'';
                         $val = ($val);
                         break;
-                    case "<>":
-                        $c= "<>";
+                    case '<>':
+                        $c= '<>';
                         $val = ''.$v.'';
                         $val = ($val);
                         break;
-                    case ">=":
-                        $c= ">=";
+                    case '>=':
+                        $c= '>=';
                         $val = ''.$v.'';
                         $val = ($val);
                         break;
-                    case "<=":
-                        $c= "<=";
+                    case '<=':
+                        $c= '<=';
                         $val = ''.$v.'';
                         $val = ($val);
                         break;
-                    case ">":
-                        $c= ">";
+                    case '>':
+                        $c= '>';
                         $val = ''.$v.'';
                         $val = ($val);
                         break;
-                    case "<":
-                        $c= "<";
+                    case '<':
+                        $c= '<';
                         $val = ''.$v.'';
                         $val = ($val);
                         break;
                     default:
-                        $c = "=";
+                        $c = '=';
                         $val = ($v);
                 }
 
@@ -761,53 +747,52 @@ class SENE_MySQLi_Engine
                     $val = '\'%'.$v.'\'';
                     $val = ($val);
                     break;
-                case "!=":
-                    $c= "<>";
+                case '!=':
+                    $c= '<>';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
-                case "<>":
-                    $c= "<>";
+                case '<>':
+                    $c= '<>';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
-                case ">":
-                    $c= ">";
+                case '>':
+                    $c= '>';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
-                case ">=":
-                    $c= ">=";
+                case '>=':
+                    $c= '>=';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
-                case "<":
-                    $c= "<";
+                case '<':
+                    $c= '<';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
-                case "<=":
-                    $c= "<=";
+                case '<=':
+                    $c= '<=';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
-                case ">":
-                    $c= ">";
+                case '>':
+                    $c= '>';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
-                case "<":
-                    $c= "<";
+                case '<':
+                    $c= '<';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
                 default:
-                    if ($v=="IS NULL" || $v=="is null") {
-                        $v = strtoupper($v);
+                    if (strtoupper(trim($v)) == "IS NULL" || strtoupper(trim($v)) == "IS NOT NULL") {
                         $c = '';
-                        $val = $v;
+                        $val = strtoupper($v);
                     } else {
-                        $c = "=";
+                        $c = '=';
                         $val = $v;
                     }
             }
@@ -817,7 +802,7 @@ class SENE_MySQLi_Engine
             }
             $this->in_where .=  ' '.$operand.' ';
 
-            $this->in_where = trim($this->in_where, "=");
+            $this->in_where = trim($this->in_where, '=');
 
             unset($c);
             unset($v);
@@ -863,7 +848,7 @@ class SENE_MySQLi_Engine
     public function setTableAlias($as)
     {
         if (empty($as)) {
-            trigger_error(TEM_ERR.': table alias required.',E_USER_WARNING);
+            trigger_error(TEM_ERR.': table alias required.', E_USER_WARNING);
         }
         $this->as_from[$as] = $this->table;
         return $this;
@@ -946,12 +931,12 @@ class SENE_MySQLi_Engine
                 $sql .= ' '.$table_alias.' ';
                 foreach ($this->join as $j) {
                     $sql .= strtoupper($j->method).' JOIN '.$j->table.' ON ';
-                    foreach($j->on as $o){
-                      $sql .= '('.$o.') ';
+                    foreach ($j->on as $o) {
+                        $sql .= '('.$o.') ';
                     }
                 }
             } else {
-                trigger_error(TEM_ERR.': Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
+                trigger_error(TEM_ERR.': Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");', E_USER_WARNING);
                 die();
             }
         } else {
@@ -969,7 +954,7 @@ class SENE_MySQLi_Engine
                     $sql .= '`'.$j->table.'` '.$j->table_as.' ON '.$j->on.' ';
                 }
             } else {
-                trigger_error(TEM_ERR.': Please use alias for main table first in JOIN MULTI, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
+                trigger_error(TEM_ERR.': Please use alias for main table first in JOIN MULTI, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");', E_USER_WARNING);
                 die();
             }
         }
@@ -1035,19 +1020,19 @@ class SENE_MySQLi_Engine
         $sql = 'SELECT '.$this->in_select.' FROM `'.$this->table.'`';
 
         if (count($this->join) > 0) {
-          $table_alias = array_search($this->table, $this->as_from);
-          if ($table_alias !== 0) {
-              $sql .= ' '.$table_alias.' ';
-              foreach ($this->join as $j) {
-                  $sql .= strtoupper($j->method).' JOIN '.$j->table.' ON ';
-                  foreach($j->on as $o){
-                    $sql .= '('.$o.') ';
-                  }
-              }
-          } else {
-              trigger_error(TEM_ERR.': Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
-              die();
-          }
+            $table_alias = array_search($this->table, $this->as_from);
+            if ($table_alias !== 0) {
+                $sql .= ' '.$table_alias.' ';
+                foreach ($this->join as $j) {
+                    $sql .= strtoupper($j->method).' JOIN '.$j->table.' ON ';
+                    foreach ($j->on as $o) {
+                        $sql .= '('.$o.') ';
+                    }
+                }
+            } else {
+                trigger_error(TEM_ERR.': Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");', E_USER_WARNING);
+                die();
+            }
         } else {
             $table_alias = array_search($this->table, $this->as_from);
             if ($table_alias !== 0) {
@@ -1063,7 +1048,7 @@ class SENE_MySQLi_Engine
                     $sql .= '`'.$j->table.'` '.$j->table_as.' ON '.$j->on.' ';
                 }
             } else {
-                trigger_error(TEM_ERR.': Please use alias for main table first in JOIN MULTI, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");',E_USER_WARNING);
+                trigger_error(TEM_ERR.': Please use alias for main table first in JOIN MULTI, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");', E_USER_WARNING);
                 die();
             }
         }
@@ -1186,8 +1171,6 @@ class SENE_MySQLi_Engine
     }
     public function insert_ignore_multi($table, $datas=array(), $is_debug=0)
     {
-        //$multi_array=0;
-
         if (!is_array($datas)) {
             trigger_error(TEM_ERR.': Only accepted array!');
             die();
@@ -1231,7 +1214,6 @@ class SENE_MySQLi_Engine
     }
     public function insert($table, $datas=array(), $multi_array=0, $is_debug=0)
     {
-        //$multi_array=0;
         $this->last_id = 0;
         if (!is_array($datas)) {
             trigger_error(TEM_ERR.': Only accepted array!');
@@ -1350,13 +1332,13 @@ class SENE_MySQLi_Engine
 
     public function join_as($tbl, $reff, $method='left')
     {
-      $join = new stdClass();
-      $join->method = strtoupper(trim($method));
-      $join->table = $tbl;
-      $join->on = array($reff);
-      $this->join[] = $join;
-      $this->in_join = $this->in_join+1;
-      return $this;
+        $join = new stdClass();
+        $join->method = strtoupper(trim($method));
+        $join->table = $tbl;
+        $join->on = array($reff);
+        $this->join[] = $join;
+        $this->in_join = $this->in_join+1;
+        return $this;
     }
 
     public function composite_create($key1, $operator, $key2, $method="AND", $bracket_open=0, $bracket_close=0)
@@ -1452,7 +1434,6 @@ class SENE_MySQLi_Engine
     }
     public function group_by($params)
     {
-        //die($params);
         if (is_array($params)) {
             foreach ($params as $k=>$v) {
                 $this->in_group .= " GROUP BY ".$v.", ";
@@ -1465,7 +1446,6 @@ class SENE_MySQLi_Engine
 
     public function replace($table, $datas=array(), $multi_array=0, $is_debug=0)
     {
-        //$multi_array=0;
         $this->last_id = 0;
         if (!is_array($datas)) {
             trigger_error(TEM_ERR.': Only accepted array!');
@@ -1506,8 +1486,6 @@ class SENE_MySQLi_Engine
     }
     public function replace_multi($table, $datas=array(), $is_debug=0)
     {
-        //$multi_array=0;
-
         if (!is_array($datas)) {
             trigger_error(TEM_ERR.': Only accepted array!');
             die();

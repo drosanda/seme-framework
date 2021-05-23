@@ -34,7 +34,7 @@ This framework suitable for Programmer that only know about Manual way of code. 
 To run the testing, please change to your framework working directory and then executed the command.
 
 ```CLI
-phpunit --configuration phpunit.xml --coverage-clover coverage.xml --log-junit junit.xml --testsuite Dev
+phpunit --configuration phpunit.xml --coverage-clover clover.xml --log-junit junit.xml --testsuite Dev
 ```
 
 ## License
