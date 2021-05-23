@@ -879,37 +879,52 @@ class SENE_MySQLi_Engine
         $this->limit_b = 0;
         return $this;
     }
-    public function limit($a, $b='')
-    {
-        $this->is_limit=1;
-        if (empty($b) && !empty($a)) {
-            $b = $a;
-            $a = 0;
-        }
-        $this->limit_a=$a;
-        $this->limit_b=$b;
-        return $this;
-    }
-    public function page($page, $page_size='')
-    {
-        if (!empty($page_size) && empty($page)) {
-            $this->is_limit=1;
-            $this->limit_a=0;
-            $this->limit_b=$page_size;
-        } elseif (empty($page_size) && !empty($page)) {
-            $this->is_limit=1;
-            $this->limit_a=0;
-            $this->limit_b=$page;
-        } elseif (!empty($page_size) && !empty($page)) {
-            $this->is_limit = 1;
-            $this->limit_a = ($page * $page_size) - $page_size;
-            if ($page == 1) {
-                $this->limit_a = ($page * $page_size) - $page_size;
-            }
-            $this->limit_b = $page_size;
-        }
-        return $this;
-    }
+
+  	/**
+  	 * Set current limit offset
+  	 * @param  int    $a    Offset / Row Count, value range integer >= 0
+  	 * @param  int    $b  	Row count, value range integer >= 0
+  	 * @return object       return this class
+  	 */
+  	public function limit($a,$b=''){
+  		$this->is_limit=1;
+  		$a = (int) $a;
+  		$b = (int) $b;
+  		if($a > 0 && $b <= 0){
+  			$b = $a;
+  			$a = 0;
+  		}
+  		$this->limit_a = $a;
+  		$this->limit_b = $b;
+  		return $this;
+  	}
+
+  	/**
+  	 * Set current page and page size
+  	 * @param  int    $page       Current page number, value range integer >= 0
+  	 * @param  int    $page_size  Page size number, value range integer >= 0
+  	 * @return object             return this class
+  	 */
+  	public function page($page,$page_size=''){
+  		$page = (int) $page;
+  		$page_size = (int) $page_size;
+  		if($page_size > 0 && $page <= 0){
+  			$this->is_limit = 1;
+  			$this->limit_a  = 0;
+  			$this->limit_b  = $page_size;
+  		}else if($page_size <= 0 && $page > 0){
+  			$this->is_limit = 1;
+  			$this->limit_a = 0;
+  			$this->limit_b = $page;
+  		}else if($page_size > 0 && $page > 0){
+  			$this->is_limit = 1;
+  			$this->limit_a = ($page * $page_size) - $page_size;
+  			if($page == 1) $this->limit_a = ($page * $page_size) - $page_size;
+  			$this->limit_b = $page_size;
+  		}
+  		return $this;
+  	}
+
     public function limitpage($page, $pagesize=10)
     {
         $this->is_limit = 0;
@@ -975,22 +990,16 @@ class SENE_MySQLi_Engine
             $sql .= " ORDER BY ".$this->in_order;
         }
 
-        if (empty($all)) {
-            if ($this->is_limit) {
-                $a = $this->limit_a;
-                $b = $this->limit_b;
-                $sql .= ' LIMIT '.$a.", ".$b;
-            } else {
-                $b = $this->pagesize;
-                if ((empty($page) || $page=="1" || $page==1)) {
-                    if (!empty($b)) {
-                        $sql .= ' LIMIT '.$b;
-                    }
-                } else {
-                    $a = $this->page;
-                    $sql .= ' LIMIT '.$a.','.$b;
-                }
-            }
+        if ($this->is_limit) {
+            $a = $this->limit_a;
+            $b = $this->limit_b;
+            $sql .= ' LIMIT '.$this->limit_a.", ".$this->limit_b;
+        } else {
+          if($this->page<=1){
+            if($this->pagesize<=0) $sql .= " LIMIT ".$this->pagesize;
+          }else{
+            $sql .= " LIMIT ".$this->page.", ".$this->pagesize;
+          }
         }
 
         $cache_save = 0;
@@ -1559,7 +1568,7 @@ class SENE_MySQLi_Engine
     {
         $res = $this->__mysqli->character_set_name();
         if (!$res) {
-            trigger_error(TEM_ERR.': Cant get charset '.$char_set.' to database.');
+            trigger_error(TEM_ERR.': Cannot get charset from database.');
         }
         return $res;
     }
