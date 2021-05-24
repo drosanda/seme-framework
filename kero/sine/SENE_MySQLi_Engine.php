@@ -996,7 +996,7 @@ class SENE_MySQLi_Engine
             $sql .= ' LIMIT '.$this->limit_a.", ".$this->limit_b;
         } else {
           if($this->page<=1){
-            if($this->pagesize<=0) $sql .= " LIMIT ".$this->pagesize;
+            if($this->pagesize > 0) $sql .= " LIMIT ".$this->pagesize;
           }else{
             $sql .= " LIMIT ".$this->page.", ".$this->pagesize;
           }

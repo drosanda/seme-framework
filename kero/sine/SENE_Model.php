@@ -10,7 +10,7 @@
  */
 abstract class SENE_Model
 {
-    protected $db;
+    public $db;
     protected $directories;
     protected $config;
     public $field = array();
