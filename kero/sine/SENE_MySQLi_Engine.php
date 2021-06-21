@@ -445,7 +445,7 @@ class SENE_MySQLi_Engine
             unset($v);
             unset($k);
             unset($val);
-        } elseif (!empty($params) && !empty($params2)) {
+        } elseif (strlen($params) && strlen($params2)) {
             $val = $params2;
             $v = $params2;
 
@@ -677,7 +677,7 @@ class SENE_MySQLi_Engine
             unset($v);
             unset($k);
             unset($val);
-        } elseif (!empty($params) && !empty($params2)) {
+        } elseif (strlen($params) && strlen($params2)) {
             $val = $params2;
             $v = $params2;
 
