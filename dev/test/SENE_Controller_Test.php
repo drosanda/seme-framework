@@ -659,18 +659,75 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
    */
+  public function testThemeCss()
+  {
+    $tc = new SENE_Controller_Mock();
+    $ts = 'admin';
+    $dir = $GLOBALS['SEMEDIR']->app_view.$ts;
+    $file = $dir.'/'.$tc->css_json;
+    $file2 = $dir.'/'.$tc->js_json;
+    $script = "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css\" />";
+    $json = array(
+      $script,
+      "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\" />"
+    );
+    if(is_dir($dir)){
+      if(is_file($file)) unlink($file);
+      if(is_file($file2)) unlink($file2);
+      rmdir($dir);
+    }
+    if(!is_dir($dir) && !file_exists($dir)) mkdir($dir);
+
+    $this->invokeMethod($tc, 'setTheme', array($ts));
+    $fh = fopen($file, "w");
+    fwrite($fh,json_encode($json));
+    fclose($fh);
+
+    $this->assertContains($script, $this->invokeMethod($tc, 'getThemeConfig', array()));
+    if(is_file($file)) unlink($file);
+
+    //test 2
+    $json = new stdClass();
+    $json->link = array();
+    $json->link[0] = new stdClass();
+    $json->link[0]->rel = 'stylesheet';
+    $json->link[0]->href = 'https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css';
+    $json->link[1] = new stdClass();
+    $json->link[1]->rel = 'stylesheet';
+    $json->link[1]->href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css';
+
+    $fh = fopen($file, "w");
+    fwrite($fh,json_encode($json));
+    fclose($fh);
+
+    $this->assertContains($script, $this->invokeMethod($tc, 'getThemeConfig', array()));
+
+    if(is_file($file)) unlink($file);
+    if(is_dir($dir)) rmdir($dir);
+  }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
   public function testThemeScript()
   {
     $tc = new SENE_Controller_Mock();
     $ts = 'admin';
     $dir = $GLOBALS['SEMEDIR']->app_view.$ts;
     $file = $dir.'/'.$tc->js_json;
+    $file2 = $dir.'/'.$tc->css_json;
     $script = "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js\"></script>";
     $json = array(
       $script,
       "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.5/jquery.min.js\"></script>"
     );
-    if(is_dir($dir)) rmdir($dir);
+    if(is_dir($dir)){
+      if(is_file($file)) unlink($file);
+      if(is_file($file2)) unlink($file2);
+      rmdir($dir);
+    }
     if(!is_dir($dir) && !file_exists($dir)) mkdir($dir);
 
     $this->invokeMethod($tc, 'setTheme', array($ts));
@@ -679,6 +736,22 @@ final class SENE_Controller_Test extends TestCase
     fclose($fh);
 
     $this->assertContains($script, $this->invokeMethod($tc, 'getJsFooterBasic', array()));
+    if(is_file($file)) unlink($file);
+
+    //test 2
+    $json = new stdClass();
+    $json->script = array();
+    $json->script[0] = new stdClass();
+    $json->script[0]->src = 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js';
+    $json->script[1] = new stdClass();
+    $json->script[1]->src = 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.5/jquery.min.js';
+
+    $fh = fopen($file, "w");
+    fwrite($fh,json_encode($json));
+    fclose($fh);
+
+    $this->assertContains($script, $this->invokeMethod($tc, 'getJsFooterBasic', array()));
+
     if(is_file($file)) unlink($file);
     if(is_dir($dir)) rmdir($dir);
   }
