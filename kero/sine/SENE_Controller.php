@@ -131,7 +131,26 @@ abstract class SENE_Controller
     private function getJsFooterBasic()
     {
         if (file_exists($this->directories->app_view.'/'.$this->getTheme().'/'.$this->js_json)) {
-            return json_decode($this->fgc($this->directories->app_view.$this->getTheme().'/'.$this->js_json));
+            $dj = json_decode($this->fgc($this->directories->app_view.$this->getTheme().'/'.$this->js_json));
+            $da = array();
+            if(is_array($dj) && count($dj)){
+              foreach($dj as $d){
+                if(is_string($d)){
+                  $da[] = $d;
+                }
+              }
+            }elseif(isset($dj->script) && count($dj->script)){
+              foreach($dj->script as $d){
+                $a = '<script ';
+                foreach($d as $k=>$v){
+                  $a .= $k.'="'.$v.'" ';
+                }
+                $da[] = rtrim($a).'></script>';
+                unset($a,$k,$v);
+              }
+            }
+            unset($dj,$d);
+            return $da;
         } else {
             return array();
         }
