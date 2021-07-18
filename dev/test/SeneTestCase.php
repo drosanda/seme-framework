@@ -5,7 +5,7 @@
  */
 
 if (!defined('SEME_VERSION')) {
-  define('SEME_VERSION', '4.0.1');
+  define('SEME_VERSION', '4.0.2');
 }
 if (!defined('SEMEROOT')) {
   define('SEMEROOT', __DIR__.'/../..');
