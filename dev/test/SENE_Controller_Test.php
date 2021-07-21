@@ -328,6 +328,7 @@ final class SENE_Controller_Test extends TestCase
   public function testGetAdditionalCdnUrl()
   {
     $tc = new SENE_Controller_Mock();
+    $tc->config->cdn_url = 'https://localhost/';
 
     $td = '{{cdn_url}}test5.css';
     $ts = $this->invokeMethod($tc, 'cdn_url', array()).'test5.css';
@@ -923,5 +924,19 @@ final class SENE_Controller_Test extends TestCase
     $ts = 'media/skin/avatar4a.png';
     $td = base_url($ts);
     $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
+  }
+
+  /**
+   * @uses SENE_Controller_Test
+   * @uses SENE_Controller_Mock
+   * @covers SENE_Controller
+   */
+  public function testRender()
+  {
+    $tc = new SENE_Controller_Mock();
+    $ts = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+    $tc->__content = $ts;
+    $this->invokeMethod($tc, 'render', array());
+    $this->expectOutputString($ts);
   }
 }
