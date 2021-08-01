@@ -1012,9 +1012,15 @@ abstract class SENE_Controller
      */
     protected function delKey()
     {
+        /**
+        * @codeCoverageIgnoreStart
+        */
         unset($_SESSION[$this->config->saltkey]);
         session_destroy();
         return $this;
+        /**
+        * @codeCoverageIgnoreEnd
+        */
     }
 
     /**
@@ -1053,9 +1059,15 @@ abstract class SENE_Controller
      */
     protected function debug($a)
     {
+        /**
+        * @codeCoverageIgnoreStart
+        */
         echo '<pre>';
         print_r($a);
         echo '</pre>';
+        /**
+        * @codeCoverageIgnoreEnd
+        */
     }
 
     /**
@@ -1064,9 +1076,15 @@ abstract class SENE_Controller
      */
     protected function dd($a)
     {
+        /**
+        * @codeCoverageIgnoreStart
+        */
         echo '<pre>';
         var_dump($a);
         echo '</pre>';
+        /**
+        * @codeCoverageIgnoreEnd
+        */
     }
 
     /**
