@@ -466,7 +466,9 @@ abstract class SENE_Controller
         if (!empty($ext)) {
             $this->js_footer[] = '<script src="'.$src.'"></script>';
         } else {
-            $src = rtrim($src, '.js');
+            if(substr(strtolower($src), -3) != '.js'){
+              $src .= '.js';
+            }
             $this->js_footer[] = '<script src="'.$src.'.js"></script>';
         }
         return $this;
