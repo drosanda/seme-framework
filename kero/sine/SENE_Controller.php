@@ -463,15 +463,11 @@ abstract class SENE_Controller
      */
     protected function putJsFooter($src, $ext=0)
     {
-        if (!empty($ext)) {
-            $this->js_footer[] = '<script src="'.$src.'"></script>';
-        } else {
-            if(substr(strtolower($src), -3) != '.js'){
-              $src .= '.js';
-            }
-            $this->js_footer[] = '<script src="'.$src.'.js"></script>';
-        }
-        return $this;
+      if (!$ext && substr(strtolower($src), -3) != '.js') {
+          $src .= '.js';
+      }
+      $this->js_footer[] = '<script src="'.$src.'"></script>';
+      return $this;
     }
 
     /**
