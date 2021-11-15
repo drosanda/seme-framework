@@ -13,14 +13,13 @@ Read the official documentation at [seme.framework.web.id](https://seme.framewor
 
 ## Version
 
-Latest version of Seme Framework
+Latest version of Seme Framework is 4.0.3
 
 ### Change Log
 
-here is the changelog :
+Here is the changelog :
 
-- remove assets directory from framework dependency
-- remove many configuration files only into single file configuration separated by environment type.
+- Some bug fix for issues [#13](https://github.com/drosanda/seme-framework/issues/13), [#12](https://github.com/drosanda/seme-framework/issues/12), and [#11](https://github.com/drosanda/seme-framework/issues/11).
 
 ## Key Feature
 
