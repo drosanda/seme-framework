@@ -1240,13 +1240,15 @@ class SENE_MySQLi_Engine
             $sql .= ') VALUES(';
 
             foreach ($datas as $key=>$val) {
-                if ($val=='NOW()' || $val=='now()') {
-                    $sql .=''.$val.',';
-                } elseif (strtolower($val)=='null') {
-                    $sql .='NULL,';
-                } else {
-                    $sql .=''.$this->esc($val).',';
-                }
+              if ($val=='NOW()' || $val=='now()') {
+                $sql .=''.$val.',';
+              } else if (strtolower($val)=='null') {
+                $sql .='NULL,';
+              } else if (stripos($val, "AES_ENCRYPT(") !== false || stripos($val, "AES_DECRYPT(") !== false) {
+                $sql .= $val.',';
+              } else {
+                $sql .=''.$this->esc($val).',';
+              }
             }
             $sql = rtrim($sql, ',');
             $sql .= ');';
@@ -1272,6 +1274,8 @@ class SENE_MySQLi_Engine
         foreach ($datas as $key=>$val) {
             if ($val=='now()' || $val=='NOW()' || $val=="NULL" || $val=='null') {
                 $sql .='`'.$key.'` = '.$val.',';
+            } else if (stripos($val, "AES_ENCRYPT(") !== false || stripos($val, "AES_DECRYPT(") !== false) {
+                $sql .= $val.',';
             } else {
                 $sql .='`'.$key.'` = '.$this->esc($val).',';
             }
