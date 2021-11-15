@@ -1,9 +1,9 @@
 <?php
 /**
 * Seme Framework - Lightweight PHP Framework
-* Version 4.0.2
+* Version 4.0.3
 */
-define('SEME_VERSION', '4.0.2');
+define('SEME_VERSION', '4.0.3');
 define('SEME_START', microtime(true));
 define('DS', DIRECTORY_SEPARATOR);
 define('EXT', '.php');
