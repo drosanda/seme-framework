@@ -40,7 +40,7 @@ class Conumtext
     {
         $b = strlen($this->alpha);
         $limit=strlen($num);
-        $r = $num  % $b ;
+        $r = $limit  % $b ;
         $res=strpos($this->alpha, $num[0]);
         for ($i=1;$i<$limit;$i++) {
             $res = $b * $res + strpos($this->alpha, $num[$i]);
