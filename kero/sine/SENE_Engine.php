@@ -180,19 +180,8 @@ class SENE_Engine
     {
         $sene_method = $this->config->method;
         if (isset($_SERVER[$sene_method])) {
-            $path = $_SERVER[$sene_method];
-            $path = strtr($path,'//', '/');
-            $path = explode('/', strtr($path,'//', '/'));
-            $i=0;
-            foreach ($path as $p) {
-                if (strlen($p)>0) {
-                    $pos = strpos($p, '?');
-                    if ($pos !== false) {
-                        unset($path[$i]);
-                    }
-                }
-                $i++;
-            }
+            $path = parse_url($_SERVER[$sene_method]);
+            if(isset($path['path'])) $path = explode('/', strtr($path['path'],'//', '/'));
             unset($p);
             $path = $this->ovrRoutes($path);
             if (!isset($path[1])) {
