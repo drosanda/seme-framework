@@ -8,6 +8,7 @@
 /**
  * Abstract class for Sene_Model
  */
+#[AllowDynamicProperties]
 abstract class SENE_Model
 {
     public $db;
