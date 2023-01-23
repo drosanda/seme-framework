@@ -1,12 +1,12 @@
 <?php
 /**
- * @author: Daeng Rosanda
- * @package SemeFramework
- * @since SemeFramework 3.0.0
- */
-
-/**
- * Abstract class for Sene_Model
+ * Abstract Class for SemeFramework Class Model
+ *
+ * @author Daeng Rosanda
+ * @version 4.0.3
+ *
+ * @package SemeFramework\Kero
+ * @since 4.0.0
  */
 #[AllowDynamicProperties]
 abstract class SENE_Model
@@ -22,9 +22,12 @@ abstract class SENE_Model
         $this->config = $GLOBALS['SEMECFG'];
         $this->loadEngine($this->config->database);
     }
+
     /**
-     * Load engine
+     * Load the database engine configuration
+     *
      * @param  object $db   Database configuration
+     *
      * @return object       this object
      */
     private function loadEngine($db)
@@ -42,8 +45,10 @@ abstract class SENE_Model
 
     /**
      * Encrypt the string
+     *
      * @param  string $val plain string
-     * @return string      encrypt command
+     *
+     * @return string      Full encrypt string command on SQL format
      */
     public function __encrypt($val)
     {
@@ -52,8 +57,10 @@ abstract class SENE_Model
 
     /**
      * Decrypt the string
+     *
      * @param  string $val decrypted string
-     * @return string      decrypt command
+     *
+     * @return string      Full decrypt string command on SQL format
      */
     public function __decrypt($key)
     {
