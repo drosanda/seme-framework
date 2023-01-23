@@ -6,6 +6,7 @@
  * @package SemeFramework
  * @since SemeFramework 3.0.0
  */
+#[AllowDynamicProperties]
 abstract class SENE_Controller
 {
     protected static $__instance;
