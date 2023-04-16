@@ -290,6 +290,7 @@ class SENE_Engine
                                 $reflection = new ReflectionMethod($cname, $func);
                                 if (!$reflection->isPublic()) {
                                     $this->notFound();
+                                    return;
                                 }
                                 $args=array();
                                 $num = $reflection->getNumberOfParameters();
@@ -336,6 +337,7 @@ class SENE_Engine
                             $reflection = new ReflectionMethod($cname, $func);
                             if (!$reflection->isPublic()) {
                                 $this->notFound();
+                                return;
                             }
                             $args=array();
                             $num = $reflection->getNumberOfParameters();
@@ -381,6 +383,7 @@ class SENE_Engine
                                 $reflection = new ReflectionMethod($cname, $func);
                                 if (!$reflection->isPublic()) {
                                     $this->notFound();
+                                    return;
                                 }
                                 $args=array();
                                 $num = $reflection->getNumberOfParameters();
