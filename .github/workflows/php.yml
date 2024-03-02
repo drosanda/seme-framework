@@ -1,0 +1,29 @@
+name: PHP Lint Check
+
+on:
+  push:
+    branches: [ "beta" ]
+  pull_request:
+    branches: [ "beta" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+    
+    - name: Run PHP linting
+      run: |
+        find . -type f -name "*.php" -exec /usr/bin/php -l {} \;
+        
