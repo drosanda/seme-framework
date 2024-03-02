@@ -26,9 +26,6 @@ jobs:
     - name: Run PHP linting
       run: |
         find . -type f -name "*.php" -exec /usr/bin/php -l {} \;
-    
-    - name: Install Composer
-      uses: php-actions/composer@v6
 
     - name: Run PHP Unit
       uses: php-actions/phpunit@v3
