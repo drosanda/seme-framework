@@ -44,39 +44,10 @@ class SENE_MySQLi_Engine
 
     public function __construct()
     {
+        $this->__mysqli = null;
         $this->directories = $GLOBALS['SEMEDIR'];
         $this->config = $GLOBALS['SEMECFG'];
-        $port = 3306;
-        if (isset($this->config->database->port)) {
-            if (strlen($this->config->database->port)>0) {
-                $port = $this->config->database->port;
-            }
-        }
-        mysqli_report(MYSQLI_REPORT_STRICT);
-        $this->__mysqli = new mysqli();
-        try {
-            $this->__mysqli->connect($this->config->database->host, $this->config->database->user, $this->config->database->pass, $this->config->database->name, $port);
-        } catch (mysqli_sql_exception $e) {
-            if ($this->config->environment == 'development') {
-                trigger_error(TEM_ERR.': Cannot connect to database server using the supplied settings.', E_USER_ERROR);
-                throw $e;
-            } elseif ($this->config->environment == 'staging' && $this->__mysqli->connect_errno) {
-                header("content-type: application/json");
-                http_response_code(200);
-                $data = array();
-                $data['status'] = $this->__mysqli->connect_errno;
-                $data['message'] = 'Failed to connect to Database: '.$this->__mysqli->connect_error;
-                $data['data'] = array();
-                echo json_encode($data);
-                return;
-            }
-        }
-
-        $cs = 'utf8';
-        if (isset($this->config->database->charset) && strlen($this->config->database->charset)>0) {
-            $cs = $this->config->database->charset;
-        }
-        $this->__mysqli->set_charset($cs);
+        
 
         self::$__instance = $this;
 
@@ -102,6 +73,55 @@ class SENE_MySQLi_Engine
         $this->_union_init();
     }
 
+    private function determine_mysql_port()
+    {
+        $this->port = 3306;
+        if (isset($this->config->database->port)) {
+            if (strlen($this->config->database->port)>0) {
+                $this->port = intval($this->config->database->port);
+            }
+        }
+
+        return $this;
+    }
+
+    protected function set_chartset()
+    {
+        $cs = 'utf8';
+        if (isset($this->config->database->charset) && strlen($this->config->database->charset)>0) {
+            $cs = $this->config->database->charset;
+        }
+        $this->trigger_mysqli()->__mysqli->set_charset($cs);
+    }
+
+    private function trigger_mysqli()
+    {
+        if (!isset($this->__mysqli)) {
+            $this->determine_mysql_port();
+            mysqli_report(MYSQLI_REPORT_STRICT);
+            $this->__mysqli = new mysqli();
+            try {
+                $this->trigger_mysqli()->__mysqli->connect($this->config->database->host, $this->config->database->user, $this->config->database->pass, $this->config->database->name, $this->port);
+            } catch (mysqli_sql_exception $e) {
+                if ($this->config->environment == 'development') {
+                    trigger_error(TEM_ERR.': Cannot connect to database server using the supplied settings.', E_USER_ERROR);
+                    throw $e;
+                } elseif ($this->config->environment == 'staging' && $this->trigger_mysqli()->__mysqli->connect_errno) {
+                    header("content-type: application/json");
+                    http_response_code(200);
+                    $data = array();
+                    $data['status'] = $this->trigger_mysqli()->__mysqli->connect_errno;
+                    $data['message'] = 'Failed to connect to Database: '.$this->trigger_mysqli()->__mysqli->connect_error;
+                    $data['data'] = array();
+                    echo json_encode($data);
+                    return;
+                }
+            }
+        }
+        
+        return $this;
+    }
+
     private function _union_init()
     {
         $this->union = new stdClass();
@@ -117,7 +137,7 @@ class SENE_MySQLi_Engine
 
     public static function getInstance()
     {
-        return self::$_instance;
+        return self::$__instance;
     }
 
     private function has_bracket_open($bracket_flag)
@@ -140,41 +160,41 @@ class SENE_MySQLi_Engine
 
     public function autocommit($var=1)
     {
-        return $this->__mysqli->autocommit($var);
+        return $this->trigger_mysqli()->__mysqli->autocommit($var);
     }
     public function begin()
     {
-        return $this->__mysqli->begin_transaction();
+        return $this->trigger_mysqli()->__mysqli->begin_transaction();
     }
     public function commit()
     {
-        return $this->__mysqli->commit();
+        return $this->trigger_mysqli()->__mysqli->commit();
     }
     public function rollback()
     {
-        return $this->__mysqli->rollback();
+        return $this->trigger_mysqli()->__mysqli->rollback();
     }
     public function savepoint($sp)
     {
-        return $this->__mysqli->savepoint($sp);
+        return $this->trigger_mysqli()->__mysqli->savepoint($sp);
     }
     public function debug($sql='')
     {
         $this->fieldname[] = 'error';
         $this->fieldname[] = 'code';
         $this->fieldname[] = 'sql';
-        $this->fieldvalue[] = $this->__mysqli->errno;
-        $this->fieldvalue[] = $this->__mysqli->error;
+        $this->fieldvalue[] = $this->trigger_mysqli()->__mysqli->errno;
+        $this->fieldvalue[] = $this->trigger_mysqli()->__mysqli->error;
         $this->fieldvalue[] = $sql;
     }
     public function exec($sql)
     {
-        $res = $this->__mysqli->query($sql);
+        $res = $this->trigger_mysqli()->__mysqli->query($sql);
         if ($res) {
             return 1;
         } else {
             if ($this->is_debug) {
-                trigger_error(TEM_ERR.': '.$this->__mysqli->error.'. '.$sql, E_USER_NOTICE);
+                trigger_error(TEM_ERR.': '.$this->trigger_mysqli()->__mysqli->error.'. '.$sql, E_USER_NOTICE);
             }
             return 0;
         }
@@ -228,7 +248,7 @@ class SENE_MySQLi_Engine
                 $dataz = json_decode($str);
                 return $dataz;
             } else {
-                $res = $this->__mysqli->query($sql);
+                $res = $this->trigger_mysqli()->__mysqli->query($sql);
                 if ($res) {
                     $dataz=array();
                     if ($type=="array") {
@@ -252,12 +272,12 @@ class SENE_MySQLi_Engine
                     return $dataz;
                 } else {
                     $this->debug($sql);
-                    trigger_error(TEM_ERR.': '.$this->__mysqli->error.'. '.$sql, E_USER_NOTICE);
+                    trigger_error(TEM_ERR.': '.$this->trigger_mysqli()->__mysqli->error.'. '.$sql, E_USER_NOTICE);
                     return $this->fieldvalue;
                 }
             }
         } else {
-            $res = $this->__mysqli->query($sql);
+            $res = $this->trigger_mysqli()->__mysqli->query($sql);
             if ($res) {
                 $dataz=array();
                 if ($type=="array") {
@@ -281,7 +301,7 @@ class SENE_MySQLi_Engine
                 return $dataz;
             } else {
                 $this->debug($sql);
-                trigger_error(TEM_ERR.': '.$this->__mysqli->error.'. '.$sql, E_USER_NOTICE);
+                trigger_error(TEM_ERR.': '.$this->trigger_mysqli()->__mysqli->error.'. '.$sql, E_USER_NOTICE);
                 return $this->fieldvalue;
             }
         }
@@ -325,7 +345,7 @@ class SENE_MySQLi_Engine
     }
     public function lastId()
     {
-        return $this->__mysqli->insert_id;
+        return $this->trigger_mysqli()->__mysqli->insert_id;
     }
     public function esc($var)
     {
@@ -334,19 +354,19 @@ class SENE_MySQLi_Engine
             if (strtolower($var)=='null') {
                 return "NULL";
             } else {
-                return '"'.$this->__mysqli->real_escape_string($var).'"';
+                return '"'.$this->trigger_mysqli()->__mysqli->real_escape_string($var).'"';
             }
         }
     }
     public function __destruct()
     {
         if (is_resource($this->__mysqli)) {
-            $this->__mysqli->close();
+            $this->trigger_mysqli()->__mysqli->close();
         }
     }
     public function getField()
     {
-        return array("field"=>$this->fieldname,"value"=>fieldvalue);
+        return array("field"=>$this->fieldname,"value"=>$this->fieldvalue);
     }
 
     public function where_null($col_params, $operand="AND", $comp="", $bracket=0, $bracket2=0)
@@ -395,6 +415,7 @@ class SENE_MySQLi_Engine
                 switch ($comp) {
                     case "like":
                         $c= "LIKE";
+                        $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     case 'like%':
@@ -419,6 +440,7 @@ class SENE_MySQLi_Engine
                         break;
                     case "notlike":
                         $c= "NOT LIKE";
+                        $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     case "notlike%%":
@@ -628,7 +650,7 @@ class SENE_MySQLi_Engine
                 switch ($comp) {
                     case "like":
                         $c= "LIKE";
-                        $val = ($val);
+                        $val = ($v);
                         break;
                     case 'like%':
                         $c= "LIKE";
@@ -652,7 +674,7 @@ class SENE_MySQLi_Engine
                         break;
                     case "notlike":
                         $c= "NOT LIKE";
-                        $val = ($val);
+                        $val = ($v);
                         break;
                     case "notlike%%":
                         $c= "NOT LIKE";
@@ -1166,9 +1188,9 @@ class SENE_MySQLi_Engine
     }
     public function query_multi($sql)
     {
-        $this->__mysqli->multi_query($sql);
-        if ($this->__mysqli->errno) {
-            trigger_error($this->__mysqli->error);
+        $this->trigger_mysqli()->__mysqli->multi_query($sql);
+        if ($this->trigger_mysqli()->__mysqli->errno) {
+            trigger_error($this->trigger_mysqli()->__mysqli->error);
         }
     }
     public function insert_batch($table, $datas=array(), $is_debug=0)
@@ -1606,7 +1628,7 @@ class SENE_MySQLi_Engine
 
     public function getCharSet()
     {
-        $res = $this->__mysqli->character_set_name();
+        $res = $this->trigger_mysqli()->__mysqli->character_set_name();
         if (!$res) {
             trigger_error(TEM_ERR.': Cannot get charset from database.');
         }
@@ -1614,9 +1636,9 @@ class SENE_MySQLi_Engine
     }
     public function setCharSet($char_set)
     {
-        $res = $this->__mysqli->set_charset($char_set);
+        $res = $this->trigger_mysqli()->__mysqli->set_charset($char_set);
         if (!$res) {
-            trigger_error(TEM_ERR.': Cant change charset from '.$this->__mysqli->character_set_name().' to '.$char_set.' to database.');
+            trigger_error(TEM_ERR.': Cant change charset from '.$this->trigger_mysqli()->__mysqli->character_set_name().' to '.$char_set.' to database.');
         }
         return 1;
     }
