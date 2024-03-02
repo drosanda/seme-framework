@@ -117,7 +117,7 @@ class SENE_MySQLi_Engine
 
     public static function getInstance()
     {
-        return self::$_instance;
+        return self::$__instance;
     }
 
     private function has_bracket_open($bracket_flag)
@@ -346,7 +346,7 @@ class SENE_MySQLi_Engine
     }
     public function getField()
     {
-        return array("field"=>$this->fieldname,"value"=>fieldvalue);
+        return array("field"=>$this->fieldname,"value"=>$this->fieldvalue);
     }
 
     public function where_null($col_params, $operand="AND", $comp="", $bracket=0, $bracket2=0)
@@ -395,6 +395,7 @@ class SENE_MySQLi_Engine
                 switch ($comp) {
                     case "like":
                         $c= "LIKE";
+                        $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     case 'like%':
@@ -419,6 +420,7 @@ class SENE_MySQLi_Engine
                         break;
                     case "notlike":
                         $c= "NOT LIKE";
+                        $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     case "notlike%%":
@@ -628,7 +630,7 @@ class SENE_MySQLi_Engine
                 switch ($comp) {
                     case "like":
                         $c= "LIKE";
-                        $val = ($val);
+                        $val = ($v);
                         break;
                     case 'like%':
                         $c= "LIKE";
@@ -652,7 +654,7 @@ class SENE_MySQLi_Engine
                         break;
                     case "notlike":
                         $c= "NOT LIKE";
-                        $val = ($val);
+                        $val = ($v);
                         break;
                     case "notlike%%":
                         $c= "NOT LIKE";
