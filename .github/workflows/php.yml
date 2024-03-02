@@ -26,4 +26,16 @@ jobs:
     - name: Run PHP linting
       run: |
         find . -type f -name "*.php" -exec /usr/bin/php -l {} \;
-        
+    
+    - name: Install Composer
+      uses: php-actions/composer@v6
+
+    - name: Run PHP Unit
+      uses: php-actions/phpunit@v3
+      with:
+        configuration: "phpunit.xml"
+        memory_limit: "256M"
+        php_extensions: "xdebug"
+        coverage_clover: "clover.xml"
+        log_junit: "junit.xml"
+        testsuite: "Dev"
