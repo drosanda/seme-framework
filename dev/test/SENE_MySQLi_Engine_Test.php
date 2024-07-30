@@ -21,9 +21,9 @@ class SENE_MySQLi_Engine_Mock extends SENE_MySQLi_Engine
     }
 }
 
-/**
- * @covers SENE_Model
- */
+#[UsesClass('SENE_MySQLi_Engine_Mock')]
+#[CoversClass('SENE_MySQLi_Engine')]
+#[CoversClass('SENE_Model')]
 final class SENE_MySQLi_Engine_Test extends TestCase
 {
     /**
@@ -44,8 +44,8 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * @uses SENE_MySQLi_Engine_Mock
-     * @covers SENE_MySQLi_Engine
+     * 
+     * 
      */
     public function testFlushQuery()
     {
@@ -64,8 +64,8 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * @uses SENE_MySQLi_Engine_Mock
-     * @covers SENE_MySQLi_Engine
+     * 
+     * 
      */
     public function testFlushQueryAfter()
     {
@@ -87,8 +87,8 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * @uses SENE_MySQLi_Engine_Mock
-     * @covers SENE_MySQLi_Engine
+     * 
+     * 
      */
     public function testWhereIsNull()
     {
@@ -113,8 +113,8 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * @uses SENE_MySQLi_Engine_Mock
-     * @covers SENE_MySQLi_Engine
+     * 
+     * 
      */
     public function testWhereIsNotNull()
     {
@@ -139,8 +139,8 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * @uses SENE_MySQLi_Engine_Mock
-     * @covers SENE_MySQLi_Engine
+     * 
+     * 
      */
     public function testWhereAsIsNull()
     {
@@ -165,8 +165,8 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * @uses SENE_MySQLi_Engine_Mock
-     * @covers SENE_MySQLi_Engine
+     * 
+     * 
      */
     public function testWhereAsIsNotNull()
     {
@@ -191,8 +191,8 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * @uses SENE_MySQLi_Engine_Mock
-     * @covers SENE_MySQLi_Engine
+     * 
+     * 
      */
     public function testWhere()
     {
@@ -302,8 +302,8 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * @uses SENE_MySQLi_Engine_Mock
-     * @covers SENE_MySQLi_Engine
+     * 
+     * 
      */
     public function testWhereAs()
     {

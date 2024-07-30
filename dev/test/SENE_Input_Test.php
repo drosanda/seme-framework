@@ -11,9 +11,9 @@ class SENE_Input_Mock extends SENE_Input {
   }
 }
 
-/**
- * @covers SENE_Input
- */
+#[UsesClass('SENE_Input_Test')]
+#[UsesClass('SENE_Input_Mock')]
+#[CoversClass('SENE_Input')]
 final class SENE_Input_Test extends TestCase
 {
   /**
@@ -34,9 +34,9 @@ final class SENE_Input_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Input_Test
-   * @uses SENE_Input_Mock
-   * @covers SENE_Input
+   * 
+   * 
+   * 
    */
   public function testPost()
   {
@@ -60,9 +60,9 @@ final class SENE_Input_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Input_Test
-   * @uses SENE_Input_Mock
-   * @covers SENE_Input
+   * 
+   * 
+   * 
    */
   public function testGet()
   {
@@ -87,9 +87,9 @@ final class SENE_Input_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Input_Test
-   * @uses SENE_Input_Mock
-   * @covers SENE_Input
+   * 
+   * 
+   * 
    */
   public function testRequest()
   {
@@ -116,9 +116,9 @@ final class SENE_Input_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Input_Test
-   * @uses SENE_Input_Mock
-   * @covers SENE_Input
+   * 
+   * 
+   * 
    */
   public function testDebug()
   {

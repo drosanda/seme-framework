@@ -18,9 +18,10 @@ class SENE_Model_Mock extends SENE_Model {
   }
 }
 
-/**
- * @covers SENE_Model
- */
+#[UsesClass('SENE_Model_Test')]
+#[UsesClass('SENE_Model_Mock')]
+#[CoversClass('SENE_MySQLi_Engine')]
+#[CoversClass('SENE_Model')]
 final class SENE_Model_Test extends TestCase
 {
   /**
@@ -41,10 +42,10 @@ final class SENE_Model_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Model_Test
-   * @uses SENE_Model_Mock
-   * @covers SENE_Model
-   * @covers SENE_MySQLi_Engine
+   * 
+   * 
+   * 
+   * 
    */
   public function testDBConnection()
   {
@@ -53,10 +54,10 @@ final class SENE_Model_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Model_Test
-   * @uses SENE_Model_Mock
-   * @covers SENE_Model
-   * @covers SENE_MySQLi_Engine
+   * 
+   * 
+   * 
+   * 
    */
   public function testDBError()
   {
@@ -65,10 +66,10 @@ final class SENE_Model_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Model_Test
-   * @uses SENE_Model_Mock
-   * @covers SENE_Model
-   * @covers SENE_MySQLi_Engine
+   * 
+   * 
+   * 
+   * 
    */
   public function testEncrypt()
   {
@@ -81,10 +82,10 @@ final class SENE_Model_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Model_Test
-   * @uses SENE_Model_Mock
-   * @covers SENE_Model
-   * @covers SENE_MySQLi_Engine
+   * 
+   * 
+   * 
+   * 
    */
   public function testDecrypt()
   {

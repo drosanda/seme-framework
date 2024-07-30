@@ -14,9 +14,9 @@ class SENE_Controller_Mock extends SENE_Controller {
   }
 }
 
-/**
- * @covers SENE_Controller
- */
+#[UsesClass('SENE_Controller_Test')]
+#[UsesClass('SENE_Controller_Mock')]
+#[CoversClass('SENE_Controller')]
 final class SENE_Controller_Test extends TestCase
 {
   /**
@@ -35,12 +35,7 @@ final class SENE_Controller_Test extends TestCase
     $method->setAccessible(true);
     return $method->invokeArgs($object, $parameters);
   }
-
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
+  
   public function testTitle()
   {
     $tc = new SENE_Controller_Mock();
@@ -49,12 +44,7 @@ final class SENE_Controller_Test extends TestCase
     $this->assertEquals($ts, $this->invokeMethod($tc, 'getTitle', array()));
     $this->assertNotEquals(strtolower($ts), $this->invokeMethod($tc, 'getTitle', array()));
   }
-
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
+  
   public function testDescription()
   {
     $tc = new SENE_Controller_Mock();
@@ -64,11 +54,6 @@ final class SENE_Controller_Test extends TestCase
     $this->assertNotEquals(strtolower($ts), $this->invokeMethod($tc, 'getDescription', array()));
   }
 
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
   public function testLang()
   {
     $tc = new SENE_Controller_Mock();
@@ -78,11 +63,6 @@ final class SENE_Controller_Test extends TestCase
     $this->assertNotEquals(strtolower($ts), $this->invokeMethod($tc, 'getLang', array()));
   }
 
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
   public function testRobots()
   {
     $tc = new SENE_Controller_Mock();
@@ -103,12 +83,7 @@ final class SENE_Controller_Test extends TestCase
     $this->assertEquals('INDEX', $this->invokeMethod($tc, 'getRobots', array()));
     $this->assertNotEquals(strtolower(''), $this->invokeMethod($tc, 'getRobots', array()));
   }
-
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
+  
   public function testAuthor()
   {
     $tc = new SENE_Controller_Mock();
@@ -118,9 +93,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testIcon()
   {
@@ -131,9 +106,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testShortcutIcon()
   {
@@ -144,9 +119,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testKeyword()
   {
@@ -157,9 +132,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testSession()
   {
@@ -170,9 +145,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testCookie()
   {
@@ -184,9 +159,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testContentLanguage()
   {
@@ -197,9 +172,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testContentType()
   {
@@ -210,9 +185,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testTheme()
   {
@@ -227,9 +202,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testCanonicalEmpty()
   {
@@ -256,9 +231,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testSetAdditional()
   {
@@ -270,9 +245,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetAdditionalPlain()
   {
@@ -286,9 +261,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetAdditionalBaseUrl()
   {
@@ -302,9 +277,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetAdditionalBaseUrlAdmin()
   {
@@ -318,9 +293,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetAdditionalCdnUrl()
   {
@@ -335,9 +310,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testSetAdditionalBefore()
   {
@@ -349,9 +324,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetAdditionalBeforePlain()
   {
@@ -365,9 +340,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetAdditionalBeforeBaseUrl()
   {
@@ -381,9 +356,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetAdditionalBeforeBaseUrlAdmin()
   {
@@ -397,9 +372,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetAdditionalBeforeCdnUrl()
   {
@@ -413,9 +388,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testSetAdditionalAfter()
   {
@@ -427,9 +402,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetAdditionalAfterPlain()
   {
@@ -443,9 +418,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetAdditionalAfterBaseUrl()
   {
@@ -459,9 +434,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetAdditionalAfterBaseUrlAdmin()
   {
@@ -473,12 +448,7 @@ final class SENE_Controller_Test extends TestCase
     $this->invokeMethod($tc, 'setadditionalafter', array($td));
     $this->invokeMethod($tc, 'getadditionalafter', array());
   }
-
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
+  
   public function testGetAdditionalAfterCdnUrl()
   {
     $tc = new SENE_Controller_Mock();
@@ -489,12 +459,7 @@ final class SENE_Controller_Test extends TestCase
     $this->invokeMethod($tc, 'setadditionalafter', array($td));
     $this->invokeMethod($tc, 'getadditionalafter', array());
   }
-
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
+  
   public function testPutJsFooter()
   {
     $tc = new SENE_Controller_Mock();
@@ -503,12 +468,7 @@ final class SENE_Controller_Test extends TestCase
     $this->invokeMethod($tc, 'putjsfooter', array($td,0));
     $this->assertContains($ts, $tc->js_footer);
   }
-
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
+  
   public function testPutJsFooterWithoutExtension()
   {
     $tc = new SENE_Controller_Mock();
@@ -519,9 +479,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testPutJsFooterExternal()
   {
@@ -533,9 +493,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetJsFooter()
   {
@@ -548,9 +508,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetJsFooterWithExtension()
   {
@@ -563,9 +523,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetJsFooterBaseUrl()
   {
@@ -578,9 +538,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetJsFooterBaseUrlWithExtension()
   {
@@ -593,9 +553,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetJsFooterBaseUrlAdmin()
   {
@@ -608,9 +568,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetJsFooterBaseUrlAdminWithExtension()
   {
@@ -621,12 +581,7 @@ final class SENE_Controller_Test extends TestCase
     $this->invokeMethod($tc, 'putjsfooter', array($td));
     $this->invokeMethod($tc, 'getjsfooter', array());
   }
-
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
+  
   public function testGetJsFooterCdnUrl()
   {
     $tc = new SENE_Controller_Mock();
@@ -636,12 +591,7 @@ final class SENE_Controller_Test extends TestCase
     $this->invokeMethod($tc, 'putjsfooter', array($td));
     $this->invokeMethod($tc, 'getjsfooter', array());
   }
-
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
+  
   public function testGetJsFooterCdnUrlWithExtension()
   {
     $tc = new SENE_Controller_Mock();
@@ -653,9 +603,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testThemeCss()
   {
@@ -705,9 +655,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testThemeScript()
   {
@@ -755,9 +705,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testResetThemeContent()
   {
@@ -770,9 +720,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetThemeContent()
   {
@@ -784,9 +734,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetThemeRightContent()
   {
@@ -798,9 +748,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetThemeLeftContent()
   {
@@ -812,9 +762,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetBodyBefore()
   {
@@ -826,9 +776,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testGetJsContent()
   {
@@ -840,9 +790,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testCdnUrl()
   {
@@ -924,9 +874,9 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
+   * 
+   * 
+   * 
    */
   public function testRender()
   {

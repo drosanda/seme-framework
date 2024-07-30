@@ -20,15 +20,15 @@ class SENE_SQL_Select_Mock extends SENE_SQL_Select
     }
 }
 
-/**
- * @covers SENE_Sql_Select
- */
+#[UsesClass('SENE_Sql_Select_Mock')]
+#[CoversClass('SENE_Sql')]
+#[CoversClass('SENE_Sql_Select')]
 final class SENE_Sql_Select_Test extends TestCase
 {
 
     /**
-     * @uses SENE_Sql_Select_Mock
-     * @covers SENE_Sql_Select
+     * 
+     * 
      */
     public function testQueryStringNeedReturnString()
     {
@@ -37,8 +37,8 @@ final class SENE_Sql_Select_Test extends TestCase
     }
 
     /**
-     * @uses SENE_Sql_Select_Mock
-     * @covers SENE_Sql_Select
+     * 
+     * 
      */
     public function testResetQueryStringNeedReturnString()
     {
@@ -48,8 +48,8 @@ final class SENE_Sql_Select_Test extends TestCase
     }
 
     /**
-     * @uses SENE_Sql_Select_Mock
-     * @covers SENE_Sql_Select
+     * 
+     * 
      */
     public function testSelectMethodIfEmtpty()
     {
@@ -59,8 +59,8 @@ final class SENE_Sql_Select_Test extends TestCase
     }
 
     /**
-     * @uses SENE_Sql_Select_Mock
-     * @covers SENE_Sql_Select
+     * 
+     * 
      */
     public function testSelectMethodIfWildCard()
     {
@@ -70,8 +70,8 @@ final class SENE_Sql_Select_Test extends TestCase
     }
 
     /**
-     * @uses SENE_Sql_Select_Mock
-     * @covers SENE_Sql_Select
+     * 
+     * 
      */
     public function testSelectMethodIfArray()
     {
@@ -81,8 +81,8 @@ final class SENE_Sql_Select_Test extends TestCase
     }
 
     /**
-     * @uses SENE_Sql_Select_Mock
-     * @covers SENE_Sql_Select
+     * 
+     * 
      */
     public function testSelectMethodIfString()
     {
@@ -93,8 +93,8 @@ final class SENE_Sql_Select_Test extends TestCase
     
 
     /**
-     * @uses SENE_Sql_Select_Mock
-     * @covers SENE_Sql_Select
+     * 
+     * 
      */
     public function testSelectAsMethodIfEmtpty()
     {
@@ -104,8 +104,8 @@ final class SENE_Sql_Select_Test extends TestCase
     }
 
     /**
-     * @uses SENE_Sql_Select_Mock
-     * @covers SENE_Sql_Select
+     * 
+     * 
      */
     public function testSelectAsMethodIfWildCard()
     {
@@ -115,8 +115,8 @@ final class SENE_Sql_Select_Test extends TestCase
     }
 
     /**
-     * @uses SENE_Sql_Select_Mock
-     * @covers SENE_Sql_Select
+     * 
+     * 
      */
     public function testSelectAsMethodIfArray()
     {
@@ -126,8 +126,8 @@ final class SENE_Sql_Select_Test extends TestCase
     }
 
     /**
-     * @uses SENE_Sql_Select_Mock
-     * @covers SENE_Sql_Select
+     * 
+     * 
      */
     public function testSelectAsMethodIfString()
     {
