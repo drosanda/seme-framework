@@ -38,8 +38,10 @@ abstract class SENE_Model
         if (!isset($db->engine)) {
             $db->engine = '';
         }
+        require_once($this->directories->kero_sine."SENE_Sql.php");
+        require_once($this->directories->kero_sine."SENE_Sql_Select.php");
         require_once($this->directories->kero_sine."SENE_MySQLi_Engine.php");
-        $this->db = new SENE_MySQLi_Engine($db);
+        $this->db = new \SENE_MySQLi_Engine($db);
         return $this;
     }
 

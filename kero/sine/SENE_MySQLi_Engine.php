@@ -13,10 +13,12 @@
 class SENE_MySQLi_Engine
 {
     protected static $__instance;
+    private $sql_select;
     public $__mysqli;
     protected $koneksi;
     protected $fieldname = array();
     protected $fieldvalue = array();
+    public $join;
     public $last_id = 0;
     public $in_select = '';
     public $in_where = '';
@@ -33,10 +35,9 @@ class SENE_MySQLi_Engine
     public $tis_limit = 0;
     public $limit_a = 0;
     public $limit_b = 0;
-    public $as_from = 0;
-    public $join = 0;
+    public $as_from;
     public $in_join = 0;
-    public $join_multi = 0;
+    public $join_multi;
     public $in_join_multi = 0;
     public $query_last;
     public $union;
@@ -80,26 +81,24 @@ class SENE_MySQLi_Engine
 
         self::$__instance = $this;
 
-        $this->in_select = '';
-        $this->in_where = '';
-        $this->in_order = '';
         $this->table = '';
         $this->is_flush = 0;
         $this->is_cache = 0;
-        $this->page = 0;
-        $this->pagesize = 0;
         $this->cache_save = 0;
         $this->cache_flush = 0;
-        $this->tis_limit = 0;
-        $this->in_join = 0;
-        $this->in_join_multi = 0;
-        $this->as_from = array();
-        $this->join = array();
-        $this->join_multi = array();
         $this->query_last = '';
         $this->is_debug = 1;
 
-        $this->_union_init();
+        $this
+            ->_union_init()
+            ->sene_sql_load()
+            ->flushQuery();
+    }
+
+    private function sene_sql_load($select_class = 'SENE_Sql_Select'){
+        $this->sql_select = new $select_class();
+
+        return $this;
     }
 
     private function _union_init()
@@ -179,17 +178,7 @@ class SENE_MySQLi_Engine
             return 0;
         }
     }
-    public function select_as($skey, $sval = '')
-    {
-        if (is_array($skey)) {
-            foreach ($skey as $k => $v) {
-                $this->in_select .= ''.$k." '".$v."', ";
-            }
-        } else {
-            $this->in_select .= ''.$skey." AS '".$sval."', ";
-        }
-        return $this;
-    }
+
     public function query($sql, $cache_enabled = 0, $flushcache = 0, $type = "object")
     {
         if ($cache_enabled) {
@@ -286,37 +275,33 @@ class SENE_MySQLi_Engine
             }
         }
     }
-
-    public function select($sql = '', $cache_enabled = 0, $flushcache = 0, $type = "object")
+    
+    /**
+     * Sets the SELECT clause of the query.
+     *
+     * @param mixed $selected_column Either an array of column names or a single column name as a string, or empty for all columns ('*')
+     * 
+     * @return self For method chaining
+     */
+    public function select($selected_column = '*')
     {
-        $exp1 = 0;
-        $exp2 = 0;
-        if (!is_array($sql)) {
-            $exp1 = count(explode("SELECT", $sql));
-            $exp2 = count(explode("FROM", $sql));
-        }
-        if ($exp1 > 1 && $exp2 > 1) {
-            return $this->query($sql, $cache_enabled, $flushcache, $type);
-        } elseif (is_array($sql)) {
-            foreach ($sql as $s) {
-                if ($s != "*") {
-                    $this->in_select .= '`'.$s."`, ";
-                } else {
-                    $this->in_select .= " * , ";
-                }
-            }
-            return $this;
-        } elseif (!empty($sql)) {
-            if ($sql != "*") {
-                $this->in_select .= '`'.$sql."`, ";
-            } else {
-                $this->in_select .= ''.$sql.", ";
-            }
-            return $this;
-        } else {
-            $this->in_select .= "*";
-            return $this;
-        }
+       $this->sql_select->select($selected_column);
+    
+        return $this;
+    }
+
+    /**
+     * Select fields as aliases.
+     *
+     * @param array|string $selected_column
+     * @param string|null $aliased_column
+     * @return $this
+     */
+    public function select_as($selected_column, string $aliased_column = null)
+    {
+        $this->sql_select->select_as($selected_column, $aliased_column);
+
+        return $this;
     }
 
     public function getStat()
@@ -865,18 +850,18 @@ class SENE_MySQLi_Engine
     public function from($table, $as = '')
     {
         if (empty($table)) {
-            trigger_error(TEM_ERR.': table name required', E_USER_ERROR);
-            die();
+            throw new InvalidArgumentException('Table name required');
         }
+
         if (!empty($as)) {
             $as = strtolower($as);
             if (isset($this->as_from[$as])) {
                 if ($this->as_from[$as] != $table) {
-                    trigger_error(TEM_ERR.': Table alias "'.$as.'" for "'.$this->as_from[$as].'" has been used, please change!');
-                    foreach ($this->as_from as $k => $v) {
-                        trigger_error($k.': '.$v);
-                    }
-                    die();
+                    throw new InvalidArgumentException(sprintf(
+                        'Table alias "%s" for "%s" has been used. Please change!',
+                        $as,
+                        $this->as_from[$as]
+                     ));
                 }
             } else {
                 $this->as_from[$as] = $table;
@@ -978,7 +963,7 @@ class SENE_MySQLi_Engine
     }
     public function get($tipe = "object", $is_debug = '')
     {
-        $this->in_select = rtrim($this->in_select, ", ");
+        $this->in_select = rtrim($this->in_select ?? '', ", ");
         if (empty($this->in_select)) {
             $this->in_select = "*";
         }
@@ -1153,7 +1138,7 @@ class SENE_MySQLi_Engine
     }
     public function flushQuery()
     {
-        $this->in_select = '';
+        $this->in_select = $this->sql_select->flush();
         $this->in_where = '';
         $this->in_order = '';
         $this->in_group = '';
