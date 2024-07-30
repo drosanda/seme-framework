@@ -23,9 +23,6 @@ class SENE_Model_Mock extends SENE_Model {
  */
 final class SENE_Model_Test extends TestCase
 {
-  public function __construct(){
-    parent::__construct();
-  }
   /**
   * Call protected/private method of a class.
   *

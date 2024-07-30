@@ -211,7 +211,7 @@ use PHPUnit\Framework\TestCase;
 
 Class SeneTestCase extends TestCase {
   public function __construct(){
-    parent::__construct();
+    parent::__construct('setUp');
 		if(!empty($GLOBALS['core_controller']) && !empty($GLOBALS['core_prefix'])){
       $core_controller_file = SENECORE.$GLOBALS['core_prefix'].$GLOBALS['core_controller'].'.php';
 			if(file_exists($core_controller_file)){

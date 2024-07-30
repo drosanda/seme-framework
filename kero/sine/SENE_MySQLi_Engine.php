@@ -1138,7 +1138,7 @@ class SENE_MySQLi_Engine
     }
     public function flushQuery()
     {
-        $this->in_select = $this->sql_select->flush();
+        $this->in_select = $this->sql_select->reset();
         $this->in_where = '';
         $this->in_order = '';
         $this->in_group = '';

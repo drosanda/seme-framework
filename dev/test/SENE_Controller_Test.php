@@ -19,9 +19,6 @@ class SENE_Controller_Mock extends SENE_Controller {
  */
 final class SENE_Controller_Test extends TestCase
 {
-  public function __construct(){
-    parent::__construct();
-  }
   /**
   * Call protected/private method of a class.
   *
