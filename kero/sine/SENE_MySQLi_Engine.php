@@ -29,15 +29,15 @@ class SENE_MySQLi_Engine
     public $pagesize = '';
     public $cache_save = '';
     public $cache_flush = '';
-    public $is_limit=0;
-    public $tis_limit=0;
-    public $limit_a=0;
-    public $limit_b=0;
-    public $as_from=0;
-    public $join=0;
-    public $in_join=0;
-    public $join_multi=0;
-    public $in_join_multi=0;
+    public $is_limit = 0;
+    public $tis_limit = 0;
+    public $limit_a = 0;
+    public $limit_b = 0;
+    public $as_from = 0;
+    public $join = 0;
+    public $in_join = 0;
+    public $join_multi = 0;
+    public $in_join_multi = 0;
     public $query_last;
     public $union;
     public $is_debug;
@@ -48,7 +48,7 @@ class SENE_MySQLi_Engine
         $this->config = $GLOBALS['SEMECFG'];
         $port = 3306;
         if (isset($this->config->database->port)) {
-            if (strlen($this->config->database->port)>0) {
+            if (strlen($this->config->database->port) > 0) {
                 $port = $this->config->database->port;
             }
         }
@@ -73,7 +73,7 @@ class SENE_MySQLi_Engine
         }
 
         $cs = 'utf8';
-        if (isset($this->config->database->charset) && strlen($this->config->database->charset)>0) {
+        if (isset($this->config->database->charset) && strlen($this->config->database->charset) > 0) {
             $cs = $this->config->database->charset;
         }
         $this->__mysqli->set_charset($cs);
@@ -91,8 +91,8 @@ class SENE_MySQLi_Engine
         $this->cache_save = 0;
         $this->cache_flush = 0;
         $this->tis_limit = 0;
-        $this->in_join=0;
-        $this->in_join_multi=0;
+        $this->in_join = 0;
+        $this->in_join_multi = 0;
         $this->as_from = array();
         $this->join = array();
         $this->join_multi = array();
@@ -105,19 +105,19 @@ class SENE_MySQLi_Engine
     private function _union_init()
     {
         $this->union = new stdClass();
-		$this->union->select = array();
-		$this->union->table = array();
-		$this->union->from_as = 'u1';
-		$this->union->group_by = '';
-		$this->union->order_by = array();
-		$this->union->limit = '';
+        $this->union->select = array();
+        $this->union->table = array();
+        $this->union->from_as = 'u1';
+        $this->union->group_by = '';
+        $this->union->order_by = array();
+        $this->union->limit = '';
 
         return $this;
     }
 
     public static function getInstance()
     {
-        return self::$_instance;
+        return self::$__instance;
     }
 
     private function has_bracket_open($bracket_flag)
@@ -138,7 +138,7 @@ class SENE_MySQLi_Engine
         return $this;
     }
 
-    public function autocommit($var=1)
+    public function autocommit($var = 1)
     {
         return $this->__mysqli->autocommit($var);
     }
@@ -158,7 +158,7 @@ class SENE_MySQLi_Engine
     {
         return $this->__mysqli->savepoint($sp);
     }
-    public function debug($sql='')
+    public function debug($sql = '')
     {
         $this->fieldname[] = 'error';
         $this->fieldname[] = 'code';
@@ -179,10 +179,10 @@ class SENE_MySQLi_Engine
             return 0;
         }
     }
-    public function select_as($skey, $sval='')
+    public function select_as($skey, $sval = '')
     {
         if (is_array($skey)) {
-            foreach ($skey as $k=>$v) {
+            foreach ($skey as $k => $v) {
                 $this->in_select .= ''.$k." '".$v."', ";
             }
         } else {
@@ -190,7 +190,7 @@ class SENE_MySQLi_Engine
         }
         return $this;
     }
-    public function query($sql, $cache_enabled=0, $flushcache=0, $type="object")
+    public function query($sql, $cache_enabled = 0, $flushcache = 0, $type = "object")
     {
         if ($cache_enabled) {
             $name = '';
@@ -205,9 +205,9 @@ class SENE_MySQLi_Engine
                 }
                 unset($names);
             }
-            $cache=md5($sql).".json";
+            $cache = md5($sql).".json";
             if (!empty($name)) {
-                $cache=$name."-".md5($sql).".json";
+                $cache = $name."-".md5($sql).".json";
             }
 
             if (isset($GLOBALS['semeflush'])) {
@@ -230,17 +230,17 @@ class SENE_MySQLi_Engine
             } else {
                 $res = $this->__mysqli->query($sql);
                 if ($res) {
-                    $dataz=array();
-                    if ($type=="array") {
-                        while ($data=$res->fetch_array()) {
+                    $dataz = array();
+                    if ($type == "array") {
+                        while ($data = $res->fetch_array()) {
                             array_push($dataz, $data);
                         }
-                    } elseif ($type=="assoc") {
-                        while ($data=$res->fetch_assoc()) {
+                    } elseif ($type == "assoc") {
+                        while ($data = $res->fetch_assoc()) {
                             array_push($dataz, $data);
                         }
                     } else {
-                        while ($data=$res->fetch_object()) {
+                        while ($data = $res->fetch_object()) {
                             $dataz[] = $data;
                         }
                     }
@@ -259,18 +259,18 @@ class SENE_MySQLi_Engine
         } else {
             $res = $this->__mysqli->query($sql);
             if ($res) {
-                $dataz=array();
-                if ($type=="array") {
-                    while ($data=$res->fetch_array()) {
+                $dataz = array();
+                if ($type == "array") {
+                    while ($data = $res->fetch_array()) {
                         array_push($dataz, $data);
                     }
-                } elseif ($type=="assoc") {
-                    while ($data=$res->fetch_assoc()) {
+                } elseif ($type == "assoc") {
+                    while ($data = $res->fetch_assoc()) {
                         array_push($dataz, $data);
                     }
                 } else {
                     if (!is_bool($res)) {
-                        while ($data=$res->fetch_object()) {
+                        while ($data = $res->fetch_object()) {
                             $dataz[] = $data;
                         }
                     }
@@ -287,7 +287,7 @@ class SENE_MySQLi_Engine
         }
     }
 
-    public function select($sql='', $cache_enabled=0, $flushcache=0, $type="object")
+    public function select($sql = '', $cache_enabled = 0, $flushcache = 0, $type = "object")
     {
         $exp1 = 0;
         $exp2 = 0;
@@ -295,11 +295,11 @@ class SENE_MySQLi_Engine
             $exp1 = count(explode("SELECT", $sql));
             $exp2 = count(explode("FROM", $sql));
         }
-        if ($exp1>1 && $exp2>1) {
+        if ($exp1 > 1 && $exp2 > 1) {
             return $this->query($sql, $cache_enabled, $flushcache, $type);
         } elseif (is_array($sql)) {
             foreach ($sql as $s) {
-                if ($s!="*") {
+                if ($s != "*") {
                     $this->in_select .= '`'.$s."`, ";
                 } else {
                     $this->in_select .= " * , ";
@@ -307,7 +307,7 @@ class SENE_MySQLi_Engine
             }
             return $this;
         } elseif (!empty($sql)) {
-            if ($sql!="*") {
+            if ($sql != "*") {
                 $this->in_select .= '`'.$sql."`, ";
             } else {
                 $this->in_select .= ''.$sql.", ";
@@ -321,7 +321,7 @@ class SENE_MySQLi_Engine
 
     public function getStat()
     {
-        return array("fieldname"=>$this->fieldname,"fieldvalue"=>$this->fieldvalue);
+        return array("fieldname" => $this->fieldname,"fieldvalue" => $this->fieldvalue);
     }
     public function lastId()
     {
@@ -331,7 +331,7 @@ class SENE_MySQLi_Engine
     {
         if (is_array($var)) {
         } else {
-            if (strtolower($var)=='null') {
+            if (strtolower($var ?? 'null') == 'null') {
                 return "NULL";
             } else {
                 return '"'.$this->__mysqli->real_escape_string($var).'"';
@@ -346,10 +346,10 @@ class SENE_MySQLi_Engine
     }
     public function getField()
     {
-        return array("field"=>$this->fieldname,"value"=>fieldvalue);
+        return array("field" => $this->fieldname,"value" => $this->fieldvalue);
     }
 
-    public function where_null($col_params, $operand="AND", $comp="", $bracket=0, $bracket2=0)
+    public function where_null($col_params, $operand = "AND", $comp = "", $bracket = 0, $bracket2 = 0)
     {
         $this->has_bracket_open($bracket);
         $this->in_where .= ' '.$col_params.' IS NULL ';
@@ -359,7 +359,7 @@ class SENE_MySQLi_Engine
         return $this;
     }
 
-    public function where_not_null($col_params, $operand="AND", $comp="", $bracket=0, $bracket2=0)
+    public function where_not_null($col_params, $operand = "AND", $comp = "", $bracket = 0, $bracket2 = 0)
     {
         $this->has_bracket_open($bracket);
         $this->in_where .= ' '.$col_params.' IS NOT NULL ';
@@ -382,92 +382,92 @@ class SENE_MySQLi_Engine
     *            bisa juga not like%,%like,%like%
     * -----------------------------------------------------------
     */
-    public function where($params, $params2='', $operand="AND", $comp='=', $bracket=0, $bracket2=0)
+    public function where($params, $params2 = '', $operand = "AND", $comp = '=', $bracket = 0, $bracket2 = 0)
     {
         $comp = strtolower($comp);
-        $c='=';
+        $c = '=';
         $operand = strtoupper($operand);
         if (is_array($params)) {
             $comp = $operand;
             $comp = strtolower($comp);
             $operand = $params2;
-            foreach ($params as $k=>$v) {
+            foreach ($params as $k => $v) {
                 switch ($comp) {
                     case "like":
-                        $c= "LIKE";
-                        $val = $this->esc($val);
+                        $c = "LIKE";
+                        $val = $this->esc($v);
                         break;
                     case 'like%':
-                        $c= "LIKE";
+                        $c = "LIKE";
                         $val = ''.$v.'%';
                         $val = $this->esc($val);
                         break;
                     case '%like':
-                        $c= "LIKE";
+                        $c = "LIKE";
                         $val = '%'.$v.'';
                         $val = $this->esc($val);
                         break;
                     case 'like%%':
-                        $c= "LIKE";
+                        $c = "LIKE";
                         $val = '%'.$v.'%';
                         $val = $this->esc($val);
                         break;
                     case '%like%':
-                        $c= "LIKE";
+                        $c = "LIKE";
                         $val = '%'.$v.'%';
                         $val = $this->esc($val);
                         break;
                     case "notlike":
-                        $c= "NOT LIKE";
-                        $val = $this->esc($val);
+                        $c = "NOT LIKE";
+                        $val = $this->esc($v);
                         break;
                     case "notlike%%":
-                        $c= "NOT LIKE";
+                        $c = "NOT LIKE";
                         $val = '%'.$v.'%';
                         $val = $this->esc($val);
                         break;
                     case "%notlike%":
-                        $c= "NOT LIKE";
+                        $c = "NOT LIKE";
                         $val = '%'.$v.'%';
                         $val = $this->esc($val);
                         break;
                     case "notlike%":
-                        $c= "NOT LIKE";
+                        $c = "NOT LIKE";
                         $val = ''.$v.'%';
                         $val = $this->esc($val);
                         break;
                     case "%notlike":
-                        $c= "NOT LIKE";
+                        $c = "NOT LIKE";
                         $val = '%'.$v.'';
                         $val = $this->esc($val);
                         break;
                     case '!=':
-                        $c= '<>';
+                        $c = '<>';
                         $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     case '<>':
-                        $c= '<>';
+                        $c = '<>';
                         $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     case '>=':
-                        $c= '>=';
+                        $c = '>=';
                         $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     case '<=':
-                        $c= '<=';
+                        $c = '<=';
                         $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     case '>':
-                        $c= '>';
+                        $c = '>';
                         $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
                     case '<':
-                        $c= '<';
+                        $c = '<';
                         $val = ''.$v.'';
                         $val = $this->esc($val);
                         break;
@@ -497,7 +497,7 @@ class SENE_MySQLi_Engine
             unset($v);
             unset($k);
             unset($val);
-        } elseif (!empty($params) && !empty($params2)) {
+        } elseif (!is_array($params)) {
             $val = $params2;
             $v = $params2;
 
@@ -522,81 +522,81 @@ class SENE_MySQLi_Engine
                     $val = $this->esc($val);
                     break;
                 case 'like%':
-                    $c= "LIKE";
+                    $c = "LIKE";
                     $val = ''.$v.'%';
                     $val = $this->esc($val);
                     break;
                 case '%like':
-                    $c= "LIKE";
+                    $c = "LIKE";
                     $val = '%'.$v.'';
                     $val = $this->esc($val);
                     break;
                 case 'like%%':
-                    $c= "LIKE";
+                    $c = "LIKE";
                     $val = '%'.$v.'%';
                     $val = $this->esc($val);
                     break;
                 case "%like%":
-                    $c= "LIKE";
+                    $c = "LIKE";
                     $val = '%'.$v.'%';
                     $val = $this->esc($val);
                     break;
                 case "notlike":
-                    $c= "NOT LIKE";
+                    $c = "NOT LIKE";
                     $val = $this->esc($val);
                     break;
                 case "notlike%%":
-                    $c= "NOT LIKE";
+                    $c = "NOT LIKE";
                     $val = '%'.$v.'%';
                     $val = $this->esc($val);
                     break;
                 case "%notlike%":
-                    $c= "NOT LIKE";
+                    $c = "NOT LIKE";
                     $val = '%'.$v.'%';
                     $val = $this->esc($val);
                     break;
                 case "notlike%":
-                    $c= "NOT LIKE";
+                    $c = "NOT LIKE";
                     $val = ''.$v.'%';
                     $val = $this->esc($val);
                     break;
                 case "%notlike":
-                    $c= "NOT LIKE";
+                    $c = "NOT LIKE";
                     $val = '%'.$v.'';
                     $val = $this->esc($val);
                     break;
                 case '!=':
-                    $c= '<>';
+                    $c = '<>';
                     $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
                 case '<>':
-                    $c= '<>';
+                    $c = '<>';
                     $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
                 case '>=':
-                    $c= '>=';
+                    $c = '>=';
                     $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
                 case '<=':
-                    $c= '<=';
+                    $c = '<=';
                     $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
                 case '>':
-                    $c= '>';
+                    $c = '>';
                     $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
                 case '<':
-                    $c= '<';
+                    $c = '<';
                     $val = ''.$v.'';
                     $val = $this->esc($val);
                     break;
                 default:
-                    if (strtoupper(trim($v)) == "IS NULL" || strtoupper(trim($v)) == "IS NOT NULL" || strtoupper(trim($v)) == "IS NOT NULL") {
+                    if (strtoupper(trim($v ?? '')) == "IS NULL" || strtoupper(trim($v ?? '')) == "IS NOT NULL" || strtoupper(trim($v ?? '')) == "IS NOT NULL") {
                         $c = '';
                         $val = strtoupper($v);
                     } else {
@@ -615,92 +615,92 @@ class SENE_MySQLi_Engine
         }
         return $this;
     }
-    public function where_as($params, $params2='', $operand="AND", $comp='=', $bracket=0, $bracket2=0)
+    public function where_as($params, $params2 = '', $operand = "AND", $comp = '=', $bracket = 0, $bracket2 = 0)
     {
         $comp = strtolower($comp);
-        $c='=';
+        $c = '=';
         $operand = strtoupper($operand);
         if (is_array($params)) {
             $comp = $operand;
             $comp = strtolower($comp);
             $operand = $params2;
-            foreach ($params as $k=>$v) {
+            foreach ($params as $k => $v) {
                 switch ($comp) {
                     case "like":
-                        $c= "LIKE";
-                        $val = ($val);
+                        $c = "LIKE";
+                        $val = ($v);
                         break;
                     case 'like%':
-                        $c= "LIKE";
+                        $c = "LIKE";
                         $val = '\''.$v.'%\'';
                         $val = ($val);
                         break;
                     case '%like':
-                        $c= "LIKE";
+                        $c = "LIKE";
                         $val = '\'%'.$v.'\'';
                         $val = ($val);
                         break;
                     case 'like%%':
-                        $c= "LIKE";
+                        $c = "LIKE";
                         $val = '\'%'.$v.'%\'';
                         $val = ($val);
                         break;
                     case '%like%':
-                        $c= "LIKE";
+                        $c = "LIKE";
                         $val = '\'%'.$v.'%\'';
                         $val = ($val);
                         break;
                     case "notlike":
-                        $c= "NOT LIKE";
-                        $val = ($val);
+                        $c = "NOT LIKE";
+                        $val = ($v);
                         break;
                     case "notlike%%":
-                        $c= "NOT LIKE";
+                        $c = "NOT LIKE";
                         $val = '\'%'.$v.'%\'';
                         $val = ($val);
                         break;
                     case "%notlike%":
-                        $c= "NOT LIKE";
+                        $c = "NOT LIKE";
                         $val = '\'%'.$v.'%\'';
                         $val = ($val);
                         break;
                     case "notlike%":
-                        $c= "NOT LIKE";
+                        $c = "NOT LIKE";
                         $val = '\''.$v.'%\'';
                         $val = ($val);
                         break;
                     case "%notlike":
-                        $c= "NOT LIKE";
+                        $c = "NOT LIKE";
                         $val = '\'%'.$v.'\'';
                         $val = ($val);
                         break;
                     case '!=':
-                        $c= '<>';
+                        $c = '<>';
                         $val = ''.$v.'';
                         $val = ($val);
                         break;
                     case '<>':
-                        $c= '<>';
+                        $c = '<>';
                         $val = ''.$v.'';
                         $val = ($val);
                         break;
                     case '>=':
-                        $c= '>=';
+                        $c = '>=';
                         $val = ''.$v.'';
                         $val = ($val);
                         break;
                     case '<=':
-                        $c= '<=';
+                        $c = '<=';
                         $val = ''.$v.'';
                         $val = ($val);
                         break;
                     case '>':
-                        $c= '>';
+                        $c = '>';
                         $val = ''.$v.'';
                         $val = ($val);
                         break;
                     case '<':
-                        $c= '<';
+                        $c = '<';
                         $val = ''.$v.'';
                         $val = ($val);
                         break;
@@ -721,7 +721,7 @@ class SENE_MySQLi_Engine
             unset($v);
             unset($k);
             unset($val);
-        } elseif (!empty($params) && !empty($params2)) {
+        } elseif (!is_array($params)) {
             $val = $params2;
             $v = $params2;
 
@@ -746,86 +746,86 @@ class SENE_MySQLi_Engine
                     $val = ($val);
                     break;
                 case 'like%':
-                    $c= "LIKE";
+                    $c = "LIKE";
                     $val = "\'".$v.'%\'';
                     $val = ($val);
                     break;
                 case '%like':
-                    $c= "LIKE";
+                    $c = "LIKE";
                     $val = '\'%'.$v.'\'';
                     $val = ($val);
                     break;
                 case 'like%%':
-                    $c= "LIKE";
+                    $c = "LIKE";
                     $val = '\'%'.$v.'%\'';
                     $val = ($val);
                     break;
                 case "%like%":
-                    $c= "LIKE";
+                    $c = "LIKE";
                     $val = '\'%'.$v.'%\'';
                     $val = ($val);
                     break;
                 case "notlike":
-                    $c= "NOT LIKE";
+                    $c = "NOT LIKE";
                     $val = ($val);
                     break;
                 case "notlike%%":
-                    $c= "NOT LIKE";
+                    $c = "NOT LIKE";
                     $val = '\'%'.$v.'%\'';
                     $val = ($val);
                     break;
                 case "%notlike%":
-                    $c= "NOT LIKE";
+                    $c = "NOT LIKE";
                     $val = '\'%'.$v.'%\'';
                     $val = ($val);
                     break;
                 case "notlike%":
-                    $c= "NOT LIKE";
+                    $c = "NOT LIKE";
                     $val = '\''.$v.'%\'';
                     $val = ($val);
                     break;
                 case "%notlike":
-                    $c= "NOT LIKE";
+                    $c = "NOT LIKE";
                     $val = '\'%'.$v.'\'';
                     $val = ($val);
                     break;
                 case '!=':
-                    $c= '<>';
+                    $c = '<>';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
                 case '<>':
-                    $c= '<>';
+                    $c = '<>';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
                 case '>':
-                    $c= '>';
+                    $c = '>';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
                 case '>=':
-                    $c= '>=';
+                    $c = '>=';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
                 case '<':
-                    $c= '<';
+                    $c = '<';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
                 case '<=':
-                    $c= '<=';
+                    $c = '<=';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
                 case '>':
-                    $c= '>';
+                    $c = '>';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
                 case '<':
-                    $c= '<';
+                    $c = '<';
                     $val = ''.$v.'';
                     $val = ($val);
                     break;
@@ -851,10 +851,10 @@ class SENE_MySQLi_Engine
         }
         return $this;
     }
-    public function order_by($params, $params2="ASC")
+    public function order_by($params, $params2 = "ASC")
     {
         if (is_array($params)) {
-            foreach ($params as $k=>$v) {
+            foreach ($params as $k => $v) {
                 $this->in_order .= $k.' '.strtoupper($v).", ";
             }
         } elseif (!empty($params) && !empty($params2)) {
@@ -862,7 +862,7 @@ class SENE_MySQLi_Engine
         }
         return $this;
     }
-    public function from($table, $as='')
+    public function from($table, $as = '')
     {
         if (empty($table)) {
             trigger_error(TEM_ERR.': table name required', E_USER_ERROR);
@@ -873,7 +873,7 @@ class SENE_MySQLi_Engine
             if (isset($this->as_from[$as])) {
                 if ($this->as_from[$as] != $table) {
                     trigger_error(TEM_ERR.': Table alias "'.$as.'" for "'.$this->as_from[$as].'" has been used, please change!');
-                    foreach ($this->as_from as $k=>$v) {
+                    foreach ($this->as_from as $k => $v) {
                         trigger_error($k.': '.$v);
                     }
                     die();
@@ -893,12 +893,12 @@ class SENE_MySQLi_Engine
         $this->as_from[$as] = $this->table;
         return $this;
     }
-    public function cache_save($cache_save=1)
+    public function cache_save($cache_save = 1)
     {
         $this->cache_save = $cache_save;
         return $this;
     }
-    public function cache_flush($cache_flush=1)
+    public function cache_flush($cache_flush = 1)
     {
         $this->cache_flush = $cache_flush;
         return $this;
@@ -906,7 +906,7 @@ class SENE_MySQLi_Engine
     public function pagesize($pagesize)
     {
         $this->tis_limit++;
-        $this->is_limit=0;
+        $this->is_limit = 0;
         $this->pagesize = (int) $pagesize;
         return $this;
     }
@@ -920,59 +920,63 @@ class SENE_MySQLi_Engine
         return $this;
     }
 
-  	/**
-  	 * Set current limit offset
-  	 * @param  int    $a    Offset / Row Count, value range integer >= 0
-  	 * @param  int    $b  	Row count, value range integer >= 0
-  	 * @return object       return this class
-  	 */
-  	public function limit($a,$b=''){
-  		$this->is_limit=1;
-  		$a = (int) $a;
-  		$b = (int) $b;
-  		if($a > 0 && $b <= 0){
-  			$b = $a;
-  			$a = 0;
-  		}
-  		$this->limit_a = $a;
-  		$this->limit_b = $b;
-  		return $this;
-  	}
+    /**
+     * Set current limit offset
+     * @param  int    $a    Offset / Row Count, value range integer >= 0
+     * @param  int    $b  	Row count, value range integer >= 0
+     * @return object       return this class
+     */
+    public function limit($a, $b = '')
+    {
+        $this->is_limit = 1;
+        $a = (int) $a;
+        $b = (int) $b;
+        if ($a > 0 && $b <= 0) {
+            $b = $a;
+            $a = 0;
+        }
+        $this->limit_a = $a;
+        $this->limit_b = $b;
+        return $this;
+    }
 
-  	/**
-  	 * Set current page and page size
-  	 * @param  int    $page       Current page number, value range integer >= 0
-  	 * @param  int    $page_size  Page size number, value range integer >= 0
-  	 * @return object             return this class
-  	 */
-  	public function page($page,$page_size=''){
-  		$page = (int) $page;
-  		$page_size = (int) $page_size;
-  		if($page_size > 0 && $page <= 0){
-  			$this->is_limit = 1;
-  			$this->limit_a  = 0;
-  			$this->limit_b  = $page_size;
-  		}else if($page_size <= 0 && $page > 0){
-  			$this->is_limit = 1;
-  			$this->limit_a = 0;
-  			$this->limit_b = $page;
-  		}else if($page_size > 0 && $page > 0){
-  			$this->is_limit = 1;
-  			$this->limit_a = ($page * $page_size) - $page_size;
-  			if($page == 1) $this->limit_a = ($page * $page_size) - $page_size;
-  			$this->limit_b = $page_size;
-  		}
-  		return $this;
-  	}
+    /**
+     * Set current page and page size
+     * @param  int    $page       Current page number, value range integer >= 0
+     * @param  int    $page_size  Page size number, value range integer >= 0
+     * @return object             return this class
+     */
+    public function page($page, $page_size = '')
+    {
+        $page = (int) $page;
+        $page_size = (int) $page_size;
+        if ($page_size > 0 && $page <= 0) {
+            $this->is_limit = 1;
+            $this->limit_a  = 0;
+            $this->limit_b  = $page_size;
+        } elseif ($page_size <= 0 && $page > 0) {
+            $this->is_limit = 1;
+            $this->limit_a = 0;
+            $this->limit_b = $page;
+        } elseif ($page_size > 0 && $page > 0) {
+            $this->is_limit = 1;
+            $this->limit_a = ($page * $page_size) - $page_size;
+            if ($page == 1) {
+                $this->limit_a = ($page * $page_size) - $page_size;
+            }
+            $this->limit_b = $page_size;
+        }
+        return $this;
+    }
 
-    public function limitpage($page, $pagesize=10)
+    public function limitpage($page, $pagesize = 10)
     {
         $this->is_limit = 0;
         $this->page = $page;
         $this->pagesize = $pagesize;
         return $this;
     }
-    public function get($tipe="object", $is_debug='')
+    public function get($tipe = "object", $is_debug = '')
     {
         $this->in_select = rtrim($this->in_select, ", ");
         if (empty($this->in_select)) {
@@ -1035,11 +1039,13 @@ class SENE_MySQLi_Engine
             $b = $this->limit_b;
             $sql .= ' LIMIT '.$this->limit_a.", ".$this->limit_b;
         } else {
-          if($this->page<=1){
-            if($this->pagesize > 0) $sql .= " LIMIT ".$this->pagesize;
-          }else{
-            $sql .= " LIMIT ".$this->page.", ".$this->pagesize;
-          }
+            if ($this->page <= 1) {
+                if ($this->pagesize > 0) {
+                    $sql .= " LIMIT ".$this->pagesize;
+                }
+            } else {
+                $sql .= " LIMIT ".$this->page.", ".$this->pagesize;
+            }
         }
 
         $cache_save = 0;
@@ -1060,7 +1066,7 @@ class SENE_MySQLi_Engine
         return $res;
     }
 
-    public function get_first($tipe="object", $is_debug='')
+    public function get_first($tipe = "object", $is_debug = '')
     {
         $this->in_select = rtrim($this->in_select, ", ");
         if (empty($this->in_select)) {
@@ -1171,11 +1177,11 @@ class SENE_MySQLi_Engine
             trigger_error($this->__mysqli->error);
         }
     }
-    public function insert_batch($table, $datas=array(), $is_debug=0)
+    public function insert_batch($table, $datas = array(), $is_debug = 0)
     {
         $this->insert_multi($table, $datas, $is_debug);
     }
-    public function insert_multi($table, $datas=array(), $is_debug=0)
+    public function insert_multi($table, $datas = array(), $is_debug = 0)
     {
         if (!is_array($datas)) {
             trigger_error(TEM_ERR.': Only accepted array!');
@@ -1188,8 +1194,8 @@ class SENE_MySQLi_Engine
                 trigger_error(TEM_ERR.' Only accepted array!');
                 die();
             }
-            foreach ($data as $key=>$val) {
-                $sql .=''.$key.',';
+            foreach ($data as $key => $val) {
+                $sql .= ''.$key.',';
             }
             break;
         }
@@ -1197,11 +1203,11 @@ class SENE_MySQLi_Engine
         $sql .= ') VALUES(';
 
         foreach ($datas as $ds) {
-            foreach ($ds as $key=>$val) {
-                if (strtolower($val)=='now()' || strtolower($val)=='null') {
-                    $sql .=''.$val.',';
+            foreach ($ds as $key => $val) {
+                if (strtolower($val) == 'now()' || strtolower($val) == 'null') {
+                    $sql .= ''.$val.',';
                 } else {
-                    $sql .=''.$this->esc($val).',';
+                    $sql .= ''.$this->esc($val).',';
                 }
             }
             $sql = rtrim($sql, ',');
@@ -1218,7 +1224,7 @@ class SENE_MySQLi_Engine
         $this->flushQuery();
         return $res;
     }
-    public function insert_ignore_multi($table, $datas=array(), $is_debug=0)
+    public function insert_ignore_multi($table, $datas = array(), $is_debug = 0)
     {
         if (!is_array($datas)) {
             trigger_error(TEM_ERR.': Only accepted array!');
@@ -1231,8 +1237,8 @@ class SENE_MySQLi_Engine
                 trigger_error(TEM_ERR.': Only accepted array!');
                 die();
             }
-            foreach ($data as $key=>$val) {
-                $sql .='`'.$key."`,";
+            foreach ($data as $key => $val) {
+                $sql .= '`'.$key."`,";
             }
             break;
         }
@@ -1240,11 +1246,11 @@ class SENE_MySQLi_Engine
         $sql .= ') VALUES'.'(';
 
         foreach ($datas as $ds) {
-            foreach ($ds as $key=>$val) {
-                if (strtolower($val)=='now()' || strtolower($val)=='null') {
-                    $sql .=''.$val.',';
+            foreach ($ds as $key => $val) {
+                if (strtolower($val) == 'now()' || strtolower($val) == 'null') {
+                    $sql .= ''.$val.',';
                 } else {
-                    $sql .=''.$this->esc($val).',';
+                    $sql .= ''.$this->esc($val).',';
                 }
             }
             $sql = rtrim($sql, ',');
@@ -1261,7 +1267,7 @@ class SENE_MySQLi_Engine
         $this->flushQuery();
         return $res;
     }
-    public function insert($table, $datas=array(), $multi_array=0, $is_debug=0)
+    public function insert($table, $datas = array(), $multi_array = 0, $is_debug = 0)
     {
         $this->last_id = 0;
         if (!is_array($datas)) {
@@ -1273,19 +1279,21 @@ class SENE_MySQLi_Engine
         } else {
             $sql = 'INSERT INTO `'.$table.'`'.'(';
 
-            foreach ($datas as $key=>$val) {
-                $sql .='`'.$key."`,";
+            foreach ($datas as $key => $val) {
+                $sql .= '`'.$key."`,";
             }
             $sql  = rtrim($sql, ',');
             $sql .= ') VALUES(';
 
-            foreach ($datas as $key=>$val) {
-                if ($val=='NOW()' || $val=='now()') {
-                    $sql .=''.$val.',';
-                } elseif (strtolower($val)=='null') {
-                    $sql .='NULL,';
+            foreach ($datas as $key => $val) {
+                if ($val == 'NOW()' || $val == 'now()') {
+                    $sql .= ''.$val.',';
+                } elseif (strtolower($val ?? 'null') == 'null') {
+                    $sql .= 'NULL,';
+                } elseif (stripos($val ?? '', "AES_ENCRYPT(") !== false || stripos($val ?? '', "AES_DECRYPT(") !== false) {
+                    $sql .= $val.',';
                 } else {
-                    $sql .=''.$this->esc($val).',';
+                    $sql .= ''.$this->esc($val).',';
                 }
             }
             $sql = rtrim($sql, ',');
@@ -1301,7 +1309,7 @@ class SENE_MySQLi_Engine
             return $res;
         }
     }
-    public function update($table, $datas=array(), $is_debug=0)
+    public function update($table, $datas = array(), $is_debug = 0)
     {
         if (!is_array($datas)) {
             trigger_error(TEM_ERR.': Only accepted array!');
@@ -1309,11 +1317,15 @@ class SENE_MySQLi_Engine
         }
 
         $sql = "UPDATE `".$table."` SET ";
-        foreach ($datas as $key=>$val) {
-            if ($val=='now()' || $val=='NOW()' || $val=="NULL" || $val=='null') {
-                $sql .='`'.$key.'` = '.$val.',';
+        foreach ($datas as $key => $val) {
+            if ($val == 'now()' || $val == 'NOW()' || $val == "NULL" || $val == 'null') {
+                $sql .= '`'.$key.'` = '.$val.',';
+
+            } elseif (stripos($val ?? '', "AES_ENCRYPT(") !== false || stripos($val ?? '', "AES_DECRYPT(") !== false) {
+                $sql .= "`".$key."` = ".$val.",";
+
             } else {
-                $sql .='`'.$key.'` = '.$this->esc($val).',';
+                $sql .= '`'.$key.'` = '.$this->esc($val).',';
             }
         }
         $sql = rtrim($sql, ',');
@@ -1324,7 +1336,7 @@ class SENE_MySQLi_Engine
             $sql .= ' WHERE '.$this->in_where;
         }
 
-        if (!empty($this->pagesize) && ($this->tis_limit>0)) {
+        if (!empty($this->pagesize) && ($this->tis_limit > 0)) {
             $b = $this->pagesize;
             $sql .= ' LIMIT '.$b;
         }
@@ -1338,7 +1350,7 @@ class SENE_MySQLi_Engine
         $this->flushQuery();
         return $res;
     }
-    public function delete($table, $is_debug=0)
+    public function delete($table, $is_debug = 0)
     {
         if (empty($table)) {
             trigger_error(TEM_ERR.': Missing table name while deleting');
@@ -1352,7 +1364,7 @@ class SENE_MySQLi_Engine
             $this->in_where = rtrim($this->in_where, "OR ");
             $sql .= ' WHERE '.$this->in_where;
         }
-        if (!empty($this->pagesize) && ($this->tis_limit>0)) {
+        if (!empty($this->pagesize) && ($this->tis_limit > 0)) {
             $b = $this->pagesize;
             $sql .= ' LIMIT '.$b;
         }
@@ -1367,30 +1379,30 @@ class SENE_MySQLi_Engine
         return $res;
     }
 
-    public function join($table, $table_as, $table_key, $reff_as, $reff_key, $method='left')
+    public function join($table, $table_as, $table_key, $reff_as, $reff_key, $method = 'left')
     {
         $join = new stdClass();
         $join->method = strtoupper(trim($method));
         $join->table = '`'.$table.'` '.$table_as;
         $join->on = array($table_as.'.`'.$table_key.'` = '.$reff_as.'.`'.$reff_key.'`');
         $this->join[] = $join;
-        $this->in_join = $this->in_join+1;
+        $this->in_join = $this->in_join + 1;
         $this->as_from[$table_as] = $table;
         return $this;
     }
 
-    public function join_as($tbl, $reff, $method='left')
+    public function join_as($tbl, $reff, $method = 'left')
     {
         $join = new stdClass();
         $join->method = strtoupper(trim($method));
         $join->table = $tbl;
         $join->on = array($reff);
         $this->join[] = $join;
-        $this->in_join = $this->in_join+1;
+        $this->in_join = $this->in_join + 1;
         return $this;
     }
 
-    public function composite_create($key1, $operator, $key2, $method="AND", $bracket_open=0, $bracket_close=0)
+    public function composite_create($key1, $operator, $key2, $method = "AND", $bracket_open = 0, $bracket_close = 0)
     {
         $composite = new stdClass();
         $composite->key1 = $key1;
@@ -1401,7 +1413,7 @@ class SENE_MySQLi_Engine
         $composite->bracket_close = $bracket_close;
         return $composite;
     }
-    public function join_composite($table, $table_alias, $composites=array(), $method='')
+    public function join_composite($table, $table_alias, $composites = array(), $method = '')
     {
         $method = strtoupper($method);
         switch ($method) {
@@ -1418,7 +1430,7 @@ class SENE_MySQLi_Engine
                 $method = 'RIGHT';
                 break;
             default:
-                $method='';
+                $method = '';
                 break;
         }
         //set table alias
@@ -1467,10 +1479,10 @@ class SENE_MySQLi_Engine
 
         //insert to global var
         $this->join_multi[$this->in_join_multi] = $join_composite;
-        $this->in_join_multi = $this->in_join_multi+1;
+        $this->in_join_multi = $this->in_join_multi + 1;
         return $this;
     }
-    public function between($key, $val1, $val2, $is_not=0)
+    public function between($key, $val1, $val2, $is_not = 0)
     {
         $this->in_where .= '(';
         $this->in_where .= ' '.$key.'';
@@ -1484,7 +1496,7 @@ class SENE_MySQLi_Engine
     public function group_by($params)
     {
         if (is_array($params)) {
-            foreach ($params as $k=>$v) {
+            foreach ($params as $k => $v) {
                 $this->in_group .= " GROUP BY ".$v.", ";
             }
         } else {
@@ -1493,7 +1505,7 @@ class SENE_MySQLi_Engine
         return $this;
     }
 
-    public function replace($table, $datas=array(), $multi_array=0, $is_debug=0)
+    public function replace($table, $datas = array(), $multi_array = 0, $is_debug = 0)
     {
         $this->last_id = 0;
         if (!is_array($datas)) {
@@ -1505,19 +1517,19 @@ class SENE_MySQLi_Engine
         } else {
             $sql = 'REPLACE INTO `'.$table.'`'.' (';
 
-            foreach ($datas as $key=>$val) {
-                $sql .='`'.$key."`,";
+            foreach ($datas as $key => $val) {
+                $sql .= '`'.$key."`,";
             }
             $sql  = rtrim($sql, ',');
             $sql .= ') VALUES(';
 
-            foreach ($datas as $key=>$val) {
-                if ($val=='NOW()' || $val=='now()') {
-                    $sql .=''.$val.',';
-                } elseif (strtolower($val)=='null') {
-                    $sql .='NULL,';
+            foreach ($datas as $key => $val) {
+                if ($val == 'NOW()' || $val == 'now()') {
+                    $sql .= ''.$val.',';
+                } elseif (strtolower($val) == 'null') {
+                    $sql .= 'NULL,';
                 } else {
-                    $sql .=''.$this->esc($val).',';
+                    $sql .= ''.$this->esc($val).',';
                 }
             }
             $sql = rtrim($sql, ',');
@@ -1533,7 +1545,7 @@ class SENE_MySQLi_Engine
             return $res;
         }
     }
-    public function replace_multi($table, $datas=array(), $is_debug=0)
+    public function replace_multi($table, $datas = array(), $is_debug = 0)
     {
         if (!is_array($datas)) {
             trigger_error(TEM_ERR.': Only accepted array!');
@@ -1546,11 +1558,11 @@ class SENE_MySQLi_Engine
                 trigger_error(TEM_ERR.': Only accepted array!');
                 die();
             }
-            foreach ($data as $key=>$val) {
-                if (strtolower($val)=='now()' || strtolower($val)=='null') {
-                    $sql .=''.$val.',';
+            foreach ($data as $key => $val) {
+                if (strtolower($val) == 'now()' || strtolower($val) == 'null') {
+                    $sql .= ''.$val.',';
                 } else {
-                    $sql .=''.$this->esc($val).',';
+                    $sql .= ''.$this->esc($val).',';
                 }
             }
             break;
@@ -1559,11 +1571,11 @@ class SENE_MySQLi_Engine
         $sql .= ') VALUES(';
 
         foreach ($datas as $ds) {
-            foreach ($ds as $key=>$val) {
-                if (strtolower($val)=='now()' || strtolower($val)=='null') {
-                    $sql .=''.$val.',';
+            foreach ($ds as $key => $val) {
+                if (strtolower($val) == 'now()' || strtolower($val) == 'null') {
+                    $sql .= ''.$val.',';
                 } else {
-                    $sql .=''.$this->esc($val).',';
+                    $sql .= ''.$this->esc($val).',';
                 }
             }
             $sql = rtrim($sql, ',');
@@ -1589,7 +1601,7 @@ class SENE_MySQLi_Engine
      * @param  string  $after       operand (AND|OR)
      * @return object               this object model
      */
-    public function where_in($tbl_key, $values, $is_not=0, $after="AND")
+    public function where_in($tbl_key, $values, $is_not = 0, $after = "AND")
     {
         $not = '';
         if ($is_not == '1' || $is_not == 1) {
@@ -1664,246 +1676,298 @@ class SENE_MySQLi_Engine
 
 
 
-	/**
-	 * Created Union Query table from query builder (last query)
-	 * @return boolean $flush 		0 not flush, 1 flush
-	 * @return string  Query
-	 */
-	public function union_create($flush=1){
-		if(!isset($this->union)) $this->union = new stdClass();
-		if(!isset($this->union->table)) $this->union->table = array();
-		if(!is_array($this->union->table)) $this->union->table = array();
-
-		$this->in_select = rtrim($this->in_select,", ");
-		if(empty($this->in_select)) $this->in_select = "*";
-		$sql = "SELECT ".$this->in_select." FROM `".$this->table."`";
-
-		if (count($this->join) > 0) {
-      $table_alias = array_search($this->table, $this->as_from);
-      if ($table_alias !== 0) {
-          $sql .= ' '.$table_alias.' ';
-          foreach ($this->join as $j) {
-              $sql .= strtoupper($j->method).' JOIN '.$j->table.' ON ';
-              foreach($j->on as $o){
-                $sql .= '('.$o.') ';
-              }
-          }
-      } else {
-          trigger_error('Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");');
-          die();
-      }
-    } else {
-        $table_alias = array_search($this->table, $this->as_from);
-        if ($table_alias !== 0) {
-            $sql .= ' '.$table_alias.' ';
+    /**
+     * Created Union Query table from query builder (last query)
+     * @return boolean $flush 		0 not flush, 1 flush
+     * @return string  Query
+     */
+    public function union_create($flush = 1)
+    {
+        if (!isset($this->union)) {
+            $this->union = new stdClass();
         }
+        if (!isset($this->union->table)) {
+            $this->union->table = array();
+        }
+        if (!is_array($this->union->table)) {
+            $this->union->table = array();
+        }
+
+        $this->in_select = rtrim($this->in_select, ", ");
+        if (empty($this->in_select)) {
+            $this->in_select = "*";
+        }
+        $sql = "SELECT ".$this->in_select." FROM `".$this->table."`";
+
+        if (count($this->join) > 0) {
+            $table_alias = array_search($this->table, $this->as_from);
+            if ($table_alias !== 0) {
+                $sql .= ' '.$table_alias.' ';
+                foreach ($this->join as $j) {
+                    $sql .= strtoupper($j->method).' JOIN '.$j->table.' ON ';
+                    foreach ($j->on as $o) {
+                        $sql .= '('.$o.') ';
+                    }
+                }
+            } else {
+                trigger_error('Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");');
+                die();
+            }
+        } else {
+            $table_alias = array_search($this->table, $this->as_from);
+            if ($table_alias !== 0) {
+                $sql .= ' '.$table_alias.' ';
+            }
+        }
+
+        if (!empty($this->in_where)) {
+            $this->in_where = rtrim($this->in_where, "AND ");
+            $this->in_where = rtrim($this->in_where, "OR ");
+            $sql .= " WHERE ".$this->in_where;
+        }
+        if (!empty($flush)) {
+            $this->flushQuery();
+        }
+        $this->union->table[] = $sql;
+        return $this;
     }
 
-		if(!empty($this->in_where)){
-			$this->in_where = rtrim($this->in_where,"AND ");
-			$this->in_where = rtrim($this->in_where,"OR ");
-			$sql .= " WHERE ".$this->in_where;
-		}
-		if(!empty($flush)) $this->flushQuery();
-		$this->union->table[] = $sql;
-		return $this;
-	}
+    /**
+     * Add select column for union method
+     *
+     * @param  string $k 	Column name
+     * @param  string $a 	Column Alias string
+     *
+     * @return object    	this object
+     */
+    public function union_select($k, $a = '')
+    {
+        if (!isset($this->union)) {
+            $this->union = new stdClass();
+        }
+        if (!isset($this->union->select)) {
+            $this->union->select = array();
+        }
+        if (!is_array($this->union->select)) {
+            $this->union->select = array();
+        }
+        if (strlen($a) == 0) {
+            $a = $k;
+        }
+        $this->union->select[$a] = $k;
+        return $this;
+    }
 
-	/**
-	 * Add select column for union method
-	 *
-	 * @param  string $k 	Column name
-	 * @param  string $a 	Column Alias string
-	 *
-	 * @return object    	this object
-	 */
-	public function union_select($k,$a=''){
-		if(!isset($this->union)) $this->union = new stdClass();
-		if(!isset($this->union->select)) $this->union->select = array();
-		if(!is_array($this->union->select)) $this->union->select = array();
-		if(strlen($a)==0){
-			$a = $k;
-		}
-		$this->union->select[$a] = $k;
-		return $this;
-	}
+    /**
+     * Set alias table for union method
+     *
+     * @param  string $a 	Alias string
+     *
+     * @return object    	this object
+     */
+    public function union_alias($a)
+    {
+        if (!isset($this->union)) {
+            $this->union = new stdClass();
+        }
+        if (!isset($this->union->from_as)) {
+            $this->union->from_as = '';
+        }
+        if (!is_string($this->union->from_as)) {
+            $this->union->from_as = '';
+        }
+        if (strlen($a) == 0) {
+            trigger_error('Empty union_alias parameter');
+            die();
+        }
+        $this->union->from_as = $a;
+        return $this;
+    }
 
-	/**
-	 * Set alias table for union method
-	 *
-	 * @param  string $a 	Alias string
-	 *
-	 * @return object    	this object
-	 */
-	public function union_alias($a){
-		if(!isset($this->union)) $this->union = new stdClass();
-		if(!isset($this->union->from_as)) $this->union->from_as = '';
-		if(!is_string($this->union->from_as)) $this->union->from_as = '';
-		if(strlen($a)==0){
-			trigger_error('Empty union_alias parameter');
-			die();
-		}
-		$this->union->from_as = $a;
-		return $this;
-	}
+    /**
+     * Set group by criteria for union method
+     *
+     * @param  string $g 	Group by string
+     *
+     * @return object    	this object
+     */
+    public function union_group_by($g)
+    {
+        if (!isset($this->union)) {
+            $this->union = new stdClass();
+        }
+        if (!isset($this->union->group_by)) {
+            $this->union->group_by = '';
+        }
+        if (!is_string($this->union->group_by)) {
+            $this->union->group_by = '';
+        }
+        if (strlen($g) == 0) {
+            trigger_error('Empty union_grup_by parameter');
+            die();
+        }
+        $this->union->group_by = $g;
+        return $this;
+    }
 
-	/**
-	 * Set group by criteria for union method
-	 *
-	 * @param  string $g 	Group by string
-	 *
-	 * @return object    	this object
-	 */
-	public function union_group_by($g){
-		if(!isset($this->union)) $this->union = new stdClass();
-		if(!isset($this->union->group_by)) $this->union->group_by = '';
-		if(!is_string($this->union->group_by)) $this->union->group_by = '';
-		if(strlen($g)==0){
-			trigger_error('Empty union_grup_by parameter');
-			die();
-		}
-		$this->union->group_by = $g;
-		return $this;
-	}
+    /**
+     * Add order by criteria for union method
+     *
+     * @param  string $c 	sort by column name
+     * @param  string $d 	sort direction
+     *
+     * @return object    	this object
+     */
+    public function union_order_by($c, $d)
+    {
+        if (!isset($this->union)) {
+            $this->union = new stdClass();
+        }
+        if (!isset($this->union->order_by)) {
+            $this->union->order_by = array();
+        }
+        if (!is_array($this->union->order_by)) {
+            $this->union->order_by = array();
+        }
+        if (strlen($c) == 0) {
+            trigger_error('Empty union_grup_by parameter');
+            die();
+        }
+        $d = strtoupper($d);
+        if (strlen($d) == 0) {
+            $d = 'ASC';
+        }
+        $this->union->order_by[] = $c.' '.$d;
+        return $this;
+    }
 
-	/**
-	 * Add order by criteria for union method
-	 *
-	 * @param  string $c 	sort by column name
-	 * @param  string $d 	sort direction
-	 *
-	 * @return object    	this object
-	 */
-	public function union_order_by($c,$d){
-		if(!isset($this->union)) $this->union = new stdClass();
-		if(!isset($this->union->order_by)) $this->union->order_by = array();
-		if(!is_array($this->union->order_by)) $this->union->order_by = array();
-		if(strlen($c)==0){
-			trigger_error('Empty union_grup_by parameter');
-			die();
-		}
-		$d = strtoupper($d);
-		if(strlen($d)==0){
-			$d = 'ASC';
-		}
-		$this->union->order_by[] = $c.' '.$d;
-		return $this;
-	}
+    /**
+     * Add limit query result for union
+     *
+     * @param  string $a 	sort by column name
+     * @param  string $b 	sort direction
+     *
+     * @return object    	this object
+     */
+    public function union_limit($a = '', $b = '')
+    {
+        if (!isset($this->union)) {
+            $this->union = new stdClass();
+        }
+        if (!isset($this->union->order_by)) {
+            $this->union->order_by = array();
+        }
+        if (!is_array($this->union->order_by)) {
+            $this->union->order_by = array();
+        }
 
-	/**
-	 * Add limit query result for union
-	 *
-	 * @param  string $a 	sort by column name
-	 * @param  string $b 	sort direction
-	 *
-	 * @return object    	this object
-	 */
-	public function union_limit($a='',$b=''){
-		if(!isset($this->union)) $this->union = new stdClass();
-		if(!isset($this->union->order_by)) $this->union->order_by = array();
-		if(!is_array($this->union->order_by)) $this->union->order_by = array();
+        $a = (int) $a;
+        $b = (int) $b;
+        if ($a <= 0) {
+            $a = '';
+        }
+        if ($b <= 0) {
+            $b = '';
+        }
+        if (strlen($a) && strlen($b)) {
+            $this->union->limit = $a.', '.$b;
+        } elseif (strlen($a) && strlen($b) == 0) {
+            $this->union->limit = $a;
+        } elseif (strlen($a) == 0 && strlen($b)) {
+            $this->union->limit = $b;
+        } else {
+            $this->union->limit = '';
+        }
 
-		$a = (int) $a;
-		$b = (int) $b;
-		if($a<=0) $a = '';
-		if($b<=0) $b = '';
-		if(strlen($a) && strlen($b)){
-			$this->union->limit = $a.', '.$b;
-		}elseif(strlen($a) && strlen($b)==0){
-			$this->union->limit = $a;
-		}elseif(strlen($a)==0 && strlen($b)){
-			$this->union->limit = $b;
-		}else{
-			$this->union->limit = '';
-		}
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Get result Executed union query
+     *
+     * @return object this object
+     */
+    public function union_get($is_debug = 0)
+    {
+        if (!isset($this->union->select)) {
+            trigger_error('Missing union.select object on union_get');
+            die();
+        }
+        if (!isset($this->union->from_as)) {
+            trigger_error('Missing union.from_as object on union_get');
+            die();
+        }
+        if (!isset($this->union->table)) {
+            trigger_error('Missing union.table object on union_get');
+            die();
+        }
+        if (!is_array($this->union->table)) {
+            trigger_error('Invalid type union.table object, is not an array');
+            die();
+        }
+        if (count($this->union->table) == 0) {
+            trigger_error('Empty union table');
+            die();
+        }
+        if (!is_string($this->union->group_by)) {
+            trigger_error('Invalid type union.group_by object, is not a string');
+            die();
+        }
+        if (!is_array($this->union->order_by)) {
+            trigger_error('Invalid type union.order_by object, is not an array');
+            die();
+        }
+        $sql = 'SELECT ';
+        if (count($this->union->select)) {
+            foreach ($this->union->select as $k => $v) {
+                if (!is_numeric($k) && $k != $v) {
+                    $sql .= ' '.$v.' AS '.$k.' ';
+                } else {
+                    $sql .= ' '.$v.' ';
+                }
+            }
+        } else {
+            $sql .= ' * ';
+        }
+        $sql .= ' FROM ( ';
+        foreach ($this->union->table as $k => $v) {
+            $sql .= $v.' UNION ';
+        }
+        $sql = chop($sql, ' UNION ');
+        $sql .= ' ) AS '.$this->union->from_as.' ';
+        if (strlen($this->union->group_by)) {
+            $sql .= ' GROUP BY '.$this->union->group_by;
+        }
+        if (count($this->union->order_by)) {
+            $sql .= ' ORDER BY ';
+            foreach ($this->union->order_by as $k => $v) {
+                $sql .= ''.$v.', ';
+            }
+            $sql = rtrim($sql, ', ');
+        }
+        if (strlen($this->union->limit)) {
+            $sql .= ' LIMIT '.$this->union->limit;
+        }
+        if ($is_debug) {
+            die($sql);
+        }
+        return $this->query($sql);
+    }
 
-	/**
-	 * Get result Executed union query
-	 *
-	 * @return object this object
-	 */
-	public function union_get($is_debug=0){
-		if(!isset($this->union->select)){
-			trigger_error('Missing union.select object on union_get');
-			die();
-		}
-		if(!isset($this->union->from_as)){
-			trigger_error('Missing union.from_as object on union_get');
-			die();
-		}
-		if(!isset($this->union->table)){
-			trigger_error('Missing union.table object on union_get');
-			die();
-		}
-		if(!is_array($this->union->table)){
-			trigger_error('Invalid type union.table object, is not an array');
-			die();
-		}
-		if(count($this->union->table)==0){
-			trigger_error('Empty union table');
-			die();
-		}
-		if(!is_string($this->union->group_by)){
-			trigger_error('Invalid type union.group_by object, is not a string');
-			die();
-		}
-		if(!is_array($this->union->order_by)){
-			trigger_error('Invalid type union.order_by object, is not an array');
-			die();
-		}
-		$sql = 'SELECT ';
-		if(count($this->union->select)){
-			foreach($this->union->select as $k=>$v){
-				if(!is_numeric($k) && $k != $v){
-					$sql .= ' '.$v.' AS '.$k.' ';
-				}else{
-					$sql .= ' '.$v.' ';
-				}
-			}
-		}else{
-			$sql .= ' * ';
-		}
-		$sql .= ' FROM ( ';
-		foreach($this->union->table as $k=>$v){
-			$sql .= $v.' UNION ';
-		}
-		$sql = chop($sql, ' UNION ');
-		$sql .= ' ) AS '.$this->union->from_as.' ';
-		if(strlen($this->union->group_by)){
-			$sql .= ' GROUP BY '.$this->union->group_by;
-		}
-		if(count($this->union->order_by)){
-			$sql .= ' ORDER BY ';
-			foreach($this->union->order_by as $k=>$v){
-				$sql .= ''.$v.', ';
-			}
-			$sql = rtrim($sql,', ');
-		}
-		if(strlen($this->union->limit)){
-			$sql .= ' LIMIT '.$this->union->limit;
-		}
-		if($is_debug){
-			die($sql);
-		}
-		return $this->query($sql);
-	}
-
-	/**
-	 * Reset union object to its default value
-	 *
-	 * @return object this object
-	 */
-	public function union_flush(){
-		$this->union = new stdClass();
-		$this->union->select = array();
-		$this->union->from_as = 'u1';
-		$this->union->table = array();
-		$this->union->group_by = '';
-		$this->union->order_by = array();
-		$this->union->limit = '';
-		return $this;
-	}
+    /**
+     * Reset union object to its default value
+     *
+     * @return object this object
+     */
+    public function union_flush()
+    {
+        $this->union = new stdClass();
+        $this->union->select = array();
+        $this->union->from_as = 'u1';
+        $this->union->table = array();
+        $this->union->group_by = '';
+        $this->union->order_by = array();
+        $this->union->limit = '';
+        return $this;
+    }
 }
