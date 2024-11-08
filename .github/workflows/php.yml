@@ -22,6 +22,7 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 
     steps:
     - name: Checkout code
@@ -30,7 +31,7 @@ jobs:
     - name: Install PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '7.4'
+        php-version: '8.2'
         extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, dom, filter, gd, json, libxml
         coverage: xdebug
     
@@ -69,7 +70,11 @@ jobs:
     
     - name: Set up MySQL
       run: |
-        mysql -h127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS seme_framework;"
+        mysql -h127.0.0.1 -uroot -proot -e "
+        ALTER DATABASE seme_framework CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        SET NAMES utf8mb4;
+        SET character_set_server = utf8mb4;
+        "
 
     - name: Install dependencies
       run: |

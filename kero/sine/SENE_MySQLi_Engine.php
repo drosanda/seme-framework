@@ -77,7 +77,7 @@ class SENE_MySQLi_Engine
         if (isset($this->config->database->charset) && strlen($this->config->database->charset) > 0) {
             $cs = $this->config->database->charset;
         }
-        $this->__mysqli->set_charset($cs);
+        #$this->__mysqli->set_charset($cs);
 
         self::$__instance = $this;
 
@@ -1611,10 +1611,10 @@ class SENE_MySQLi_Engine
     }
     public function setCharSet($char_set)
     {
-        $res = $this->__mysqli->set_charset($char_set);
-        if (!$res) {
-            trigger_error(TEM_ERR.': Cant change charset from '.$this->__mysqli->character_set_name().' to '.$char_set.' to database.');
-        }
+        // $res = $this->__mysqli->set_charset($char_set);
+        // if (!$res) {
+        //     trigger_error(TEM_ERR.': Cant change charset from '.$this->__mysqli->character_set_name().' to '.$char_set.' to database.');
+        // }
         return 1;
     }
     public function getLastQuery()
