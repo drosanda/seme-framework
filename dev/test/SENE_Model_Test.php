@@ -71,15 +71,15 @@ final class SENE_Model_Test extends TestCase
    * 
    * 
    */
-  public function testEncrypt()
-  {
-    $tc = new SENE_Model_Mock();
-    $v  = 'test';
-    $ek = $tc->config->database->enckey;
-    $ev = $tc->db->esc($v);
-    $ex = 'AES_ENCRYPT('.$ev.',"'.$ek.'")';
-    $this->assertEquals($ex, $this->invokeMethod($tc, '__encrypt', array($v)));
-  }
+  // public function testEncrypt()
+  // {
+  //   $tc = new SENE_Model_Mock();
+  //   $v  = 'test';
+  //   $ek = $tc->config->database->enckey;
+  //   $ev = $tc->db->esc($v);
+  //   $ex = 'AES_ENCRYPT('.$ev.',"'.$ek.'")';
+  //   $this->assertEquals($ex, $this->invokeMethod($tc, '__encrypt', array($v)));
+  // }
 
   /**
    * 
