@@ -53,6 +53,11 @@ jobs:
         $db['enckey'] = '';
         EOL
 
+    - name: Remove vendor directory and composer.lock
+      run: |
+        rm -rf vendor
+        rm -f composer.lock
+
     - name: PHP lint
       run: |
         lint_errors=$(find app kero/sine -type f -name "*.php" -exec php -l {} \; 2>&1)
