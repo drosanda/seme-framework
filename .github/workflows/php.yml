@@ -13,6 +13,15 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: seme_framework
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
     - name: Checkout code
@@ -24,6 +33,25 @@ jobs:
         php-version: '7.4'
         extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, dom, filter, gd, json, libxml
         coverage: xdebug
+    
+    - name: Create config file
+      run: |
+        cat > app/config/production.php << 'EOL'
+        <?php
+        $site = "http://".$_SERVER['HTTP_HOST']."/";
+        $method = "PATH_INFO";//REQUEST_URI,PATH_INFO,ORIG_PATH_INFO,
+        $admin_secret_url = 'admin';
+        $cdn_url = '';
+
+        $db['host']  = '127.0.0.1';
+        $db['user']  = 'root';
+        $db['pass']  = 'root';
+        $db['name']  = 'seme_framework';
+        $db['port'] = '3306';
+        $db['charset'] = 'utf8mb4';
+        $db['engine'] = 'mysqli';
+        $db['enckey'] = '';
+        EOL
 
     - name: PHP lint
       run: |
@@ -32,7 +60,17 @@ jobs:
         if grep -q "Parse error" <<< "$lint_errors"; then
           exit 1
         fi
-  
+    
+    - name: Verify MySQL connection
+      run: |
+        while ! mysqladmin ping -h"127.0.0.1" -P"3306" --silent; do
+          sleep 1
+        done
+    
+    - name: Set up MySQL
+      run: |
+        mysql -h127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS seme_framework;"
+
     - name: Install dependencies
       run: |
         composer install --no-ansi --no-interaction --no-progress --no-scripts --no-suggest
