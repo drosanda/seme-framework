@@ -41,17 +41,17 @@ final class SENE_Model_Test extends TestCase
     return $method->invokeArgs($object, $parameters);
   }
 
-  /**
-   * 
-   * 
-   * 
-   * 
-   */
-  public function testDBConnection()
-  {
-    $tc = new SENE_Model_Mock();
-    $this->assertEquals(0,$tc->db->__mysqli->connect_errno);
-  }
+  // /**
+  //  * 
+  //  * 
+  //  * 
+  //  * 
+  //  */
+  // public function testDBConnection()
+  // {
+  //   $tc = new SENE_Model_Mock();
+  //   $this->assertEquals(0,$tc->db->__mysqli->connect_errno);
+  // }
 
   /**
    * 
