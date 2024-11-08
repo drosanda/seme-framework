@@ -36,6 +36,10 @@ final class SENE_Controller_Test extends TestCase
     return $method->invokeArgs($object, $parameters);
   }
   
+  /**
+   * @covers SENE_Controller::setTitle()
+   * @covers SENE_Controller::getTitle()
+   */
   public function testTitle()
   {
     $tc = new SENE_Controller_Mock();
@@ -45,6 +49,10 @@ final class SENE_Controller_Test extends TestCase
     $this->assertNotEquals(strtolower($ts), $this->invokeMethod($tc, 'getTitle', array()));
   }
   
+  /**
+   * @covers SENE_Controller::setDescription()
+   * @covers SENE_Controller::getDescription()
+   */
   public function testDescription()
   {
     $tc = new SENE_Controller_Mock();
@@ -53,7 +61,11 @@ final class SENE_Controller_Test extends TestCase
     $this->assertEquals($ts, $this->invokeMethod($tc, 'getDescription', array()));
     $this->assertNotEquals(strtolower($ts), $this->invokeMethod($tc, 'getDescription', array()));
   }
-
+  
+  /**
+   * @covers SENE_Controller::setLang()
+   * @covers SENE_Controller::getLang()
+   */
   public function testLang()
   {
     $tc = new SENE_Controller_Mock();
@@ -62,7 +74,11 @@ final class SENE_Controller_Test extends TestCase
     $this->assertEquals($ts, $this->invokeMethod($tc, 'getLang', array()));
     $this->assertNotEquals(strtolower($ts), $this->invokeMethod($tc, 'getLang', array()));
   }
-
+  
+  /**
+   * @covers SENE_Controller::setRobots()
+   * @covers SENE_Controller::getRobots()
+   */
   public function testRobots()
   {
     $tc = new SENE_Controller_Mock();
@@ -83,7 +99,11 @@ final class SENE_Controller_Test extends TestCase
     $this->assertEquals('INDEX', $this->invokeMethod($tc, 'getRobots', array()));
     $this->assertNotEquals(strtolower(''), $this->invokeMethod($tc, 'getRobots', array()));
   }
-  
+
+  /**
+   * @covers SENE_Controller::setAuthor()
+   * @covers SENE_Controller::getAuthor()
+   */
   public function testAuthor()
   {
     $tc = new SENE_Controller_Mock();
@@ -93,9 +113,8 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * 
-   * 
-   * 
+   * @covers SENE_Controller::setIcon()
+   * @covers SENE_Controller::getIcon()
    */
   public function testIcon()
   {
@@ -106,9 +125,8 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * 
-   * 
-   * 
+   * @covers SENE_Controller::setShortcutIcon()
+   * @covers SENE_Controller::getShortcutIcon()
    */
   public function testShortcutIcon()
   {
@@ -202,9 +220,8 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * 
-   * 
-   * 
+   * @covers SENE_Controller::setcanonical
+   * @covers SENE_Controller::getcanonical
    */
   public function testCanonicalEmpty()
   {
@@ -231,9 +248,8 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * 
-   * 
-   * 
+   * @covers SENE_Controller::setadditional
+   * @covers SENE_Controller::getadditional
    */
   public function testSetAdditional()
   {
@@ -245,9 +261,8 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * 
-   * 
-   * 
+   * @covers SENE_Controller::setadditional
+   * @covers SENE_Controller::getadditional
    */
   public function testGetAdditionalPlain()
   {
@@ -261,9 +276,8 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * 
-   * 
-   * 
+   * @covers SENE_Controller::setadditional
+   * @covers SENE_Controller::getadditional
    */
   public function testGetAdditionalBaseUrl()
   {
@@ -277,9 +291,8 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * 
-   * 
-   * 
+   * @covers SENE_Controller::setadditional
+   * @covers SENE_Controller::getadditional
    */
   public function testGetAdditionalBaseUrlAdmin()
   {
@@ -293,9 +306,8 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * 
-   * 
-   * 
+   * @covers SENE_Controller::setadditional
+   * @covers SENE_Controller::getadditional
    */
   public function testGetAdditionalCdnUrl()
   {
@@ -310,9 +322,7 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * 
-   * 
-   * 
+   * @covers SENE_Controller::setadditionalbefore
    */
   public function testSetAdditionalBefore()
   {
@@ -324,9 +334,8 @@ final class SENE_Controller_Test extends TestCase
   }
 
   /**
-   * 
-   * 
-   * 
+   * @covers SENE_Controller::setadditionalbefore
+   * @covers SENE_Controller::getadditionalbefore
    */
   public function testGetAdditionalBeforePlain()
   {

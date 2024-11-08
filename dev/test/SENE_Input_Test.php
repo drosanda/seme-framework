@@ -60,9 +60,8 @@ final class SENE_Input_Test extends TestCase
   }
 
   /**
-   * 
-   * 
-   * 
+   * @covers SENE_Input::get
+   * @covers SENE_Input::post
    */
   public function testGet()
   {
@@ -87,9 +86,7 @@ final class SENE_Input_Test extends TestCase
   }
 
   /**
-   * 
-   * 
-   * 
+   * @covers SENE_Input::request
    */
   public function testRequest()
   {

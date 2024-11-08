@@ -1,0 +1,37 @@
+name: PHP Lint Check
+
+on:
+  push:
+    branches: [ "unittest" ]
+  pull_request:
+    branches: [ "unittest" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+
+    - name: PHP lint
+      run: |
+        lint_errors=$(find app kero/sine -type f -name "*.php" -exec php -l {} \; 2>&1)
+        echo "$lint_errors"
+        if grep -q "Parse error" <<< "$lint_errors"; then
+          exit 1
+        fi
+    
+    - name: Run PHPUnit tests
+      run: |
+        vendor\bin\phpunit.bat --configuration phpunit.xml --testsuite Dev

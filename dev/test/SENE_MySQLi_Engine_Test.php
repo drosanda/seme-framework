@@ -3,7 +3,6 @@
 declare(strict_types=1);
 // Path to run ./vendor/bin/phpunit --bootstrap vendor/autoload.php FileName.php
 // Butuh Framework PHPUnit
-use PHPUnit\Framework\TestCase;
 
 require_once $GLOBALS['SEMEDIR']->kero_sine.'SENE_Sql.php';
 require_once $GLOBALS['SEMEDIR']->kero_sine.'SENE_Sql_Select.php';
@@ -24,7 +23,7 @@ class SENE_MySQLi_Engine_Mock extends SENE_MySQLi_Engine
 #[UsesClass('SENE_MySQLi_Engine_Mock')]
 #[CoversClass('SENE_MySQLi_Engine')]
 #[CoversClass('SENE_Model')]
-final class SENE_MySQLi_Engine_Test extends TestCase
+final class SENE_MySQLi_Engine_Test extends PHPUnit\Framework\TestCase
 {
     /**
     * Call protected/private method of a class.
@@ -44,7 +43,7 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * 
+     * @covers SENE_MySQLi_Engine::flushQuery
      * 
      */
     public function testFlushQuery()
@@ -64,7 +63,7 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * 
+     * @covers SENE_MySQLi_Engine::flushQuery
      * 
      */
     public function testFlushQueryAfter()
@@ -87,7 +86,7 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * 
+     * @covers SENE_MySQLi_Engine::flushQuery
      * 
      */
     public function testWhereIsNull()
@@ -113,7 +112,9 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * 
+     * @covers SENE_MySQLi_Engine::select
+     * @covers SENE_MySQLi_Engine::from
+     * @covers SENE_MySQLi_Engine::where
      * 
      */
     public function testWhereIsNotNull()
@@ -139,7 +140,9 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * 
+     * @covers SENE_MySQLi_Engine::select
+     * @covers SENE_MySQLi_Engine::from
+     * @covers SENE_MySQLi_Engine::where
      * 
      */
     public function testWhereAsIsNull()
@@ -165,7 +168,8 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * 
+     * @covers SENE_MySQLi_Engine::where_as
+     * @covers SENE_MySQLi_Engine::where
      * 
      */
     public function testWhereAsIsNotNull()
@@ -191,7 +195,9 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * 
+     * @covers SENE_MySQLi_Engine::select
+     * @covers SENE_MySQLi_Engine::from
+     * @covers SENE_MySQLi_Engine::where
      * 
      */
     public function testWhere()
@@ -302,7 +308,8 @@ final class SENE_MySQLi_Engine_Test extends TestCase
     }
 
     /**
-     * 
+     * @covers SENE_MySQLi_Engine::where_as
+     * @covers SENE_MySQLi_Engine::where
      * 
      */
     public function testWhereAs()
