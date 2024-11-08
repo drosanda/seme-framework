@@ -82,7 +82,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        composer install --no-ansi --no-interaction --no-progress --no-scripts --no-suggest
+        composer install --no-ansi --no-interaction --no-progress --no-scripts
         composer require -W --dev phpunit/phpunit
     
     - name: List vendor directory
