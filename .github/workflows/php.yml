@@ -36,10 +36,10 @@ jobs:
     
     - name: Create config file
       run: |
-        cat > app/config/production.php << 'EOL'
+        cat > app/config/development.php << 'EOL'
         <?php
         $site = "http://".$_SERVER['HTTP_HOST']."/";
-        $method = "PATH_INFO";//REQUEST_URI,PATH_INFO,ORIG_PATH_INFO,
+        $method = "REQUEST_URI";
         $admin_secret_url = 'admin';
         $cdn_url = '';
 
