@@ -22,6 +22,8 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: '7.4'
+        extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, dom, filter, gd, json, libxml
+        coverage: xdebug
 
     - name: PHP lint
       run: |
@@ -32,5 +34,4 @@ jobs:
         fi
     
     - name: Run PHPUnit tests
-      run: |
-        vendor\bin\phpunit.bat --configuration phpunit.xml --testsuite Dev
+      run: vendor/bin/phpunit --configuration phpunit.xml --testsuite Dev
