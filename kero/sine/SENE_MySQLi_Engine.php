@@ -33,10 +33,10 @@ class SENE_MySQLi_Engine
     public $tis_limit=0;
     public $limit_a=0;
     public $limit_b=0;
-    public $as_from=0;
-    public $join=0;
+    public $as_from=array();
+    public $join=array();
     public $in_join=0;
-    public $join_multi=0;
+    public $join_multi=array();
     public $in_join_multi=0;
     public $query_last;
     public $union;
@@ -117,7 +117,7 @@ class SENE_MySQLi_Engine
 
     public static function getInstance()
     {
-        return self::$_instance;
+        return self::$__instance;
     }
 
     private function has_bracket_open($bracket_flag)
@@ -346,7 +346,7 @@ class SENE_MySQLi_Engine
     }
     public function getField()
     {
-        return array("field"=>$this->fieldname,"value"=>fieldvalue);
+        return array("field"=>$this->fieldname,"value"=>$this->fieldvalue);
     }
 
     public function where_null($col_params, $operand="AND", $comp="", $bracket=0, $bracket2=0)
@@ -395,7 +395,7 @@ class SENE_MySQLi_Engine
                 switch ($comp) {
                     case "like":
                         $c= "LIKE";
-                        $val = $this->esc($val);
+                        $val = $this->esc($v);
                         break;
                     case 'like%':
                         $c= "LIKE";
@@ -419,7 +419,7 @@ class SENE_MySQLi_Engine
                         break;
                     case "notlike":
                         $c= "NOT LIKE";
-                        $val = $this->esc($val);
+                        $val = $this->esc($v);
                         break;
                     case "notlike%%":
                         $c= "NOT LIKE";
@@ -628,7 +628,7 @@ class SENE_MySQLi_Engine
                 switch ($comp) {
                     case "like":
                         $c= "LIKE";
-                        $val = ($val);
+                        $val = ($v);
                         break;
                     case 'like%':
                         $c= "LIKE";
@@ -652,7 +652,7 @@ class SENE_MySQLi_Engine
                         break;
                     case "notlike":
                         $c= "NOT LIKE";
-                        $val = ($val);
+                        $val = ($v);
                         break;
                     case "notlike%%":
                         $c= "NOT LIKE";
