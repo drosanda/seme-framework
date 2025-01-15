@@ -256,18 +256,29 @@ abstract class SENE_Controller
     }
 
     /**
-     * For loading layout from a theme
-     * Default file location app/view/front/page/
+     * Load a php file that contains html layout
+     * Default locations:
+     * - SELECTED_THEME/layout/
+     * - SELECTED_THEME/page/
+     * 
      * @param  string $a          name of layout without .php suffix
-     * @param  array  $__forward  data that will be passed to
+     * @param  array  $__forward  data that will be passed into layout
      * @return object             return this class
      */
-    protected function loadLayout(string $a, $__forward=array())
+    protected function loadLayout(string $layout_file_name, $__forward=array())
     {
-        if (empty($a)) {
-            trigger_error(TEM_ERR.': Layout not found. Please check layout file at '.$this->directories->app_view.$this->getTheme().'page/ executed', E_USER_ERROR);
+        if (empty($layout_file_name)) {
+            trigger_error(TEM_ERR.': Layout not found. Please check layout file at '.$this->directories->app_view.$this->getTheme().'layout/ or page/', E_USER_ERROR);
         }
-        $this->view($this->getTheme().'page/'.$a, $__forward);
+        
+        if (file_exists($GLOBALS['SEMEDIR']->app_view.$this->getTheme().'layout/'.$layout_file_name.'.php')) {
+            $this->view($this->getTheme().'layout/'.$layout_file_name, $__forward);
+        } else if (file_exists($GLOBALS['SEMEDIR']->app_view.$this->getTheme().'page/'.$layout_file_name.'.php')) {
+            $this->view($this->getTheme().'page/'.$layout_file_name, $__forward);
+        } else {
+            trigger_error(TEM_ERR.': Could not load '.$this->directories->app_view.$this->getTheme().'layout/'.$layout_file_name.'.php or '.$this->directories->app_view.$this->getTheme().'page/'.$layout_file_name.'.php', E_USER_ERROR);
+        }
+        
         return $this;
     }
 
