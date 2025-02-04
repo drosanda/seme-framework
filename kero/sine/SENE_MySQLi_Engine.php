@@ -632,7 +632,7 @@ class SENE_MySQLi_Engine
                         break;
                     case 'like%':
                         $c= "LIKE";
-                        $val = '\''.$v.'%\'';
+						$val = '\''.$v.'%\'';
                         $val = ($val);
                         break;
                     case '%like':
@@ -747,7 +747,7 @@ class SENE_MySQLi_Engine
                     break;
                 case 'like%':
                     $c= "LIKE";
-                    $val = "\'".$v.'%\'';
+                    $val = '\''.$v.'%\'';
                     $val = ($val);
                     break;
                 case '%like':
