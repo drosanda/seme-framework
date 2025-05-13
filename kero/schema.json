@@ -1,0 +1,58 @@
+{
+    "cdate": "250512103703",
+    "ldate": "250512103703",
+    "tables": {
+        "b_user": {
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "int",
+                    "length": "10",
+                    "value": "unsigned",
+                    "is_null": false,
+                    "default_value": null,
+                    "is_index": true,
+                    "is_unsigned": true,
+                    "is_zerofill": false,
+                    "is_primary": true,
+                    "is_auto_increment": true,
+                    "after": ""
+                },
+                "username": {
+                    "name": "username",
+                    "type": "string",
+                    "length": "64",
+                    "is_null": false,
+                    "default_value": null,
+                    "after": "id"
+                },
+                "password": {
+                    "name": "password",
+                    "type": "string",
+                    "length": "25",
+                    "is_null": false,
+                    "default_value": null,
+                    "after": "username"
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "datetime",
+                    "length": "",
+                    "value": [],
+                    "is_null": false,
+                    "default_value": null,
+                    "after": "password"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "is_null": true,
+                    "default_value": null,
+                    "after": "created_at"
+                }
+            },
+            "indexes": {},
+            "relations": {}
+        }
+    }
+}

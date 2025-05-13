@@ -1,6 +1,5 @@
 <?php
-
-class Home extends SENE_Controller
+class Home extends JI_Controller
 {
     public function __construct()
     {
@@ -8,6 +7,6 @@ class Home extends SENE_Controller
     }
     public function index()
     {
-       
+        echo 'dev/home';
     }
 }

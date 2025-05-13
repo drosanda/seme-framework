@@ -1,4 +1,6 @@
 <?php
+require_once SEMEROOT.'kero/sine/SENE_MySQLi_Column_Builder.php';
+
 /**
  * Engine Class for MySQL / MariaDB database type
  * Contains some query builder that compatible with MySQL or MariaDB query / command.
@@ -14,7 +16,6 @@ class SENE_MySQLi_Engine
 {
     protected static $__instance;
     public $__mysqli;
-    protected $koneksi;
     protected $fieldname = array();
     protected $fieldvalue = array();
     public $last_id = 0;
@@ -41,6 +42,7 @@ class SENE_MySQLi_Engine
     public $query_last;
     public $union;
     public $is_debug;
+    public $table_builder;
 
     public function __construct()
     {
@@ -72,11 +74,11 @@ class SENE_MySQLi_Engine
             }
         }
 
-        $cs = 'utf8';
+        $charset = 'latin1';
         if (isset($this->config->database->charset) && strlen($this->config->database->charset)>0) {
-            $cs = $this->config->database->charset;
+            $charset = $this->config->database->charset;
         }
-        $this->__mysqli->set_charset($cs);
+        $this->__mysqli->set_charset($charset);
 
         self::$__instance = $this;
 
@@ -100,6 +102,13 @@ class SENE_MySQLi_Engine
         $this->is_debug = 1;
 
         $this->_union_init();
+        $this->table_builder_initialize($charset);
+    }
+
+    private function table_builder_initialize($charset)
+    {
+        $this->table_builder = new \SENE_MySQLi_Table_Builder($this->__mysqli, $this->config->database->name, $charset);
+        return $this;
     }
 
     private function _union_init()
@@ -1906,4 +1915,15 @@ class SENE_MySQLi_Engine
 		$this->union->limit = '';
 		return $this;
 	}
+
+    public function index_exists($table_name, $index_name){
+        $database_name = $this->config->database->name;
+        $sql = "show index from $database_name.$table_name Key_name like '$index_name';";
+        $d = $this->query($sql);
+        if (count($d)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

@@ -1,0 +1,10 @@
+{
+    "link":
+    [
+      {"rel": "stylesheet", "href": "https://skin-cenah.b-cdn.net/css/bootstrap.min.css"},
+      {"rel": "stylesheet", "href": "https://skin-cenah.b-cdn.net/css/plugins.css"},
+      {"rel": "stylesheet", "href": "https://skin-cenah.b-cdn.net/css/main.css"},
+      {"rel": "stylesheet", "href": "https://skin-cenah.b-cdn.net/css/themes.css"},
+      {"rel": "stylesheet", "href": "https://skin-cenah.b-cdn.net/css/themes/erplite.css"}
+    ]
+  }

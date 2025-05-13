@@ -8,6 +8,8 @@
  * @package SemeFramework\Kero
  * @since 4.0.0
  */
+
+require_once SEMEROOT.'kero/sine/SENE_MySQLi_Table_Builder.php';
 #[AllowDynamicProperties]
 abstract class SENE_Model
 {

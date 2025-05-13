@@ -45,7 +45,7 @@ $cdn_url = '';
 $db['host']  = 'localhost';
 $db['user']  = 'root';
 $db['pass']  = '';
-$db['name']  = 'seme_framework';
+$db['name']  = 'seme_admin_db';
 $db['port'] = '3306';
 $db['charset'] = 'utf8mb4';
 $db['engine'] = 'mysqli';
@@ -70,9 +70,9 @@ $timezone = 'Asia/Jakarta';
 /* all var $core_* value in lower case string*/
 /* @var string */
 /****************************/
-$core_prefix = '';
-$core_controller = '';
-$core_model = '';
+$core_prefix = 'ji_';
+$core_controller = 'controller';
+$core_model = 'model';
 
 /********************************/
 /* == Controller Configuration == */
