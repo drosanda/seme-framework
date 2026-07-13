@@ -20,9 +20,6 @@ class SENE_MySQLi_Engine_Mock extends SENE_MySQLi_Engine {
  */
 final class SENE_MySQLi_Engine_Test extends TestCase
 {
-  public function __construct(){
-    parent::__construct();
-  }
   /**
   * Call protected/private method of a class.
   *
@@ -36,7 +33,6 @@ final class SENE_MySQLi_Engine_Test extends TestCase
   {
     $reflection = new \ReflectionClass(get_class($object));
     $method = $reflection->getMethod($methodName);
-    $method->setAccessible(true);
     return $method->invokeArgs($object, $parameters);
   }
 
@@ -367,7 +363,7 @@ final class SENE_MySQLi_Engine_Test extends TestCase
 
     $this->invokeMethod($tc, 'flushQuery', array());
     $this->invokeMethod($tc, 'where_as', array('name',$str,'AND', 'like%'));
-    $this->assertEquals("name LIKE \'$str%'  AND ",$tc->in_where);
+    $this->assertEquals("name LIKE '$str%'  AND ",$tc->in_where);
 
     $this->invokeMethod($tc, 'flushQuery', array());
     $this->invokeMethod($tc, 'where_as', array('name',$str,'AND', '%like'));

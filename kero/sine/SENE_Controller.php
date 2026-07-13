@@ -932,7 +932,7 @@ abstract class SENE_Controller
 
     public static function getInstance()
     {
-        return self::$_instance;
+        return self::$__instance;
     }
 
     /**

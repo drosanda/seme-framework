@@ -69,6 +69,15 @@ class SENE_MySQLi_Engine
                 $data['data'] = array();
                 echo json_encode($data);
                 return;
+            } else {
+                header("content-type: application/json");
+                http_response_code(200);
+                $data = array();
+                $data['status'] = $this->__mysqli->connect_errno;
+                $data['message'] = TEM_ERR.': Cannot connect to database server.';
+                $data['data'] = array();
+                echo json_encode($data);
+                return;
             }
         }
 
@@ -331,7 +340,7 @@ class SENE_MySQLi_Engine
     {
         if (is_array($var)) {
         } else {
-            if (strtolower($var)=='null') {
+            if ($var === null || strtolower((string) $var)=='null') {
                 return "NULL";
             } else {
                 return '"'.$this->__mysqli->real_escape_string($var).'"';
@@ -1198,7 +1207,7 @@ class SENE_MySQLi_Engine
 
         foreach ($datas as $ds) {
             foreach ($ds as $key=>$val) {
-                if (strtolower($val)=='now()' || strtolower($val)=='null') {
+                if (strtolower((string) $val)=='now()' || strtolower((string) $val)=='null') {
                     $sql .=''.$val.',';
                 } else {
                     $sql .=''.$this->esc($val).',';
@@ -1241,7 +1250,7 @@ class SENE_MySQLi_Engine
 
         foreach ($datas as $ds) {
             foreach ($ds as $key=>$val) {
-                if (strtolower($val)=='now()' || strtolower($val)=='null') {
+                if (strtolower((string) $val)=='now()' || strtolower((string) $val)=='null') {
                     $sql .=''.$val.',';
                 } else {
                     $sql .=''.$this->esc($val).',';
@@ -1282,7 +1291,7 @@ class SENE_MySQLi_Engine
             foreach ($datas as $key=>$val) {
                 if ($val=='NOW()' || $val=='now()') {
                     $sql .=''.$val.',';
-                } elseif (strtolower($val)=='null') {
+                } elseif ($val===null || strtolower((string) $val)=='null') {
                     $sql .='NULL,';
                 } else {
                     $sql .=''.$this->esc($val).',';
@@ -1514,7 +1523,7 @@ class SENE_MySQLi_Engine
             foreach ($datas as $key=>$val) {
                 if ($val=='NOW()' || $val=='now()') {
                     $sql .=''.$val.',';
-                } elseif (strtolower($val)=='null') {
+                } elseif ($val===null || strtolower((string) $val)=='null') {
                     $sql .='NULL,';
                 } else {
                     $sql .=''.$this->esc($val).',';
@@ -1547,7 +1556,7 @@ class SENE_MySQLi_Engine
                 die();
             }
             foreach ($data as $key=>$val) {
-                if (strtolower($val)=='now()' || strtolower($val)=='null') {
+                if (strtolower((string) $val)=='now()' || strtolower((string) $val)=='null') {
                     $sql .=''.$val.',';
                 } else {
                     $sql .=''.$this->esc($val).',';
@@ -1560,7 +1569,7 @@ class SENE_MySQLi_Engine
 
         foreach ($datas as $ds) {
             foreach ($ds as $key=>$val) {
-                if (strtolower($val)=='now()' || strtolower($val)=='null') {
+                if (strtolower((string) $val)=='now()' || strtolower((string) $val)=='null') {
                     $sql .=''.$val.',';
                 } else {
                     $sql .=''.$this->esc($val).',';

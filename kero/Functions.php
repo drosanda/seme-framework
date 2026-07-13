@@ -82,6 +82,9 @@ function dd($var)
 */
 function seme_error_handling($errno, $errstr, $error_file, $error_line)
 {
+    if (in_array($errno, array(E_DEPRECATED, E_USER_DEPRECATED, E_NOTICE, E_USER_NOTICE, E_STRICT))) {
+        return false;
+    }
     if (isset($_SERVER['argv'])) {
         $backtraces = debug_backtrace();
         $bct = array();
