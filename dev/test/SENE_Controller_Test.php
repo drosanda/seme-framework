@@ -19,9 +19,6 @@ class SENE_Controller_Mock extends SENE_Controller {
  */
 final class SENE_Controller_Test extends TestCase
 {
-  public function __construct(){
-    parent::__construct();
-  }
   /**
   * Call protected/private method of a class.
   *
@@ -35,7 +32,6 @@ final class SENE_Controller_Test extends TestCase
   {
     $reflection = new \ReflectionClass(get_class($object));
     $method = $reflection->getMethod($methodName);
-    $method->setAccessible(true);
     return $method->invokeArgs($object, $parameters);
   }
 

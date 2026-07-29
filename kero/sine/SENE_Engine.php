@@ -98,7 +98,7 @@ class SENE_Engine
      */
     public static function getInstance()
     {
-        return self::$_instance;
+        return self::$__instance;
     }
 
     /**

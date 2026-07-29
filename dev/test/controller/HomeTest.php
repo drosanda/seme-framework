@@ -6,9 +6,6 @@ require_once $GLOBALS['SEMEDIR']->app_controller.'home.php';
 
 final class HomeTest extends SeneTestCase
 {
-  public function __construct(){
-    parent::__construct();
-  }
   /**
   * @covers Home
   * @uses SENE_Controller

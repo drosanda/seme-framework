@@ -36,14 +36,14 @@ class SENE_JSON_Engine
         $mixed[$key] = $this->utf8ize($value);
       }
     } elseif (is_string($mixed)) {
-      return utf8_encode($mixed);
+      return mb_convert_encoding($mixed, 'UTF-8', 'ISO-8859-1');
     }
     return $mixed;
   }
   private function latin1_to_utf8($dat)
   {
     if (is_string($dat)) {
-      return utf8_encode($dat);
+      return mb_convert_encoding($dat, 'UTF-8', 'ISO-8859-1');
     } elseif (is_array($dat)) {
       $ret = [];
       foreach ($dat as $i => $d) {

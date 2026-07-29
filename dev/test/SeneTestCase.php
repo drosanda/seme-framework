@@ -210,8 +210,7 @@ require_once $GLOBALS['SEMEDIR']->kero_sine.'SENE_Input.php';
 use PHPUnit\Framework\TestCase;
 
 Class SeneTestCase extends TestCase {
-  public function __construct(){
-    parent::__construct();
+  protected function setUp(): void {
 		if(!empty($GLOBALS['core_controller']) && !empty($GLOBALS['core_prefix'])){
       $core_controller_file = SENECORE.$GLOBALS['core_prefix'].$GLOBALS['core_controller'].'.php';
 			if(file_exists($core_controller_file)){
@@ -247,7 +246,6 @@ Class SeneTestCase extends TestCase {
   {
     $reflection = new \ReflectionClass(get_class($object));
     $method = $reflection->getMethod($methodName);
-    $method->setAccessible(true);
     return $method->invokeArgs($object, $parameters);
   }
 }
