@@ -364,7 +364,7 @@
 		 */
 		static function isValidImageHandle($handle)
 		{
-			return (is_resource($handle) && get_resource_type($handle) == 'gd');
+			return ($handle instanceof GdImage) || (is_resource($handle) && get_resource_type($handle) == 'gd');
 		}
 
 		/**
@@ -375,7 +375,7 @@
 		static function assertValidImageHandle($handle)
 		{
 			if (!self::isValidImageHandle($handle))
-				throw new WideImage_InvalidImageHandleException("{$handle} is not a valid image handle.");
+				throw new WideImage_InvalidImageHandleException("Handle is not a valid image handle.");
 		}
 	}
 
