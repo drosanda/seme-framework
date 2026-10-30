@@ -272,7 +272,7 @@ class SENE_Engine
                             }
 
                             if (!class_exists($cname, false)) {
-                                trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".$this->directories->app_controller.$path[2].'/'.$path[3].".php", E_USER_ERROR);
+                                seme_fatal("Unable to load class: $cname. Please check classname on controller is exists in ".$this->directories->app_controller.$path[2].'/'.$path[3].".php");
                                 return;
                             }
 
@@ -320,7 +320,7 @@ class SENE_Engine
                         }
 
                         if (!class_exists($cname, false)) {
-                            trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".$this->directories->app_controller." triggered ", E_USER_ERROR);
+                            seme_fatal("Unable to load class: $cname. Please check classname on controller is exists in ".$this->directories->app_controller." triggered ");
                             return;
                         }
                         $cname = new $cname();

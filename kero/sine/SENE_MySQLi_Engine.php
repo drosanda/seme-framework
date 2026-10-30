@@ -41,6 +41,10 @@ class SENE_MySQLi_Engine
     public $query_last;
     public $union;
     public $is_debug;
+    /** Also write query errors to stderr so they appear in `docker logs` */
+    public $stderr = true;
+    /** Colorize (ANSI) and line-break SQL written to stderr */
+    public $stderr_color = true;
 
     public function __construct()
     {
@@ -58,7 +62,7 @@ class SENE_MySQLi_Engine
             $this->__mysqli->connect($this->config->database->host, $this->config->database->user, $this->config->database->pass, $this->config->database->name, $port);
         } catch (mysqli_sql_exception $e) {
             if ($this->config->environment == 'development') {
-                trigger_error(TEM_ERR.': Cannot connect to database server using the supplied settings.', E_USER_ERROR);
+                seme_fatal(TEM_ERR.': Cannot connect to database server using the supplied settings.');
                 throw $e;
             } elseif ($this->config->environment == 'staging' && $this->__mysqli->connect_errno) {
                 header("content-type: application/json");
@@ -176,14 +180,53 @@ class SENE_MySQLi_Engine
         $this->fieldvalue[] = $this->__mysqli->error;
         $this->fieldvalue[] = $sql;
     }
+    private function logSql($sql)
+    {
+        if (!$this->stderr) {
+            return;
+        }
+        $c = $this->stderr_color;
+        $out = trim(preg_replace('/\s+/', ' ', $sql));
+        $out = preg_replace(
+            '/\s(FROM|WHERE|GROUP BY|ORDER BY|HAVING|LIMIT|UNION(?: ALL)?|(?:LEFT |RIGHT |INNER |OUTER |CROSS )*JOIN|ON DUPLICATE KEY UPDATE|VALUES|SET)\b/i',
+            "\n  $1",
+            $out
+        );
+        if ($c) {
+            $out = preg_replace(
+                '/\b(SELECT|INSERT(?: IGNORE)? INTO|REPLACE INTO|UPDATE|DELETE|FROM|WHERE|GROUP BY|ORDER BY|HAVING|LIMIT|UNION(?: ALL)?|(?:LEFT |RIGHT |INNER |OUTER |CROSS )*JOIN|ON DUPLICATE KEY UPDATE|VALUES|SET|AS|ON|AND|OR|NOT|IN|LIKE|IS|NULL|BETWEEN|DISTINCT|ASC|DESC)\b/i',
+                "\033[1;34m$1\033[0m",
+                $out
+            );
+            $out = preg_replace("/('(?:[^'\\\\]|\\\\.)*')/", "\033[32m$1\033[0m", $out);
+            $out = preg_replace('/`([^`]+)`/', "\033[36m`$1`\033[0m", $out);
+            $out = preg_replace('/(?<![\w;m])(\d+)(?![\w;m])/', "\033[33m$1\033[0m", $out);
+            $tag = "\033[2m".date('Y-m-d H:i:s')."\033[0m \033[1;35m[SQL]\033[0m ";
+        } else {
+            $tag = date('Y-m-d H:i:s').' [SQL] ';
+        }
+        @file_put_contents('php://stderr', $tag.$out.PHP_EOL);
+    }
+    private function logError($sql)
+    {
+        $msg = TEM_ERR.': '.$this->__mysqli->error.'. '.$sql;
+        if ($this->stderr) {
+            $e = $this->stderr_color ? "\033[1;31m" : '';
+            $r = $this->stderr_color ? "\033[0m" : '';
+            @file_put_contents('php://stderr', date('Y-m-d H:i:s').' '.$e.'[SQL ERROR]'.$r.' '.$msg.PHP_EOL);
+        }
+        return $msg;
+    }
     public function exec($sql)
     {
         $res = $this->__mysqli->query($sql);
+        $this->logSql($sql);
         if ($res) {
             return 1;
         } else {
+            $msg = $this->logError($sql);
             if ($this->is_debug) {
-                trigger_error(TEM_ERR.': '.$this->__mysqli->error.'. '.$sql, E_USER_NOTICE);
+                trigger_error($msg, E_USER_NOTICE);
             }
             return 0;
         }
@@ -237,6 +280,7 @@ class SENE_MySQLi_Engine
                 $dataz = json_decode($str);
                 return $dataz;
             } else {
+                $this->logSql($sql);
                 $res = $this->__mysqli->query($sql);
                 if ($res) {
                     $dataz=array();
@@ -261,11 +305,12 @@ class SENE_MySQLi_Engine
                     return $dataz;
                 } else {
                     $this->debug($sql);
-                    trigger_error(TEM_ERR.': '.$this->__mysqli->error.'. '.$sql, E_USER_NOTICE);
+                    trigger_error($this->logError($sql), E_USER_NOTICE);
                     return $this->fieldvalue;
                 }
             }
         } else {
+            $this->logSql($sql);
             $res = $this->__mysqli->query($sql);
             if ($res) {
                 $dataz=array();
@@ -290,7 +335,7 @@ class SENE_MySQLi_Engine
                 return $dataz;
             } else {
                 $this->debug($sql);
-                trigger_error(TEM_ERR.': '.$this->__mysqli->error.'. '.$sql, E_USER_NOTICE);
+                trigger_error($this->logError($sql), E_USER_NOTICE);
                 return $this->fieldvalue;
             }
         }
@@ -874,7 +919,7 @@ class SENE_MySQLi_Engine
     public function from($table, $as='')
     {
         if (empty($table)) {
-            trigger_error(TEM_ERR.': table name required', E_USER_ERROR);
+            seme_fatal(TEM_ERR.': table name required');
             die();
         }
         if (!empty($as)) {
@@ -1176,6 +1221,9 @@ class SENE_MySQLi_Engine
     public function query_multi($sql)
     {
         $this->__mysqli->multi_query($sql);
+        if ($this->stderr) {
+            @file_put_contents('php://stderr', date('Y-m-d H:i:s').' - '.$sql.PHP_EOL);
+        }
         if ($this->__mysqli->errno) {
             trigger_error($this->__mysqli->error);
         }

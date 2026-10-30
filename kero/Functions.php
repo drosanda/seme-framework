@@ -82,7 +82,7 @@ function dd($var)
 */
 function seme_error_handling($errno, $errstr, $error_file, $error_line)
 {
-    if (in_array($errno, array(E_DEPRECATED, E_USER_DEPRECATED, E_NOTICE, E_USER_NOTICE, E_STRICT))) {
+    if (in_array($errno, array(E_DEPRECATED, E_USER_DEPRECATED, E_NOTICE, E_USER_NOTICE))) {
         return false;
     }
     if (isset($_SERVER['argv'])) {
@@ -237,6 +237,23 @@ function seme_error_handling($errno, $errstr, $error_file, $error_line)
 
 // register error handler
 set_error_handler("seme_error_handling");
+
+/**
+ * Raise a fatal framework error.
+ * Replacement for trigger_error() with E_USER_ERROR, which is deprecated since PHP 8.4
+ *
+ * @param  string $message error message
+ *
+ * @return void
+ */
+function seme_fatal($message)
+{
+    $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+    $file = isset($bt[0]['file']) ? $bt[0]['file'] : '';
+    $line = isset($bt[0]['line']) ? $bt[0]['line'] : 0;
+    seme_error_handling(E_USER_ERROR, $message, $file, $line);
+    die($message);
+}
 
 /**
  * Procedure for registering namespace into current session
