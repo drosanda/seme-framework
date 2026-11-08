@@ -398,6 +398,114 @@ final class SENE_MySQLi_EngineTest extends TestCase
         ];
     }
 
+    /** @return array<string, array{string}> */
+    public static function mixedCaseNullProvider(): array
+    {
+        return [
+            'mixed null'     => ['Is nUlL', 'IS NULL'],
+            'mixed not null' => ['Is not nUlL', 'IS NOT NULL'],
+            'lower null'     => ['is null', 'IS NULL'],
+            'lower not null' => ['is not null', 'IS NOT NULL'],
+        ];
+    }
+
+    #[DataProvider('mixedCaseNullProvider')]
+    public function testWhereIsNullKeywordsAreCaseInsensitive(string $value, string $keyword): void
+    {
+        $this->assertSame('`name` '.$keyword, $this->whereOf(fn ($db) => $db->where('name', $value)));
+    }
+
+    #[DataProvider('mixedCaseNullProvider')]
+    public function testWhereAsIsNullKeywordsAreCaseInsensitive(string $value, string $keyword): void
+    {
+        $this->assertSame('name '.$keyword, $this->whereOf(fn ($db) => $db->where_as('name', $value)));
+    }
+
+    /** @return array<string, array{string, string}> */
+    public static function whereAsComparisonProvider(): array
+    {
+        return [
+            'default'          => ['',          'name = b.x'],
+            'equal'            => ['=',         'name = b.x'],
+            'greater'          => ['>',         'name > b.x'],
+            'greater or equal' => ['>=',        'name >= b.x'],
+            'less'             => ['<',         'name < b.x'],
+            'less or equal'    => ['<=',        'name <= b.x'],
+            'not equal (!=)'   => ['!=',        'name <> b.x'],
+            'not equal (<>)'   => ['<>',        'name <> b.x'],
+            'like'             => ['like',      'name LIKE b.x'],
+            'not like'         => ['notlike',   'name NOT LIKE b.x'],
+        ];
+    }
+
+    #[DataProvider('whereAsComparisonProvider')]
+    public function testWhereAsComparisonOperators(string $comp, string $expected): void
+    {
+        $this->assertSame($expected, $this->whereOf(fn ($db) => $db->where_as('name', 'b.x', 'AND', $comp)));
+    }
+
+    /** @return array<string, array{string, string}> */
+    public static function whereAsLikeWildcardProvider(): array
+    {
+        return [
+            'like prefix'       => ['like%',      "name LIKE 'Alice%'"],
+            'like suffix'       => ['%like',      "name LIKE '%Alice'"],
+            'like contains'     => ['%like%',     "name LIKE '%Alice%'"],
+            'like contains 2'   => ['like%%',     "name LIKE '%Alice%'"],
+            'not like prefix'   => ['notlike%',   "name NOT LIKE 'Alice%'"],
+            'not like suffix'   => ['%notlike',   "name NOT LIKE '%Alice'"],
+            'not like contains' => ['%notlike%',  "name NOT LIKE '%Alice%'"],
+            'not like contains 2' => ['notlike%%', "name NOT LIKE '%Alice%'"],
+        ];
+    }
+
+    #[DataProvider('whereAsLikeWildcardProvider')]
+    public function testWhereAsLikeWildcards(string $comp, string $expected): void
+    {
+        $this->assertSame($expected, $this->whereOf(fn ($db) => $db->where_as('name', 'Alice', 'AND', $comp)));
+    }
+
+    public function testWhereAsJoinsWithGivenOperand(): void
+    {
+        $this->assertSame(
+            'name = b.x OR z = b.z',
+            $this->whereOf(fn ($db) => $db->where_as('name', 'b.x', 'OR')->where_as('z', 'b.z'))
+        );
+    }
+
+    public function testWhereBracketsGroupSeveralConditions(): void
+    {
+        $this->assertSame(
+            '( `name` = "Alice" AND `age` = "32" )',
+            $this->whereOf(fn ($db) => $db->where('name', 'Alice', 'AND', '=', 1, 0)->where('age', 32, 'AND', '=', 0, 1))
+        );
+    }
+
+    public function testWhereAsBracketsGroupSeveralConditions(): void
+    {
+        $this->assertSame(
+            '( name = b.x AND age = 32 )',
+            $this->whereOf(fn ($db) => $db->where_as('name', 'b.x', 'AND', '=', 1, 0)->where_as('age', 32, 'AND', '=', 0, 1))
+        );
+    }
+
+    public function testFlushQueryAfterBuildingClearsEverything(): void
+    {
+        $this->db->select('*')->from('tabel')->where('name', 'ashley');
+        $this->db->flushQuery();
+
+        $this->assertSame('', $this->db->in_select);
+        $this->assertSame('', $this->db->in_where);
+        $this->assertSame('', $this->db->in_order);
+        $this->assertSame('', $this->db->in_group);
+        $this->assertSame(0, $this->db->pagesize);
+        $this->assertSame(0, $this->db->page);
+        $this->assertSame(0, $this->db->is_limit);
+        $this->assertSame(0, $this->db->limit_a);
+        $this->assertSame(0, $this->db->limit_b);
+        $this->assertSame([], $this->db->as_from);
+    }
+
     public function testWhereBracketsWrapACondition(): void
     {
         $this->assertSame(
@@ -1396,6 +1504,106 @@ final class SENE_MySQLi_EngineTest extends TestCase
         }
 
         return $seen;
+    }
+
+    // ---- full generated SQL ---------------------------------------------
+    //
+    // Each case builds a complete statement and compares the whole SQL string,
+    // so clause order, quoting and spacing between clauses are all pinned.
+
+    /** @return array<string, array{callable, string}> */
+    public static function fullSelectProvider(): array
+    {
+        return [
+            'blog by slug (select_as)' => [
+                fn ($db) => $db->select_as('id', 'blog_id')->from('d_blog')->where('slug', 'what-is-seme-framework'),
+                'SELECT id AS \'blog_id\' FROM `d_blog` WHERE `slug` = "what-is-seme-framework"',
+            ],
+            'select star, no where' => [
+                fn ($db) => $db->from('d_blog'),
+                'SELECT * FROM `d_blog`',
+            ],
+            'columns and two conditions' => [
+                fn ($db) => $db->select('id')->select('title')->from('d_blog')
+                    ->where('is_active', 1)->where('author_id', 7),
+                'SELECT `id`, `title` FROM `d_blog` WHERE `is_active` = "1" AND `author_id` = "7"',
+            ],
+            'or condition' => [
+                fn ($db) => $db->from('d_blog')->where('a', 1, 'OR')->where('b', 2),
+                'SELECT * FROM `d_blog` WHERE `a` = "1" OR `b` = "2"',
+            ],
+            'where in' => [
+                fn ($db) => $db->from('d_blog')->where_in('id', [1, 2, 3]),
+                'SELECT * FROM `d_blog` WHERE id IN ("1", "2", "3")',
+            ],
+            'order by' => [
+                fn ($db) => $db->from('d_blog')->order_by('cdate', 'desc'),
+                'SELECT * FROM `d_blog` ORDER BY cdate DESC',
+            ],
+            'group by' => [
+                fn ($db) => $db->select_as('COUNT(*)', 'total')->from('d_blog')->group_by('author_id'),
+                'SELECT COUNT(*) AS \'total\' FROM `d_blog` GROUP BY author_id',
+            ],
+            'limit' => [
+                fn ($db) => $db->from('d_blog')->limit(5, 10),
+                'SELECT * FROM `d_blog` LIMIT 5, 10',
+            ],
+            'where + group + order + limit' => [
+                fn ($db) => $db->from('d_blog')->where('is_active', 1)
+                    ->group_by('author_id')->order_by('author_id')->limit(0, 20),
+                'SELECT * FROM `d_blog` WHERE `is_active` = "1" GROUP BY author_id ORDER BY author_id ASC LIMIT 0, 20',
+            ],
+            'alias join' => [
+                fn ($db) => $db->from('d_blog', 'a')->join('b_user', 'u', 'id', 'a', 'author_id'),
+                'SELECT * FROM `d_blog` a LEFT JOIN `b_user` u ON (u.`id` = a.`author_id`)',
+            ],
+        ];
+    }
+
+    #[DataProvider('fullSelectProvider')]
+    public function testFullSelectStatement(callable $build, string $expected): void
+    {
+        $build($this->db);
+        $this->db->get();
+
+        $this->assertSame($expected, $this->sql());
+    }
+
+    public function testFullSelectFromTheBlogExample(): void
+    {
+        $this->mysqli->rows = [['blog_id' => 42]];
+
+        $this->db->select_as('id', 'blog_id');
+        $this->db->from('d_blog');
+        $this->db->where('slug', 'what-is-seme-framework');
+        $rows = $this->db->get();
+
+        $this->assertSame(
+            'SELECT id AS \'blog_id\' FROM `d_blog` WHERE `slug` = "what-is-seme-framework"',
+            $this->sql()
+        );
+        $this->assertEquals([(object) ['blog_id' => 42]], $rows);
+    }
+
+    public function testFullInsertStatement(): void
+    {
+        $this->db->insert('d_blog', ['title' => 'Hi', 'slug' => 'hi']);
+
+        $this->assertSame('INSERT INTO `d_blog`(`title`,`slug`) VALUES("Hi","hi");', $this->sql());
+    }
+
+    public function testFullUpdateStatement(): void
+    {
+        $this->db->where('id', 5)->update('d_blog', ['title' => 'New']);
+
+        $this->assertSame('UPDATE `d_blog` SET `title` = "New" WHERE `id` = "5"', $this->sql());
+    }
+
+    public function testFullDeleteStatement(): void
+    {
+        $this->db->where('id', 5)->delete('d_blog');
+
+        $this->assertSame('DELETE FROM `d_blog` WHERE `id` = "5"', $this->sql());
     }
 
     // ---- state / misc ---------------------------------------------------
