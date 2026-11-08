@@ -4,7 +4,7 @@
  * Contains some query builder that compatible with MySQL or MariaDB query / command.
  *
  * @author: Daeng Rosanda
- * @version 4.0.11
+ * @version 4.0.12
  *
  * @package SemeFramework\Kero\Sine
  * @since 2.0.0
@@ -489,6 +489,23 @@ class SENE_MySQLi_Engine
     {
         seme_fatal(TEM_ERR.': '.$message);
         throw new InvalidArgumentException($message);
+    }
+
+    /**
+     * Remove the dangling joiner the where builders leave at the end of the
+     * WHERE clause ("... AND ", "... OR ").
+     *
+     * Only a whole trailing AND / OR word is removed. rtrim($s, "AND ") is a
+     * character mask, not a suffix, and would also eat the last letters of a
+     * raw operand such as "b.ID".
+     *
+     * @param  string $where WHERE clause body
+     * @return string        clause without the trailing joiner
+     */
+    private function trimJoiner($where)
+    {
+        $where = preg_replace('/(?<=[\s)])(?:AND|OR)\s*$/Di', '', (string) $where);
+        return rtrim($where);
     }
 
     /**
@@ -1154,8 +1171,7 @@ class SENE_MySQLi_Engine
         }
 
         if (!empty($this->in_where)) {
-            $this->in_where = rtrim($this->in_where, "AND ");
-            $this->in_where = rtrim($this->in_where, "OR ");
+            $this->in_where = $this->trimJoiner($this->in_where);
             $sql .= ' WHERE '.$this->in_where;
         }
 
@@ -1242,12 +1258,10 @@ class SENE_MySQLi_Engine
         }
 
         if (!empty($this->in_where)) {
-            $this->in_where = rtrim($this->in_where, "AND ");
+            $this->in_where = $this->trimJoiner($this->in_where);
             $sql .= ' WHERE '.$this->in_where;
         }
         $sql = rtrim($sql, ' ');
-        $sql = rtrim($sql, ' AND');
-        $sql = rtrim($sql, ' OR');
         $sql = $sql.' ';
 
         if (!empty($this->in_group)) {
@@ -1461,8 +1475,7 @@ class SENE_MySQLi_Engine
         $sql = rtrim($sql, ',');
 
         if (!empty($this->in_where)) {
-            $this->in_where = rtrim($this->in_where, "AND ");
-            $this->in_where = rtrim($this->in_where, "OR ");
+            $this->in_where = $this->trimJoiner($this->in_where);
             $sql .= ' WHERE '.$this->in_where;
         }
 
@@ -1490,8 +1503,7 @@ class SENE_MySQLi_Engine
         $sql = 'DELETE FROM '.$this->quoteIdentifier($table);
 
         if (!empty($this->in_where)) {
-            $this->in_where = rtrim($this->in_where, "AND ");
-            $this->in_where = rtrim($this->in_where, "OR ");
+            $this->in_where = $this->trimJoiner($this->in_where);
             $sql .= ' WHERE '.$this->in_where;
         }
         if (!empty($this->pagesize) && ($this->tis_limit>0)) {
@@ -1877,8 +1889,7 @@ class SENE_MySQLi_Engine
     }
 
 		if(!empty($this->in_where)){
-			$this->in_where = rtrim($this->in_where,"AND ");
-			$this->in_where = rtrim($this->in_where,"OR ");
+			$this->in_where = $this->trimJoiner($this->in_where);
 			$sql .= " WHERE ".$this->in_where;
 		}
 		if(!empty($flush)) $this->flushQuery();
@@ -2044,10 +2055,7 @@ class SENE_MySQLi_Engine
 			$sql .= ' * ';
 		}
 		$sql .= ' FROM ( ';
-		foreach($this->union->table as $k=>$v){
-			$sql .= $v.' UNION ';
-		}
-		$sql = chop($sql, ' UNION ');
+		$sql .= implode(' UNION ', $this->union->table);
 		$sql .= ' ) AS '.$this->union->from_as.' ';
 		if(strlen($this->union->group_by)){
 			$sql .= ' GROUP BY '.$this->union->group_by;

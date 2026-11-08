@@ -626,14 +626,97 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->assertSame('a.x = b.y', $this->whereOf(fn ($db) => $db->where_as('a.x', 'b.y')));
     }
 
-    public function testTrailingKeywordTrimIsACharacterMaskNotASuffix(): void
+    /** @return array<string, array{string}> */
+    public static function lookalikeOperandProvider(): array
     {
-        // CURRENT BEHAVIOUR: get() strips the trailing joiner with
-        // rtrim($where, "AND "), which removes any run of the characters
-        // A, N, D and space, so a raw operand ending in "ID" loses its "D".
-        $where = $this->whereOf(fn ($db) => $db->where_as('a.parent', 'b.ID'));
+        // Each ends in letters that rtrim($s, "AND ") / rtrim($s, "OR ") would eat.
+        return [
+            'ID'      => ['b.ID'],
+            'AND'     => ['b.BRAND'],
+            'COND'    => ['b.COND'],
+            'COLOR'   => ['b.COLOR'],
+            'NOR'     => ['b.NOR'],
+            'A'       => ['b.A'],
+        ];
+    }
 
-        $this->assertSame('a.parent = b.I', $where);
+    #[DataProvider('lookalikeOperandProvider')]
+    public function testTrailingJoinerTrimKeepsTheLastRawOperandIntact(string $operand): void
+    {
+        $this->assertSame('a.x = '.$operand, $this->whereOf(fn ($db) => $db->where_as('a.x', $operand)));
+    }
+
+    #[DataProvider('lookalikeOperandProvider')]
+    public function testTrailingOrJoinerTrimKeepsTheLastRawOperandIntact(string $operand): void
+    {
+        $this->assertSame(
+            'a.x = '.$operand,
+            $this->whereOf(fn ($db) => $db->where_as('a.x', $operand, 'OR'))
+        );
+    }
+
+    public function testJoinersBetweenConditionsAreKeptAndOnlyTheLastIsRemoved(): void
+    {
+        $this->assertSame(
+            'a.x = b.ID AND a.y = b.COLOR',
+            $this->whereOf(fn ($db) => $db->where_as('a.x', 'b.ID')->where_as('a.y', 'b.COLOR'))
+        );
+    }
+
+    public function testTrailingJoinerIsRemovedAfterABracketedCondition(): void
+    {
+        $this->assertSame(
+            '( age BETWEEN 1 AND 2)',
+            $this->whereOf(fn ($db) => $db->between('age', 1, 2))
+        );
+    }
+
+    public function testLowercaseJoinerFromWhereInIsRemoved(): void
+    {
+        $this->assertSame(
+            'id IN ("1")',
+            $this->whereOf(fn ($db) => $db->where_in('id', [1], 0, 'or'))
+        );
+    }
+
+    public function testGetFirstKeepsTheLastRawOperand(): void
+    {
+        $this->db->from('t')->where_as('a.parent', 'b.ID')->get_first();
+
+        $this->assertSame('SELECT * FROM `t` WHERE a.parent = b.ID LIMIT 0, 1', $this->sql());
+    }
+
+    public function testGetFirstDoesNotTrimLettersOffTheEndOfTheSql(): void
+    {
+        // get_first() used to rtrim() the whole statement with " AND" and
+        // " OR" masks. A raw operand at the very end showed the damage.
+        $this->db->from('t')->where_as('a.x', 'b.REGION')->get_first();
+
+        $this->assertStringContainsString('WHERE a.x = b.REGION LIMIT 0, 1', $this->sql());
+    }
+
+    public function testUpdateAndDeleteKeepTheLastRawOperand(): void
+    {
+        $this->db->where_as('a.parent', 'b.ID')->update('t', ['n' => 1]);
+        $this->assertSame('UPDATE `t` SET `n` = "1" WHERE a.parent = b.ID', trim((string) end($this->mysqli->queries)));
+
+        $this->db->where_as('a.parent', 'b.COLOR', 'OR')->delete('t');
+        $this->assertSame('DELETE FROM `t` WHERE a.parent = b.COLOR', trim((string) end($this->mysqli->queries)));
+    }
+
+    public function testUnionKeepsRawOperandsThatLookLikeTheKeyword(): void
+    {
+        // union_get() used to chop() the trailing " UNION " as a character
+        // mask, which also removed the "ION" of "b.REGION".
+        $this->db->from('a')->union_create();
+        $this->db->from('b')->where_as('x', 'b.REGION')->union_create();
+
+        $this->db->union_get();
+
+        $this->assertSame(
+            'SELECT * FROM ( SELECT * FROM `a` UNION SELECT * FROM `b` WHERE x = b.REGION ) AS u1',
+            $this->sql()
+        );
     }
 
     // ---- order / group --------------------------------------------------
