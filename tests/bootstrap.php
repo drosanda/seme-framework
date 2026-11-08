@@ -35,3 +35,12 @@ foreach (array(
 ) as $alias => $dir) {
     $GLOBALS['SEMEDIR']->$alias = SEMEROOT.$dir.DIRECTORY_SEPARATOR;
 }
+
+if (!defined('SEME_VERSION')) {
+    define('SEME_VERSION', 'test');
+}
+
+// Functions.php registers seme_error_handling() globally on include.
+// Load it once here and drop the handler so it can't hijack PHPUnit's own.
+require_once $GLOBALS['SEMEDIR']->kero.'Functions.php';
+restore_error_handler();

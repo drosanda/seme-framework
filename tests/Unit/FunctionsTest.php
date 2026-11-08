@@ -5,15 +5,6 @@ use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-if (!defined('SEME_VERSION')) {
-    define('SEME_VERSION', 'test');
-}
-
-require_once $GLOBALS['SEMEDIR']->kero.'Functions.php';
-// Functions.php registers seme_error_handling() globally on include.
-// Drop it so it can't hijack PHPUnit's own error handling.
-restore_error_handler();
-
 #[CoversFunction('base_url')]
 #[CoversFunction('base_url_admin')]
 #[CoversFunction('base_url_front')]
