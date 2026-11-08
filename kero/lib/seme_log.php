@@ -7,18 +7,27 @@
  * - app/cache if write permission enable
  */
 class Seme_Log {
-  var $directory = '';
-  var $filename = 'seme.log';
-  var $path = '';
+  public $directory = '';
+  public $filename = 'seme.log';
+  public $path = '';
+  /** Also write to stderr so it appears in `docker logs` */
+  public $stderr = true;
 
   public function __construct(){
-    $this->directory = SEMEROOT;
-    $this->path = $this->directory.DIRECTORY_SEPARATOR.$this->filename;
-    if(!file_exists($this->path)) touch($this->path);
-    if(!is_writable($this->path)){
-      $this->directory = SENECACHE;
+    $this->resolvePath();
+  }
+
+  /**
+   * Pick first writable location: SEMEROOT, then SENECACHE
+   */
+  private function resolvePath(){
+    $this->filename = basename($this->filename);
+    if(empty($this->dir))
+    foreach([SEMEROOT, SENECACHE] as $dir){
+      $this->directory = rtrim($dir, '/\\');
       $this->path = $this->directory.DIRECTORY_SEPARATOR.$this->filename;
-      if(is_writable($this->path)) touch($this->path);
+      if(!file_exists($this->path)) @touch($this->path);
+      if(is_writable($this->path)) return;
     }
   }
 
@@ -29,14 +38,7 @@ class Seme_Log {
    */
   public function changeFilename($filename){
     $this->filename = $filename;
-    $this->directory = SEMEROOT;
-    $this->path = $this->directory.DIRECTORY_SEPARATOR.$this->filename;
-    if(!file_exists($this->path)) touch($this->path);
-    if(!is_writable($this->path)){
-      $this->directory = SENECACHE;
-      $this->path = $this->directory.DIRECTORY_SEPARATOR.$this->filename;
-      if(is_writable($this->path)) touch($this->path);
-    }
+    $this->resolvePath();
     return $this;
   }
 
@@ -46,10 +48,9 @@ class Seme_Log {
    * @return object           this class
    */
   public function write($str){
-    $f = fopen($this->path,'a+');
-    fwrite($f,date("Y-m-d H:i:s").' - ');
-    fwrite($f,$str.PHP_EOL);
-    fclose($f);
+    $line = date("Y-m-d H:i:s").' - '.$str.PHP_EOL;
+    @file_put_contents($this->path, $line, FILE_APPEND | LOCK_EX);
+    if($this->stderr) @file_put_contents('php://stderr', $line);
     return $this;
   }
 

@@ -95,7 +95,7 @@
 		 */
 		function destroy()
 		{
-			if ($this->isValid() && !$this->handleReleased)
+			if (PHP_VERSION_ID < 80000 && $this->isValid() && !$this->handleReleased)
 				imagedestroy($this->handle);
 			
 			$this->handle = null;

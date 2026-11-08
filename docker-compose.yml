@@ -1,0 +1,51 @@
+services:
+  nginx:
+    image: nginx:1.24.0-bullseye
+    container_name: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/fastcgi.conf:/etc/nginx/fastcgi.conf
+    depends_on:
+      - php
+    networks:
+      - seme_webstack_network
+
+  php:
+    # image: drosanda/seme_webstack_php:7.4
+    # build:
+    #   context: ./docker/7.4/
+    #   dockerfile: Dockerfile
+
+    # image: drosanda/seme_webstack_php:8.2
+    # build:
+    #   context: ./docker/8.2/
+    #   dockerfile: Dockerfile
+
+    # image: drosanda/seme_webstack_php:8.3
+    # build:
+    #   context: ./docker/8.3/
+    #   dockerfile: Dockerfile
+
+    # image: drosanda/seme_webstack_php:8.4
+    # build:
+    #   context: ./docker/8.4/
+    #   dockerfile: Dockerfile
+
+    image: drosanda/seme_webstack_php:8.5
+    build:
+      context: ./docker/8.5/
+      dockerfile: Dockerfile
+
+    container_name: php
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - seme_webstack_network
+
+networks:
+  seme_webstack_network:
+    external: true

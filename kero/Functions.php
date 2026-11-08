@@ -63,16 +63,33 @@ function redir($url, $time=0, $type=0)
         }
     }
 }
+
 /**
-* Var Dumper
-* @param  mixed  $var  any variable that can be dumped
-*/
+ * Render a variable for debugging. Pure function, no side effects.
+ */
+function dd_format($var): string
+{
+    $out = print_r($var, true);
+    return PHP_SAPI === 'cli'
+        ? $out.PHP_EOL
+        : '<pre>'.htmlspecialchars($out, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8').'</pre>';
+}
+
+/**
+ * Var Dumper: print and stop.
+ * @param mixed $var any variable that can be dumped
+ * @return never
+ */
 function dd($var)
 {
-    echo "<pre>";
-    print_r($var);
-    exit;
+    echo dd_format($var);
+    $terminator = $GLOBALS['SEME_DD_TERMINATOR'] ?? null;
+    if (is_callable($terminator)) {
+        $terminator();          // tests inject a callable that throws
+    }
+    exit(1);
 }
+
 /**
 * Customize Error Handler
 * @param  int $errno         Error number
@@ -82,7 +99,7 @@ function dd($var)
 */
 function seme_error_handling($errno, $errstr, $error_file, $error_line)
 {
-    if (in_array($errno, array(E_DEPRECATED, E_USER_DEPRECATED, E_NOTICE, E_USER_NOTICE, E_STRICT))) {
+    if (in_array($errno, array(E_DEPRECATED, E_USER_DEPRECATED, E_NOTICE, E_USER_NOTICE))) {
         return false;
     }
     if (isset($_SERVER['argv'])) {
@@ -155,7 +172,7 @@ function seme_error_handling($errno, $errstr, $error_file, $error_line)
             }
         }
         print '=========== Seme Framework v'.SEME_VERSION.' ============'.PHP_EOL;
-        die();
+        seme_terminate();
     } else {
         header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
         $backtraces = debug_backtrace();
@@ -231,12 +248,41 @@ function seme_error_handling($errno, $errstr, $error_file, $error_line)
         }
         echo '</div>';
         echo "<hr><p><small>Seme Framework v".SEME_VERSION." Error Handler</small></p>";
-        die();
+        seme_terminate();
     }
 }
 
 // register error handler
 set_error_handler("seme_error_handling");
+
+/**
+ * Terminate the request. Overridable so tests can intercept it.
+ */
+function seme_terminate($message = '')
+{
+    if (isset($GLOBALS['SEME_TERMINATOR']) && is_callable($GLOBALS['SEME_TERMINATOR'])) {
+        call_user_func($GLOBALS['SEME_TERMINATOR'], $message);
+        return;
+    }
+    die($message);
+}
+
+/**
+ * Raise a fatal framework error.
+ * Replacement for trigger_error() with E_USER_ERROR, which is deprecated since PHP 8.4
+ *
+ * @param  string $message error message
+ *
+ * @return void
+ */
+function seme_fatal($message)
+{
+    $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+    $file = isset($bt[0]['file']) ? $bt[0]['file'] : '';
+    $line = isset($bt[0]['line']) ? $bt[0]['line'] : 0;
+    seme_error_handling(E_USER_ERROR, $message, $file, $line);
+    seme_terminate($message);
+}
 
 /**
  * Procedure for registering namespace into current session

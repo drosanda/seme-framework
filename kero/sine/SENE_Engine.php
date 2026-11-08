@@ -19,7 +19,7 @@ if (!defined('LBL_CDN_URL')) {
  *
  * @author Daeng Rosanda
  *
- * @version 4.03
+ * @version 4.0.7
  *
  * @package SemeFramework\Kero
  * @since 3.0.0
@@ -144,11 +144,86 @@ class SENE_Engine
         $cname->index();
     }
 
+    /**
+     * Check that a resolved (realpath) location is inside the controller directory
+     *
+     * @param string|false $realpath Result of realpath()
+     * @return bool true if path exists and lives under app_controller
+     */
+    private function insideControllerDir($realpath)
+    {
+        if ($realpath === false) {
+            return false;
+        }
+        $base = realpath($this->directories->app_controller);
+        if ($base === false) {
+            return false;
+        }
+        $base = rtrim($base, '/\\');
+        return $realpath === $base || strpos($realpath, $base.DIRECTORY_SEPARATOR) === 0;
+    }
+
+    /**
+     * Check that a method may be reached from a URL
+     *
+     * @param string $cname Controller class name
+     * @param string $func  Method name
+     * @return bool
+     */
+    private function isRoutableMethod($cname, $func)
+    {
+        if (!method_exists($cname, $func) || strpos($func, '__') === 0) {
+            return false;
+        }
+        $reflection = new ReflectionMethod($cname, $func);
+        if (!$reflection->isPublic()) {
+            return false;
+        }
+        return $reflection->getDeclaringClass()->getName() !== 'SENE_Controller';
+    }
+
+    /**
+     * Validate the method, instantiate the controller and invoke the method
+     * with arguments taken from the URL segments starting at $offset.
+     *
+     * @param string $cname    Controller class name
+     * @param string $func     Method name from URL
+     * @param array  $path     URL segments
+     * @param int    $offset   Index of first argument segment
+     * @param string $newpath  Directory used to look for a custom 404 controller
+     * @return void
+     */
+    private function callController($cname, $func, $path, $offset, $newpath='')
+    {
+        $func = strtr($func, '-', '_');
+        if (!$this->isRoutableMethod($cname, $func)) {
+            $this->notFound($newpath);
+            return;
+        }
+        $reflection = new ReflectionMethod($cname, $func);
+        $controller = new $cname();
+        $args = array();
+        foreach ($reflection->getParameters() as $j => $param) {
+            if (isset($path[$offset+$j])) {
+                $args[] = $path[$offset+$j];
+            } elseif ($param->isDefaultValueAvailable()) {
+                $args[] = $param->getDefaultValue();
+            } else {
+                $args[] = null;
+            }
+        }
+        $reflection->invokeArgs($controller, $args);
+    }
+
     private function notFound($newpath='')
     {
         $cname = $this->notfound.'';
-        if (file_exists($newpath.$this->notfound.".php")) {
-            require_once($newpath.$this->notfound.".php");
+        $dir = '';
+        if (is_string($newpath) && $newpath !== '') {
+            $dir = rtrim($newpath, '/').'/';
+        }
+        if ($dir !== '' && file_exists($dir.$this->notfound.".php")) {
+            require_once($dir.$this->notfound.".php");
         } else {
             require_once($this->directories->app_controller.$this->notfound.".php");
         }
@@ -224,14 +299,20 @@ class SENE_Engine
             }
             unset($p);
             $path = $this->ovrRoutes($path);
+            foreach ($path as $segment) {
+                if ($segment === '.' || $segment === '..') {
+                    $this->notFound();
+                    return;
+                }
+            }
+            unset($segment);
             if (!isset($path[1])) {
                 $path[1] = '';
             }
             $path[1] = strtr($path[1],'-', '_');
             if (!empty($path[1])) {
                 if ($path[1] == "admin" && $this->config->baseurl_admin !="admin") {
-                    $newpath = realpath($this->directories->app_controller.$path[1]);
-                    $this->notFound($newpath);
+                    $this->notFound();
                     return;
                 }
 
@@ -242,164 +323,82 @@ class SENE_Engine
                 }
 
                 $newpath = realpath($this->directories->app_controller.$path[1]);
+                if ($newpath !== false && !$this->insideControllerDir($newpath)) {
+                    $this->notFound();
+                    return;
+                }
 
-                if (is_dir($newpath)) {
-                    $newpath = rtrim($newpath, '/');
-                    $newpath = $newpath.'/';
+                if ($newpath !== false && is_dir($newpath)) {
+                    $newpath = rtrim($newpath, '/').'/';
                     if (empty($path[2])) {
                         $path[2] = 'home';
                     }
-                    $dirn = $newpath.'/'.$path[2];
-                    $filename = realpath($newpath.''.$path[2].".php");
+                    $dirn = realpath($newpath.$path[2]);
+                    $filename = realpath($newpath.$path[2].".php");
 
-                    if (is_dir($dirn)) {
-                        $dirn = rtrim($dirn, '/');
-                        $dirn = $dirn.'/';
-                        if (!isset($path[3])) {
-                            $path[3] = '';
-                        }
+                    if ($dirn !== false && is_dir($dirn) && $this->insideControllerDir($dirn)) {
+                        $dirn = rtrim($dirn, '/').'/';
                         if (empty($path[3])) {
                             $path[3] = 'home';
                         }
-                        $filename = realpath($dirn.''.$path[3].".php");
-                        if (is_file($filename)) {
+                        $filename = realpath($dirn.$path[3].".php");
+                        if ($filename !== false && is_file($filename) && $this->insideControllerDir($filename)) {
                             require_once $filename;
-                            $cname = basename($filename, ".php");
-                            $cname = strtr($cname,'-', '_');
+                            $cname = strtr(basename($filename, ".php"), '-', '_');
 
                             if (!class_exists($cname, false)) {
                                 $cname = $this->namespace().'\\'.$cname;
                             }
 
                             if (!class_exists($cname, false)) {
-                                trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".$this->directories->app_controller.$path[2].'/'.$path[3].".php", E_USER_ERROR);
+                                seme_fatal("Unable to load class: $cname. Please check classname on controller is exists in ".$this->directories->app_controller.$path[2].'/'.$path[3].".php");
                                 return;
                             }
 
-                            $cname = new $cname();
                             $func = "index";
-                            if (isset($path[4])) {
-                                if (empty($path[4])) {
-                                    $func = "index";
-                                } else {
-                                    $func = $path[4];
-                                }
+                            if (!empty($path[4])) {
+                                $func = $path[4];
                             }
-                            $func = strtr($func,'-', '_');
-                            if (method_exists($cname, $func)) {
-                                $reflection = new ReflectionMethod($cname, $func);
-                                if (!$reflection->isPublic()) {
-                                    $this->notFound();
-                                    return;
-                                }
-                                $args=array();
-                                $num = $reflection->getNumberOfParameters();
-                                if ($num>0) {
-                                    for ($j=0;$j<$num;$j++) {
-                                        if (isset($path[(5+$j)])) {
-                                            $args[]=$path[(5+$j)];
-                                        } else {
-                                            $args[]=null;
-                                        }
-                                    }
-                                }
-                                $reflection->invokeArgs($cname, $args);
-                            } else {
-                                $this->notFound($newpath);
-                            }
+                            $this->callController($cname, $func, $path, 5, $newpath);
                         } else {
                             $this->notFound($newpath);
                         }
-                    } elseif (is_file($filename)) {
+                    } elseif ($filename !== false && is_file($filename) && $this->insideControllerDir($filename)) {
                         require_once $filename;
-                        $cname = basename($filename, ".php");
-                        $cname = strtr($cname,'-', '_');
+                        $cname = strtr(basename($filename, ".php"), '-', '_');
 
                         if (!class_exists($cname, false)) {
                             $cname = $this->namespace().'\\'.$cname;
                         }
 
                         if (!class_exists($cname, false)) {
-                            trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".$this->directories->app_controller." triggered ", E_USER_ERROR);
+                            seme_fatal("Unable to load class: $cname. Please check classname on controller is exists in ".$this->directories->app_controller." triggered ");
                             return;
                         }
-                        $cname = new $cname();
                         $func = "index";
-                        if (isset($path[3])) {
-                            if (empty($path[3])) {
-                                $func = "index";
-                            } else {
-                                $func = $path[3];
-                            }
+                        if (!empty($path[3])) {
+                            $func = $path[3];
                         }
-                        $func = strtr($func,'-', '_');
-                        if (method_exists($cname, $func)) {
-                            $reflection = new ReflectionMethod($cname, $func);
-                            if (!$reflection->isPublic()) {
-                                $this->notFound();
-                                return;
-                            }
-                            $args=array();
-                            $num = $reflection->getNumberOfParameters();
-                            if ($num>0) {
-                                for ($j=0;$j<$num;$j++) {
-                                    if (isset($path[(4+$j)])) {
-                                        $args[]=$path[(4+$j)];
-                                    } else {
-                                        $args[]=null;
-                                    }
-                                }
-                            }
-                            $reflection->invokeArgs($cname, $args);
-                        } else {
-                            $this->notFound($newpath);
-                        }
+                        $this->callController($cname, $func, $path, 4, $newpath);
                     } else {
                         $this->notFound($newpath);
                     }
                 } else {
                     $filename = realpath($this->directories->app_controller.$path[1].".php");
-                    if (is_file($filename)) {
-                        include $filename;
-                        $cname = basename($filename, ".php");
-                        $cname = strtr($cname,'-', '_');
+                    if ($filename !== false && is_file($filename) && $this->insideControllerDir($filename)) {
+                        require_once $filename;
+                        $cname = strtr(basename($filename, ".php"), '-', '_');
 
                         if (!class_exists($cname, false)) {
                             $cname = $this->namespace().'\\'.$cname;
                         }
 
-                        if (class_exists($cname)) {
-                            $cname = new $cname();
+                        if (class_exists($cname, false)) {
                             $func = "index";
-                            if (isset($path[2])) {
-                                if (empty($path[2])) {
-                                    $func = "index";
-                                } else {
-                                    $func = $path[2];
-                                }
+                            if (!empty($path[2])) {
+                                $func = $path[2];
                             }
-                            $func = strtr($func,'-', '_');
-                            if (method_exists($cname, $func)) {
-                                $reflection = new ReflectionMethod($cname, $func);
-                                if (!$reflection->isPublic()) {
-                                    $this->notFound();
-                                    return;
-                                }
-                                $args=array();
-                                $num = $reflection->getNumberOfParameters();
-                                if ($num>0) {
-                                    for ($j=0;$j<$num;$j++) {
-                                        if (isset($path[(3+$j)])) {
-                                            $args[]=$path[(3+$j)];
-                                        } else {
-                                            $args[]=null;
-                                        }
-                                    }
-                                }
-                                $reflection->invokeArgs($cname, $args);
-                            } else {
-                                $this->notFound();
-                            }
+                            $this->callController($cname, $func, $path, 3);
                         } else {
                             $this->notFound();
                         }

@@ -167,7 +167,7 @@ abstract class SENE_Controller
     {
         $this->theme = rtrim($theme, '/').'/';
         if (!is_dir($this->directories->app_view.$this->theme.'/')) {
-            trigger_error(TEM_ERR.': Missing theme directory for '.$theme.'', E_USER_ERROR);
+            seme_fatal(TEM_ERR.': Missing theme directory for '.$theme.'');
         }
         $this->additional = $this->getThemeConfig();
         $this->js_footer = $this->getJsFooterBasic();
@@ -201,12 +201,12 @@ abstract class SENE_Controller
                 }
 
                 if (!class_exists($cname)) {
-                    trigger_error(TEM_ERR.': could load model '.$a.' on '.$mfile.' ('.$cname.')', E_USER_ERROR);
+                    seme_fatal(TEM_ERR.': could load model '.$a.' on '.$mfile.' ('.$cname.')');
                 }
 
                 $this->{$b} = new $cname();
             } else {
-                trigger_error(TEM_ERR.': could not find model '.$a.'  on '.$mfile, E_USER_ERROR);
+                seme_fatal(TEM_ERR.': could not find model '.$a.'  on '.$mfile);
             }
         } elseif ($c=="lib") {
             $mfile = $this->directories->kero_lib.$a.'.php';
@@ -222,18 +222,18 @@ abstract class SENE_Controller
                 }
 
                 if (!class_exists($b)) {
-                    trigger_error(TEM_ERR.': could load model '.$a.' on '.$mfile.' ('.$b.')', E_USER_ERROR);
+                    seme_fatal(TEM_ERR.': could load model '.$a.' on '.$mfile.' ('.$b.')');
                 }
                 $this->$b = new $b();
             } else {
-                trigger_error(TEM_ERR.': could not find library '.$a.'  on '.$mfile, E_USER_ERROR);
+                seme_fatal(TEM_ERR.': could not find library '.$a.'  on '.$mfile);
             }
         } else {
             $mfile = $this->directories->kero_lib.$a.'.php';
             if (file_exists($this->directories->kero_lib.$a.'.php')) {
                 require_once $this->directories->kero_lib.$a.'.php';
             } else {
-                trigger_error(TEM_ERR.': could not find require_once library '.$a.' on '.$mfile, E_USER_ERROR);
+                seme_fatal(TEM_ERR.': could not find require_once library '.$a.' on '.$mfile);
             }
         }
         return $this;
@@ -265,7 +265,7 @@ abstract class SENE_Controller
     protected function loadLayout(string $a, $__forward=array())
     {
         if (empty($a)) {
-            trigger_error(TEM_ERR.': Layout not found. Please check layout file at '.$this->directories->app_view.$this->getTheme().'page/ executed', E_USER_ERROR);
+            seme_fatal(TEM_ERR.': Layout not found. Please check layout file at '.$this->directories->app_view.$this->getTheme().'page/ executed');
         }
         $this->view($this->getTheme().'page/'.$a, $__forward);
         return $this;
@@ -301,7 +301,7 @@ abstract class SENE_Controller
             ob_end_clean();
             return 0;
         } else {
-            trigger_error('unable to load putThemeContent for '.$v.'.php', E_USER_ERROR);
+            seme_fatal('unable to load putThemeContent for '.$v.'.php');
         }
         return $this;
     }
@@ -326,7 +326,7 @@ abstract class SENE_Controller
             ob_end_clean();
             return $this;
         } else {
-            trigger_error('unable to load putThemeRightContent for '.$v.'.php', E_USER_ERROR);
+            seme_fatal('unable to load putThemeRightContent for '.$v.'.php');
         }
     }
 
@@ -350,7 +350,7 @@ abstract class SENE_Controller
             ob_end_clean();
             return $this;
         } else {
-            trigger_error('unable to load putThemeLeftContent for '.$v.'.php', E_USER_ERROR);
+            seme_fatal('unable to load putThemeLeftContent for '.$v.'.php');
         }
     }
 
@@ -374,7 +374,7 @@ abstract class SENE_Controller
             ob_end_clean();
             return $this;
         } else {
-            trigger_error(TEM_ERR.': unable to load putJsReady for '.$v.'.php', E_USER_ERROR);
+            seme_fatal(TEM_ERR.': unable to load putJsReady for '.$v.'.php');
         }
     }
 
@@ -429,7 +429,7 @@ abstract class SENE_Controller
             ob_end_clean();
             return $this;
         } else {
-            trigger_error(TEM_ERR.': unable to load putJsContent for '.$v.'.php', E_USER_ERROR);
+            seme_fatal(TEM_ERR.': unable to load putJsContent for '.$v.'.php');
         }
         return $this;
     }
@@ -454,7 +454,7 @@ abstract class SENE_Controller
             ob_end_clean();
             return $this;
         } else {
-            trigger_error(TEM_ERR.': unable to load putBodyBefore for '.$v.'.php', E_USER_ERROR);
+            seme_fatal(TEM_ERR.': unable to load putBodyBefore for '.$v.'.php');
         }
     }
 
@@ -953,7 +953,7 @@ abstract class SENE_Controller
             $this->__content = ob_get_contents();
             ob_end_clean();
         } else {
-            trigger_error('unable to load view '.$this->directories->app_view.$a.'.php', E_USER_ERROR);
+            seme_fatal('unable to load view '.$this->directories->app_view.$a.'.php');
         }
         return $this;
     }
@@ -984,7 +984,7 @@ abstract class SENE_Controller
                 }
 
                 if (!class_exists($cname)) {
-                    trigger_error(TEM_ERR.': could load library '.$a.' on '.$lpath.' ('.$cname.')', E_USER_ERROR);
+                    seme_fatal(TEM_ERR.': could load library '.$a.' on '.$lpath.' ('.$cname.')');
                 }
                 $method = new $cname();
                 $b = strtolower($b);
@@ -999,7 +999,7 @@ abstract class SENE_Controller
                 $b = strtolower($b);
                 $this->{$b} = $method;
             } else {
-                trigger_error('unable to load library on '.$lpath, E_USER_ERROR);
+                seme_fatal('unable to load library on '.$lpath);
             }
         } else {
             if (file_exists(strtolower($this->directories->kero_lib.$a.'.php'))) {
@@ -1007,7 +1007,7 @@ abstract class SENE_Controller
             } elseif (file_exists($this->directories->kero_lib.$a.'.php')) {
                 require_once($this->directories->kero_lib.$a.'.php');
             } else {
-                trigger_error('unable to load library on '.strtolower($this->directories->kero_lib.$a.".php x"), E_USER_ERROR);
+                seme_fatal('unable to load library on '.strtolower($this->directories->kero_lib.$a.".php x"));
             }
         }
         return $this;
