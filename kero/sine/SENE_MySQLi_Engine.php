@@ -4,7 +4,7 @@
  * Contains some query builder that compatible with MySQL or MariaDB query / command.
  *
  * @author: Daeng Rosanda
- * @version 4.0.12
+ * @version 4.0.13
  *
  * @package SemeFramework\Kero\Sine
  * @since 2.0.0
@@ -408,7 +408,7 @@ class SENE_MySQLi_Engine
         $this->has_bracket_open($bracket);
         $this->in_where .= ' '.$this->assertColumn($col_params, 'where_null').' IS NULL ';
         $this->has_bracket_close($bracket2);
-        $this->in_where .= ' '.$operand.' ';
+        $this->in_where .= ' '.$this->joiner($operand).' ';
 
         return $this;
     }
@@ -418,7 +418,7 @@ class SENE_MySQLi_Engine
         $this->has_bracket_open($bracket);
         $this->in_where .= ' '.$this->assertColumn($col_params, 'where_not_null').' IS NOT NULL ';
         $this->has_bracket_close($bracket2);
-        $this->in_where .= ' '.$operand.' ';
+        $this->in_where .= ' '.$this->joiner($operand).' ';
 
         return $this;
     }
@@ -509,6 +509,24 @@ class SENE_MySQLi_Engine
     }
 
     /**
+     * Validate the word that joins one condition to the next.
+     *
+     * It is written into the SQL as-is, so only AND and OR are accepted
+     * (any case).
+     *
+     * @param  string $operand joiner
+     * @return string          AND or OR
+     */
+    private function joiner($operand)
+    {
+        $operand = strtoupper(trim((string) $operand));
+        if ($operand !== 'AND' && $operand !== 'OR') {
+            $this->invalidIdentifier('invalid condition joiner, use AND or OR');
+        }
+        return $operand;
+    }
+
+    /**
      * Tell whether a value was supplied to where() / where_as().
      *
      * Only null and '' mean "no value" ('' is the default of the argument).
@@ -545,7 +563,7 @@ class SENE_MySQLi_Engine
         if (is_array($params)) {
             $comp = $operand;
             $comp = strtolower($comp);
-            $operand = $params2;
+            $operand = $this->joiner(($params2 === '' || $params2 === null) ? 'AND' : $params2);
             foreach ($params as $k=>$v) {
                 switch ($comp) {
                     case "like":
@@ -643,6 +661,7 @@ class SENE_MySQLi_Engine
             unset($k);
             unset($val);
         } elseif (!empty($params) && $this->hasWhereValue($params2)) {
+            $operand = $this->joiner($operand);
             if (is_bool($params2)) {
                 $params2 = (int) $params2;
             }
@@ -761,7 +780,7 @@ class SENE_MySQLi_Engine
         if (is_array($params)) {
             $comp = $operand;
             $comp = strtolower($comp);
-            $operand = $params2;
+            $operand = $this->joiner(($params2 === '' || $params2 === null) ? 'AND' : $params2);
             foreach ($params as $k=>$v) {
                 switch ($comp) {
                     case "like":
@@ -860,6 +879,7 @@ class SENE_MySQLi_Engine
             unset($k);
             unset($val);
         } elseif (!empty($params) && $this->hasWhereValue($params2)) {
+            $operand = $this->joiner($operand);
             if (is_bool($params2)) {
                 $params2 = (int) $params2;
             }
@@ -1070,6 +1090,7 @@ class SENE_MySQLi_Engine
     {
         $this->tis_limit = 0;
         $this->is_limit = 0;
+        $this->page = 0;
         $this->pagesize = 0;
         $this->limit_a = 0;
         $this->limit_b = 0;
@@ -1121,11 +1142,22 @@ class SENE_MySQLi_Engine
   		return $this;
   	}
 
+    /**
+     * Paginate the next get(): page 1 is the first page.
+     *
+     * Page 3 of 10 rows is "LIMIT 20, 10". Both values are cast to integers
+     * because they are written into the SQL. A page size of 0 or less means
+     * "no limit".
+     *
+     * @param  int $page     page number, starting at 1
+     * @param  int $pagesize rows per page
+     * @return object        this object
+     */
     public function limitpage($page, $pagesize=10)
     {
         $this->is_limit = 0;
-        $this->page = $page;
-        $this->pagesize = $pagesize;
+        $this->page = (int) $page;
+        $this->pagesize = (int) $pagesize;
         return $this;
     }
     public function get($tipe="object", $is_debug='')
@@ -1192,8 +1224,9 @@ class SENE_MySQLi_Engine
         } else {
           if($this->page<=1){
             if($this->pagesize > 0) $sql .= " LIMIT ".$this->pagesize;
-          }else{
-            $sql .= " LIMIT ".$this->page.", ".$this->pagesize;
+          }elseif($this->pagesize > 0){
+            // page N starts after the (N - 1) previous pages
+            $sql .= " LIMIT ".(($this->page - 1) * $this->pagesize).", ".$this->pagesize;
           }
         }
 
@@ -1789,7 +1822,7 @@ class SENE_MySQLi_Engine
             $this->in_where .= $this->esc($v).", ";
         }
         $this->in_where = rtrim($this->in_where, ", ");
-        $this->in_where .= ') '.$after.' ';
+        $this->in_where .= ') '.$this->joiner($after).' ';
         return $this;
     }
 

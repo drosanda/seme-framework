@@ -506,14 +506,90 @@ final class SENE_MySQLi_EngineTest extends TestCase
         );
     }
 
-    public function testWhereArrayFormWithoutJoinerGluesConditionsTogether(): void
+    #[DataProvider('missingJoinerProvider')]
+    public function testWhereArrayFormDefaultsTheJoinerToAnd(mixed $joiner): void
     {
-        // CURRENT BEHAVIOUR: the joiner defaults to '' in array form, so
-        // two conditions are emitted with no AND between them (invalid SQL).
         $this->assertSame(
-            '`a` = "1" `b` = "2"',
+            '`a` = "1" AND `b` = "2"',
+            $this->whereOf(fn ($db) => $db->where(['a' => 1, 'b' => 2], $joiner))
+        );
+    }
+
+    /** @return array<string, array{mixed}> */
+    public static function missingJoinerProvider(): array
+    {
+        return ['empty string' => [''], 'null' => [null]];
+    }
+
+    public function testWhereArrayFormWithNoSecondArgumentUsesAnd(): void
+    {
+        $this->assertSame(
+            '`a` = "1" AND `b` = "2"',
             $this->whereOf(fn ($db) => $db->where(['a' => 1, 'b' => 2]))
         );
+    }
+
+    public function testWhereArrayFormDefaultJoinerAlsoLinksTheNextCall(): void
+    {
+        $this->assertSame(
+            '`a` = "1" AND `b` = "2" AND `c` = "3"',
+            $this->whereOf(fn ($db) => $db->where(['a' => 1, 'b' => 2])->where('c', 3))
+        );
+    }
+
+    public function testWhereArrayFormDefaultJoinerKeepsTheComparison(): void
+    {
+        // Joiner omitted, comparison given: where($arr, '', 'like%').
+        $this->assertSame(
+            '`a` LIKE "x%" AND `b` LIKE "y%"',
+            $this->whereOf(fn ($db) => $db->where(['a' => 'x', 'b' => 'y'], '', 'like%'))
+        );
+    }
+
+    public function testWhereAsArrayFormDefaultsTheJoinerToAnd(): void
+    {
+        $this->assertSame(
+            'a = b.x AND c = d.y',
+            $this->whereOf(fn ($db) => $db->where_as(['a' => 'b.x', 'c' => 'd.y']))
+        );
+    }
+
+    public function testWhereAsArrayFormHonoursAnExplicitJoiner(): void
+    {
+        $this->assertSame(
+            'a = b.x OR c = d.y',
+            $this->whereOf(fn ($db) => $db->where_as(['a' => 'b.x', 'c' => 'd.y'], 'or'))
+        );
+    }
+
+    public function testJoinerIsCaseInsensitive(): void
+    {
+        $this->assertSame(
+            '`a` = "1" OR `b` = "2"',
+            $this->whereOf(fn ($db) => $db->where(['a' => 1, 'b' => 2], 'oR'))
+        );
+    }
+
+    #[DataProvider('hostileJoinerProvider')]
+    public function testJoinerRejectsAnythingButAndOr(string $joiner): void
+    {
+        $this->assertRejected(fn () => $this->db->where('a', 1, $joiner), 'invalid condition joiner');
+        $this->assertRejected(fn () => $this->db->where(['a' => 1], $joiner), 'invalid condition joiner');
+        $this->assertRejected(fn () => $this->db->where_as(['a' => 'b.c'], $joiner), 'invalid condition joiner');
+        $this->assertRejected(fn () => $this->db->where_null('a', $joiner), 'invalid condition joiner');
+        $this->assertRejected(fn () => $this->db->where_not_null('a', $joiner), 'invalid condition joiner');
+        $this->assertRejected(fn () => $this->db->where_in('a', [1], 0, $joiner), 'invalid condition joiner');
+    }
+
+    /** @return array<string, array{string}> */
+    public static function hostileJoinerProvider(): array
+    {
+        return [
+            'injection'      => ['AND 1=1 OR'],
+            'xor'            => ['XOR'],
+            'symbol'         => ['&&'],
+            'statement'      => ['OR 1=1; DROP TABLE t; --'],
+        ];
     }
 
     // ---- where helpers --------------------------------------------------
@@ -862,14 +938,77 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->assertSame('SELECT * FROM `users`'.$suffix, $this->selectSql());
     }
 
-    public function testLimitPageTreatsPageNumberAsOffset(): void
+    /** @return array<string, array{int, int, string}> */
+    public static function limitPageProvider(): array
     {
-        // CURRENT BEHAVIOUR: for page > 1 the page number itself is used as
-        // the OFFSET, so page 3 of 10 yields "LIMIT 3, 10". page() computes
-        // the real offset (page - 1) * size.
-        $this->db->limitpage(3, 10);
+        return [
+            'page 1'                 => [1, 10, ' LIMIT 10'],
+            'page 2'                 => [2, 10, ' LIMIT 10, 10'],
+            'page 3'                 => [3, 10, ' LIMIT 20, 10'],
+            'page 5 of 25'           => [5, 25, ' LIMIT 100, 25'],
+            'page 0 is the first'    => [0, 10, ' LIMIT 10'],
+            'negative is the first'  => [-4, 10, ' LIMIT 10'],
+            'size 0 means no limit'  => [3, 0, ''],
+            'negative size no limit' => [3, -5, ''],
+        ];
+    }
 
-        $this->assertSame('SELECT * FROM `users` LIMIT 3, 10', $this->selectSql());
+    #[DataProvider('limitPageProvider')]
+    public function testLimitPageOffsetIsPreviousPagesTimesPageSize(int $page, int $size, string $suffix): void
+    {
+        $this->db->limitpage($page, $size);
+
+        $this->assertSame('SELECT * FROM `users`'.$suffix, $this->selectSql());
+    }
+
+    public function testLimitPageDefaultsToTenRowsPerPage(): void
+    {
+        $this->db->limitpage(2);
+
+        $this->assertSame('SELECT * FROM `users` LIMIT 10, 10', $this->selectSql());
+    }
+
+    #[DataProvider('pageAgreementProvider')]
+    public function testLimitPageAgreesWithPageForTheSameArguments(int $page, int $size): void
+    {
+        // limitpage() used to use the page number as the offset; page() was right.
+        $this->db->limitpage($page, $size);
+        $viaLimitPage = $this->selectSql();
+
+        $this->mysqli->queries = [];
+        $this->db->page($page, $size);
+        $viaPage = $this->selectSql();
+
+        $this->assertSame($viaPage, $viaLimitPage);
+    }
+
+    /** @return array<string, array{int, int}> */
+    public static function pageAgreementProvider(): array
+    {
+        return ['2/10' => [2, 10], '3/10' => [3, 10], '4/7' => [4, 7], '9/50' => [9, 50]];
+    }
+
+    public function testLimitPageCastsItsArgumentsToIntegers(): void
+    {
+        // Both values are written into the SQL; non-numeric tails are dropped.
+        $this->db->limitpage('3; DROP TABLE users', '10 OR 1=1');
+
+        $this->assertSame('SELECT * FROM `users` LIMIT 20, 10', $this->selectSql());
+    }
+
+    public function testLimitPageIsClearedAfterGet(): void
+    {
+        $this->db->limitpage(3, 10);
+        $this->selectSql();
+
+        $this->assertSame('SELECT * FROM `users`', $this->selectSql());
+    }
+
+    public function testExplicitLimitWinsOverLimitPage(): void
+    {
+        $this->db->limitpage(3, 10)->limit(5);
+
+        $this->assertSame('SELECT * FROM `users` LIMIT 0, 5', $this->selectSql());
     }
 
     public function testNoLimitClearsPreviousLimit(): void
@@ -877,6 +1016,16 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->db->limit(10)->nolimit();
 
         $this->assertSame('SELECT * FROM `users`', $this->selectSql());
+    }
+
+    public function testNoLimitAlsoClearsLimitPage(): void
+    {
+        $this->db->limitpage(3, 10)->nolimit();
+        $this->assertSame('SELECT * FROM `users`', $this->selectSql());
+
+        // A stale page number would turn this into "LIMIT 10, 5".
+        $this->db->limitpage(3, 10)->nolimit()->pagesize(5);
+        $this->assertSame('SELECT * FROM `users` LIMIT 5', $this->selectSql());
     }
 
     // ---- joins ----------------------------------------------------------
