@@ -4,7 +4,7 @@
  * Contains some query builder that compatible with MySQL or MariaDB query / command.
  *
  * @author: Daeng Rosanda
- * @version 4.0.9
+ * @version 4.0.10
  *
  * @package SemeFramework\Kero\Sine
  * @since 2.0.0
@@ -457,7 +457,7 @@ class SENE_MySQLi_Engine
      */
     private function assertColumn($name, $where)
     {
-        if (!is_string($name) || !preg_match('/^`?[A-Za-z0-9_$]+`?(\.`?[A-Za-z0-9_$]+`?)*$/', $name)) {
+        if (!is_string($name) || !preg_match('/^`?[A-Za-z0-9_$]+`?(\.`?[A-Za-z0-9_$]+`?)*$/D', $name)) {
             $this->invalidIdentifier($where.': invalid column reference');
         }
         return $name;
@@ -472,7 +472,7 @@ class SENE_MySQLi_Engine
      */
     private function assertAlias($alias, $where)
     {
-        if (!is_string($alias) || !preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $alias)) {
+        if (!is_string($alias) || !preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/D', $alias)) {
             $this->invalidIdentifier($where.': invalid table alias');
         }
         return $alias;
@@ -1615,6 +1615,40 @@ class SENE_MySQLi_Engine
         $this->in_join_multi = $this->in_join_multi+1;
         return $this;
     }
+    /**
+     * Render a BETWEEN bound as SQL.
+     *
+     * Plain numbers are emitted as numeric literals so existing numeric
+     * ranges produce the same SQL as before. Everything else (dates,
+     * strings, null) is escaped and quoted like any other value.
+     *
+     * @param  mixed $value bound
+     * @return string       SQL literal
+     */
+    private function betweenBound($value)
+    {
+        if (is_bool($value)) {
+            $value = (int) $value;
+        }
+        if (is_int($value) || (is_float($value) && is_finite($value))) {
+            return (string) $value;
+        }
+        if (is_string($value) && preg_match('/^-?\d+(\.\d+)?$/D', $value)) {
+            return $value;
+        }
+        return $this->esc($value);
+    }
+
+    /**
+     * Add a BETWEEN condition. Both bounds are values: numbers stay
+     * unquoted, anything else is escaped and quoted.
+     *
+     * @param  string $key    column name
+     * @param  mixed  $val1   lower bound
+     * @param  mixed  $val2   upper bound
+     * @param  int    $is_not 1 for NOT BETWEEN
+     * @return object         this object
+     */
     public function between($key, $val1, $val2, $is_not=0)
     {
         $this->in_where .= '(';
@@ -1622,7 +1656,7 @@ class SENE_MySQLi_Engine
         if ($is_not) {
             $this->in_where .= " NOT ";
         }
-        $this->in_where .= " BETWEEN ".$val1." AND ".$val2.'';
+        $this->in_where .= " BETWEEN ".$this->betweenBound($val1)." AND ".$this->betweenBound($val2).'';
         $this->in_where .= ") AND ";
         return $this;
     }

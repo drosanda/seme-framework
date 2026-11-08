@@ -561,13 +561,61 @@ final class SENE_MySQLi_EngineTest extends TestCase
         );
     }
 
-    public function testBetweenDoesNotEscapeItsBounds(): void
+    /** @return array<string, array{mixed, mixed, string}> */
+    public static function betweenBoundProvider(): array
     {
-        // CURRENT BEHAVIOUR: the column is validated but the bounds are
-        // values and still pasted into the SQL verbatim.
+        return [
+            'ints'                 => [18, 65, '( age BETWEEN 18 AND 65)'],
+            'negative'             => [-5, 5, '( age BETWEEN -5 AND 5)'],
+            'numeric strings'      => ['18', '65.5', '( age BETWEEN 18 AND 65.5)'],
+            'floats'               => [1.5, 2.25, '( age BETWEEN 1.5 AND 2.25)'],
+            'dates are quoted'     => ['2024-01-01', '2024-12-31', '( age BETWEEN "2024-01-01" AND "2024-12-31")'],
+            'null bound'           => [null, 10, '( age BETWEEN NULL AND 10)'],
+            'bool becomes int'     => [false, true, '( age BETWEEN 0 AND 1)'],
+            'quotes are escaped'   => ['a"b', 'c', '( age BETWEEN "a\\"b" AND "c")'],
+        ];
+    }
+
+    #[DataProvider('betweenBoundProvider')]
+    public function testBetweenRendersBoundsAsLiterals(mixed $low, mixed $high, string $expected): void
+    {
+        $this->assertSame($expected, $this->whereOf(fn ($db) => $db->between('age', $low, $high)));
+    }
+
+    #[DataProvider('hostileBoundProvider')]
+    public function testBetweenCannotBeInjectedThroughBounds(string $hostile, string $expected): void
+    {
+        // These used to be pasted into the SQL verbatim.
+        $this->assertSame($expected, $this->whereOf(fn ($db) => $db->between('age', $hostile, 2)));
+    }
+
+    /** @return array<string, array{string, string}> */
+    public static function hostileBoundProvider(): array
+    {
+        return [
+            'boolean injection' => ['1 OR 1=1', '( age BETWEEN "1 OR 1=1" AND 2)'],
+            'quote breakout'    => ['1" OR "1"="1', '( age BETWEEN "1\\" OR \\"1\\"=\\"1" AND 2)'],
+            'statement'         => ['1; DROP TABLE t', '( age BETWEEN "1; DROP TABLE t" AND 2)'],
+            'leading number'    => ['1abc', '( age BETWEEN "1abc" AND 2)'],
+            // sql() collapses whitespace, so the quoted "1\n" reads as "1 ".
+            'trailing newline'  => ["1\n", '( age BETWEEN "1 " AND 2)'],
+        ];
+    }
+
+    public function testBetweenUpperBoundIsEscapedToo(): void
+    {
         $this->assertSame(
-            '( age BETWEEN 1 OR 1=1 AND 2)',
-            $this->whereOf(fn ($db) => $db->between('age', '1 OR 1=1', 2))
+            '( age BETWEEN 1 AND "2 OR 1=1")',
+            $this->whereOf(fn ($db) => $db->between('age', 1, '2 OR 1=1'))
+        );
+    }
+
+    public function testBetweenNumericStringsWithExponentOrSignAreQuoted(): void
+    {
+        // Only plain decimals are treated as numbers; the rest is quoted.
+        $this->assertSame(
+            '( age BETWEEN "1e3" AND "+5")',
+            $this->whereOf(fn ($db) => $db->between('age', '1e3', '+5'))
         );
     }
 
@@ -1228,6 +1276,13 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->assertRejected(fn () => $this->db->between('age BETWEEN 1 AND 2 OR 1', 1, 2), 'between: invalid column');
         $this->assertRejected(fn () => $this->db->where_null('a OR 1=1'), 'where_null: invalid column');
         $this->assertRejected(fn () => $this->db->where_not_null('a OR 1=1'), 'where_not_null: invalid column');
+    }
+
+    public function testValidatorsRejectTrailingNewline(): void
+    {
+        // PCRE's $ would accept "name\n" without the D modifier.
+        $this->assertRejected(fn () => $this->db->order_by("name\n"), 'order_by: invalid column');
+        $this->assertRejected(fn () => $this->db->from('users', "u\n"), 'from: invalid table alias');
     }
 
     public function testWhereInAcceptsQualifiedColumns(): void
