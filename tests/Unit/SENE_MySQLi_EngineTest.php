@@ -144,6 +144,28 @@ final class SENE_MySQLi_EngineTest extends TestCase
         unset($GLOBALS['SEME_TERMINATOR']);
     }
 
+    /**
+     * Assert that $fn is rejected by the identifier checks and that no SQL
+     * was built. The terminator is a no-op so we also prove the engine does
+     * not carry on after seme_fatal() returns.
+     */
+    private function assertRejected(callable $fn, string $messagePart): void
+    {
+        $GLOBALS['SEME_TERMINATOR'] = function () {
+        };
+
+        ob_start();
+        try {
+            $fn();
+            $this->fail('Expected the identifier to be rejected.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertStringContainsString($messagePart, $e->getMessage());
+        } finally {
+            ob_end_clean();
+        }
+        $this->assertSame([], $this->mysqli->queries, 'No SQL may be sent for a rejected identifier.');
+    }
+
     /** Last SQL sent to the stub, whitespace collapsed. */
     private function sql(): string
     {
@@ -447,13 +469,21 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->assertSame('UPDATE `users` SET `active` = "1" WHERE `id` = "0"', trim((string) end($this->mysqli->queries)));
     }
 
-    public function testWhereDoesNotEscapeColumnNames(): void
+    public function testWhereEscapesBackticksInColumnNames(): void
     {
-        // CURRENT BEHAVIOUR: only the value is escaped. A column name that
-        // comes from user input can close the backtick and inject SQL.
+        // A column name from user input can no longer close the backtick:
+        // the embedded backticks are doubled, so it stays one identifier.
         $this->assertSame(
-            '`a` = 1 OR `b` = "1"',
+            '`a`` = 1 OR ``b` = "1"',
             $this->whereOf(fn ($db) => $db->where('a` = 1 OR `b', 1))
+        );
+    }
+
+    public function testWhereArrayFormEscapesBackticksInColumnNames(): void
+    {
+        $this->assertSame(
+            '`a`` OR ``b` = "1"',
+            $this->whereOf(fn ($db) => $db->where(['a` OR `b' => 1], 'AND'))
         );
     }
 
@@ -533,7 +563,8 @@ final class SENE_MySQLi_EngineTest extends TestCase
 
     public function testBetweenDoesNotEscapeItsBounds(): void
     {
-        // CURRENT BEHAVIOUR: bounds are pasted into the SQL verbatim.
+        // CURRENT BEHAVIOUR: the column is validated but the bounds are
+        // values and still pasted into the SQL verbatim.
         $this->assertSame(
             '( age BETWEEN 1 OR 1=1 AND 2)',
             $this->whereOf(fn ($db) => $db->between('age', '1 OR 1=1', 2))
@@ -576,12 +607,49 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->assertSame('SELECT * FROM `users` ORDER BY a ASC, b DESC, c ASC', $this->selectSql());
     }
 
-    public function testOrderByDoesNotEscapeIdentifiers(): void
+    public function testOrderByAcceptsQualifiedAndBackticksColumns(): void
     {
-        // CURRENT BEHAVIOUR
-        $this->db->order_by('name; DROP TABLE users', 'asc');
+        $this->db->order_by('u.name', 'desc')->order_by('`created_at`');
 
-        $this->assertSame('SELECT * FROM `users` ORDER BY name; DROP TABLE users ASC', $this->selectSql());
+        $this->assertSame('SELECT * FROM `users` ORDER BY u.name DESC, `created_at` ASC', $this->selectSql());
+    }
+
+    #[DataProvider('hostileOrderColumnProvider')]
+    public function testOrderByRejectsExpressionsAndInjection(string $column): void
+    {
+        $this->assertRejected(fn () => $this->db->order_by($column), 'order_by: invalid column');
+    }
+
+    /** @return array<string, array{string}> */
+    public static function hostileOrderColumnProvider(): array
+    {
+        return [
+            'statement'      => ['name; DROP TABLE users'],
+            'subquery'       => ['(SELECT 1)'],
+            'function'       => ['RAND()'],
+            'comment'        => ['name -- x'],
+            'space'          => ['name desc'],
+        ];
+    }
+
+    #[DataProvider('hostileDirectionProvider')]
+    public function testOrderByRejectsAnythingButAscOrDesc(string $direction): void
+    {
+        $this->assertRejected(fn () => $this->db->order_by('name', $direction), 'direction must be ASC or DESC');
+    }
+
+    /** @return array<string, array{string}> */
+    public static function hostileDirectionProvider(): array
+    {
+        return [
+            'extra column' => ['ASC, (SELECT 1)'],
+            'word'         => ['sideways'],
+        ];
+    }
+
+    public function testOrderByArrayFormValidatesKeysAndDirections(): void
+    {
+        $this->assertRejected(fn () => $this->db->order_by(['a; b' => 'asc']), 'order_by: invalid column');
     }
 
     public function testGroupByString(): void
@@ -598,6 +666,12 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->db->group_by(['a', 'b']);
 
         $this->assertSame('SELECT * FROM `users` GROUP BY a, GROUP BY b', $this->selectSql());
+    }
+
+    public function testGroupByRejectsExpressions(): void
+    {
+        $this->assertRejected(fn () => $this->db->group_by('role; DROP TABLE users'), 'group_by: invalid column');
+        $this->assertRejected(fn () => $this->db->group_by(['ok', 'a b']), 'group_by: invalid column');
     }
 
     public function testClauseOrderIsWhereGroupOrderLimit(): void
@@ -799,35 +873,35 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->assertSame('INSERT INTO `t`(`a`,`b`,`c`,`d`) VALUES(NOW(),NULL,NULL,now());', end($this->mysqli->queries));
     }
 
-    public function testInsertDoesNotEscapeColumnNames(): void
+    public function testInsertEscapesBackticksInColumnNames(): void
     {
-        // CURRENT BEHAVIOUR: array keys go into the SQL inside backticks
-        // without escaping, so keys built from user input are injectable.
         $this->db->insert('t', ['a`) VALUES ("x"); -- ' => 1]);
 
-        $this->assertStringStartsWith('INSERT INTO `t`(`a`) VALUES ("x"); -- `)', (string) end($this->mysqli->queries));
+        $this->assertSame(
+            'INSERT INTO `t`(`a``) VALUES ("x"); -- `) VALUES("1");',
+            end($this->mysqli->queries)
+        );
     }
 
     public function testInsertWithMultiFlagDelegatesToInsertMulti(): void
     {
         $this->db->insert('t', [['a' => 1], ['a' => 2]], 1);
 
-        $this->assertStringStartsWith('INSERT INTO `t` (a) VALUES("1"),("2")', (string) end($this->mysqli->queries));
+        $this->assertStringStartsWith('INSERT INTO `t` (`a`) VALUES("1"),("2")', (string) end($this->mysqli->queries));
     }
 
     public function testInsertMultiBuildsOneStatement(): void
     {
         $this->db->insert_multi('t', [['a' => 1, 'b' => 'x'], ['a' => 2, 'b' => 'y']]);
 
-        // CURRENT BEHAVIOUR: unlike insert(), column names are not backticked here.
-        $this->assertSame('INSERT INTO `t` (a,b) VALUES("1","x"),("2","y");', end($this->mysqli->queries));
+        $this->assertSame('INSERT INTO `t` (`a`,`b`) VALUES("1","x"),("2","y");', end($this->mysqli->queries));
     }
 
     public function testInsertBatchIsAnAliasOfInsertMulti(): void
     {
         $this->db->insert_batch('t', [['a' => 1]]);
 
-        $this->assertSame('INSERT INTO `t` (a) VALUES("1");', end($this->mysqli->queries));
+        $this->assertSame('INSERT INTO `t` (`a`) VALUES("1");', end($this->mysqli->queries));
     }
 
     public function testInsertIgnoreMultiBackticksColumns(): void
@@ -841,7 +915,7 @@ final class SENE_MySQLi_EngineTest extends TestCase
     {
         $this->db->insert_multi('t', [['a' => 'now()', 'b' => 'null']]);
 
-        $this->assertSame('INSERT INTO `t` (a,b) VALUES(now(),null);', end($this->mysqli->queries));
+        $this->assertSame('INSERT INTO `t` (`a`,`b`) VALUES(now(),null);', end($this->mysqli->queries));
     }
 
     // ---- update ---------------------------------------------------------
@@ -925,14 +999,18 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->assertSame(9, $this->db->last_id);
     }
 
-    public function testReplaceMultiUsesValuesAsColumnNames(): void
+    public function testReplaceMultiUsesKeysAsColumnNames(): void
     {
-        // CURRENT BEHAVIOUR (bug): the column list is built from the escaped
-        // VALUES of the first row, not from its keys, so the statement is
-        // invalid. insert_multi() reads the keys correctly.
-        $this->db->replace_multi('t', [['a' => 1], ['a' => 2]]);
+        $this->db->replace_multi('t', [['a' => 1, 'b' => 'x'], ['a' => 2, 'b' => 'y']]);
 
-        $this->assertSame('REPLACE INTO `t` ("1") VALUES("1"),("2");', end($this->mysqli->queries));
+        $this->assertSame('REPLACE INTO `t` (`a`,`b`) VALUES("1","x"),("2","y");', end($this->mysqli->queries));
+    }
+
+    public function testReplaceMultiViaReplaceFlag(): void
+    {
+        $this->db->replace('t', [['a' => 1]], 1);
+
+        $this->assertSame('REPLACE INTO `t` (`a`) VALUES("1");', end($this->mysqli->queries));
     }
 
     // ---- exec / query / errors ------------------------------------------
@@ -1067,6 +1145,107 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->expectException(Error::class);
 
         $this->captureErrors(fn () => $this->db->__encrypt('x'));
+    }
+
+    // ---- identifier escaping ----------------------------------------------
+
+    public function testTableNamesAreBacktickQuoted(): void
+    {
+        $this->assertSame('SELECT * FROM `us``ers`', $this->selectSql('us`ers'));
+    }
+
+    public function testQualifiedTableNameIsQuotedPerPart(): void
+    {
+        $this->assertSame('SELECT * FROM `shop`.`users`', $this->selectSql('shop.users'));
+    }
+
+    public function testWriteStatementsQuoteTableNames(): void
+    {
+        $this->db->insert('a`b', ['x' => 1]);
+        $this->assertSame('INSERT INTO `a``b`(`x`) VALUES("1");', end($this->mysqli->queries));
+
+        $this->db->update('a`b', ['x' => 1]);
+        $this->assertSame('UPDATE `a``b` SET `x` = "1"', end($this->mysqli->queries));
+
+        $this->db->delete('a`b');
+        $this->assertSame('DELETE FROM `a``b`', end($this->mysqli->queries));
+
+        $this->db->replace('a`b', ['x' => 1]);
+        $this->assertSame('REPLACE INTO `a``b` (`x`) VALUES("1");', end($this->mysqli->queries));
+
+        $this->db->insert_ignore_multi('a`b', [['x' => 1]]);
+        $this->assertSame('INSERT IGNORE INTO `a``b`(`x`) VALUES("1");', end($this->mysqli->queries));
+    }
+
+    public function testUpdateQuotesColumnNames(): void
+    {
+        $this->db->update('t', ['a` = 1, `b' => 2]);
+
+        $this->assertSame('UPDATE `t` SET `a`` = 1, ``b` = "2"', end($this->mysqli->queries));
+    }
+
+    public function testSelectQuotesColumnsAndKeepsTableStar(): void
+    {
+        $this->db->select(['u.id', 'u.*', 'we`ird']);
+
+        $this->assertSame('SELECT `u`.`id`, `u`.*, `we``ird` FROM `users`', $this->selectSql());
+    }
+
+    public function testJoinQuotesTableAndKeys(): void
+    {
+        $this->db->from('users', 'u')->join('or`ders', 'o', 'user`id', 'u', 'id')->get();
+
+        $this->assertSame(
+            'SELECT * FROM `users` u LEFT JOIN `or``ders` o ON (o.`user``id` = u.`id`)',
+            $this->sql()
+        );
+    }
+
+    #[DataProvider('hostileAliasProvider')]
+    public function testAliasesAreValidated(string $alias): void
+    {
+        $this->assertRejected(fn () => $this->db->from('users', $alias), 'from: invalid table alias');
+        $this->assertRejected(fn () => $this->db->join('o', $alias, 'k', 'u', 'id'), 'join: invalid table alias');
+        $this->assertRejected(fn () => $this->db->join('o', 'o', 'k', $alias, 'id'), 'join: invalid table alias');
+        $this->assertRejected(fn () => $this->db->join_composite('o', $alias, []), 'join_composite: invalid table alias');
+    }
+
+    /** @return array<string, array{string}> */
+    public static function hostileAliasProvider(): array
+    {
+        return [
+            'statement' => ['u; DROP TABLE users'],
+            'space'     => ['a b'],
+            'dot'       => ['a.b'],
+            'backtick'  => ['a`'],
+            'leading digit' => ['1a'],
+        ];
+    }
+
+    public function testWhereInAndBetweenAndNullChecksValidateTheColumn(): void
+    {
+        $this->assertRejected(fn () => $this->db->where_in('id) OR (1', [1]), 'where_in: invalid column');
+        $this->assertRejected(fn () => $this->db->between('age BETWEEN 1 AND 2 OR 1', 1, 2), 'between: invalid column');
+        $this->assertRejected(fn () => $this->db->where_null('a OR 1=1'), 'where_null: invalid column');
+        $this->assertRejected(fn () => $this->db->where_not_null('a OR 1=1'), 'where_not_null: invalid column');
+    }
+
+    public function testWhereInAcceptsQualifiedColumns(): void
+    {
+        $this->assertSame('u.id IN ("1")', $this->whereOf(fn ($db) => $db->where_in('u.id', [1])));
+    }
+
+    public function testEmptyTableNameIsRejected(): void
+    {
+        $this->assertRejected(fn () => $this->db->delete('x.'), 'empty identifier');
+    }
+
+    public function testRawByDesignApisStillAcceptExpressions(): void
+    {
+        // Documented escape hatches for expressions; callers own the safety.
+        $this->db->select_as('COUNT(DISTINCT u.id)', 'n')->where_as('a.x', 'b.y');
+
+        $this->assertSame("SELECT COUNT(DISTINCT u.id) AS 'n' FROM `users` WHERE a.x = b.y", $this->selectSql());
     }
 
     // ---- union ----------------------------------------------------------

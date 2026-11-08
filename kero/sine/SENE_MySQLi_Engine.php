@@ -4,7 +4,7 @@
  * Contains some query builder that compatible with MySQL or MariaDB query / command.
  *
  * @author: Daeng Rosanda
- * @version 4.0.8
+ * @version 4.0.9
  *
  * @package SemeFramework\Kero\Sine
  * @since 2.0.0
@@ -354,7 +354,7 @@ class SENE_MySQLi_Engine
         } elseif (is_array($sql)) {
             foreach ($sql as $s) {
                 if ($s!="*") {
-                    $this->in_select .= '`'.$s."`, ";
+                    $this->in_select .= $this->quoteIdentifier($s).", ";
                 } else {
                     $this->in_select .= " * , ";
                 }
@@ -362,7 +362,7 @@ class SENE_MySQLi_Engine
             return $this;
         } elseif (!empty($sql)) {
             if ($sql!="*") {
-                $this->in_select .= '`'.$sql."`, ";
+                $this->in_select .= $this->quoteIdentifier($sql).", ";
             } else {
                 $this->in_select .= ''.$sql.", ";
             }
@@ -406,7 +406,7 @@ class SENE_MySQLi_Engine
     public function where_null($col_params, $operand="AND", $comp="", $bracket=0, $bracket2=0)
     {
         $this->has_bracket_open($bracket);
-        $this->in_where .= ' '.$col_params.' IS NULL ';
+        $this->in_where .= ' '.$this->assertColumn($col_params, 'where_null').' IS NULL ';
         $this->has_bracket_close($bracket2);
         $this->in_where .= ' '.$operand.' ';
 
@@ -416,11 +416,79 @@ class SENE_MySQLi_Engine
     public function where_not_null($col_params, $operand="AND", $comp="", $bracket=0, $bracket2=0)
     {
         $this->has_bracket_open($bracket);
-        $this->in_where .= ' '.$col_params.' IS NOT NULL ';
+        $this->in_where .= ' '.$this->assertColumn($col_params, 'where_not_null').' IS NOT NULL ';
         $this->has_bracket_close($bracket2);
         $this->in_where .= ' '.$operand.' ';
 
         return $this;
+    }
+
+    /**
+     * Quote an SQL identifier (table, column, "table.column").
+     *
+     * Every dot separated part is wrapped in backticks and any backtick
+     * inside it is doubled, so a name can never close the quoting and
+     * inject SQL. A lone "*" is left as is so "table.*" keeps working.
+     *
+     * @param  string $name identifier, optionally qualified with dots
+     * @return string       quoted identifier
+     */
+    private function quoteIdentifier($name)
+    {
+        $parts = array();
+        foreach (explode('.', (string) $name) as $part) {
+            if ($part === '') {
+                $this->invalidIdentifier('empty identifier');
+            }
+            $parts[] = $part === '*' ? '*' : '`'.str_replace('`', '``', $part).'`';
+        }
+        return implode('.', $parts);
+    }
+
+    /**
+     * Validate a column reference that is emitted unquoted (ORDER BY,
+     * GROUP BY, IN, BETWEEN ...). Only plain names, optionally qualified
+     * ("t.col") and optionally backticked, are accepted. Expressions must
+     * go through the APIs that are raw by design (select_as, where_as ...).
+     *
+     * @param  string $name  column reference
+     * @param  string $where name of the caller for the error message
+     * @return string        the same, validated, column reference
+     */
+    private function assertColumn($name, $where)
+    {
+        if (!is_string($name) || !preg_match('/^`?[A-Za-z0-9_$]+`?(\.`?[A-Za-z0-9_$]+`?)*$/', $name)) {
+            $this->invalidIdentifier($where.': invalid column reference');
+        }
+        return $name;
+    }
+
+    /**
+     * Validate a table alias.
+     *
+     * @param  string $alias alias
+     * @param  string $where name of the caller for the error message
+     * @return string        the same, validated, alias
+     */
+    private function assertAlias($alias, $where)
+    {
+        if (!is_string($alias) || !preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $alias)) {
+            $this->invalidIdentifier($where.': invalid table alias');
+        }
+        return $alias;
+    }
+
+    /**
+     * Stop on a rejected identifier. seme_fatal() normally ends the request;
+     * the exception guarantees nothing is built if it is intercepted.
+     *
+     * @param  string $message reason
+     * @return void
+     */
+    private function invalidIdentifier($message)
+    {
+        seme_fatal(TEM_ERR.': '.$message);
+        throw new InvalidArgumentException($message);
     }
 
     /**
@@ -548,17 +616,7 @@ class SENE_MySQLi_Engine
 
                 $this->has_bracket_open($bracket);
 
-                $kst = explode(".", $k);
-                if (count($kst)) {
-                    $kst = explode(".", $k);
-                    foreach ($kst as $ks) {
-                        $this->in_where .= '`'.$ks."`.";
-                    }
-                    $this->in_where = rtrim($this->in_where, ".");
-                } else {
-                    $this->in_where .= '`'.$k.'`';
-                    unset($kst);
-                }
+                $this->in_where .= $this->quoteIdentifier($k);
                 $this->in_where .= ' '.$c.' '.$val.' ';
                 $this->has_bracket_close($bracket2);
                 $this->in_where .= ' '.strtoupper($operand).' ';
@@ -576,17 +634,7 @@ class SENE_MySQLi_Engine
 
             $this->has_bracket_open($bracket);
 
-            $kst = explode(".", $params);
-            if (count($kst)) {
-                $kst = explode(".", $params);
-                foreach ($kst as $ks) {
-                    $this->in_where .= '`'.$ks."`.";
-                }
-                $this->in_where = rtrim($this->in_where, ".");
-            } else {
-                $this->in_where .= '`'.$params.'`';
-            }
-            unset($kst);
+            $this->in_where .= $this->quoteIdentifier($params);
 
 
             switch ($comp) {
@@ -927,14 +975,29 @@ class SENE_MySQLi_Engine
         }
         return $this;
     }
+    /**
+     * Validate an ORDER BY direction.
+     *
+     * @param  string $direction ASC or DESC, any case
+     * @return string            ASC or DESC
+     */
+    private function orderDirection($direction)
+    {
+        $direction = strtoupper(trim((string) $direction));
+        if ($direction !== 'ASC' && $direction !== 'DESC') {
+            $this->invalidIdentifier('order_by: direction must be ASC or DESC');
+        }
+        return $direction;
+    }
+
     public function order_by($params, $params2="ASC")
     {
         if (is_array($params)) {
             foreach ($params as $k=>$v) {
-                $this->in_order .= $k.' '.strtoupper($v).", ";
+                $this->in_order .= $this->assertColumn($k, 'order_by').' '.$this->orderDirection($v).", ";
             }
         } elseif (!empty($params) && !empty($params2)) {
-            $this->in_order .= $params.' '.strtoupper($params2).", ";
+            $this->in_order .= $this->assertColumn($params, 'order_by').' '.$this->orderDirection($params2).", ";
         }
         return $this;
     }
@@ -945,7 +1008,7 @@ class SENE_MySQLi_Engine
             die();
         }
         if (!empty($as)) {
-            $as = strtolower($as);
+            $as = strtolower($this->assertAlias($as, 'from'));
             if (isset($this->as_from[$as])) {
                 if ($this->as_from[$as] != $table) {
                     trigger_error(TEM_ERR.': Table alias "'.$as.'" for "'.$this->as_from[$as].'" has been used, please change!');
@@ -1054,7 +1117,7 @@ class SENE_MySQLi_Engine
         if (empty($this->in_select)) {
             $this->in_select = "*";
         }
-        $sql = 'SELECT '.$this->in_select.' FROM `'.$this->table.'`';
+        $sql = 'SELECT '.$this->in_select.' FROM '.$this->quoteIdentifier($this->table);
 
         if (count($this->join) > 0) {
             $table_alias = array_search($this->table, $this->as_from);
@@ -1082,7 +1145,7 @@ class SENE_MySQLi_Engine
             if ($table_alias !== 0) {
                 foreach ($this->join_multi as $j) {
                     $sql .= strtoupper($j->method).' JOIN ';
-                    $sql .= '`'.$j->table.'` '.$j->table_as.' ON '.$j->on.' ';
+                    $sql .= $this->quoteIdentifier($j->table).' '.$j->table_as.' ON '.$j->on.' ';
                 }
             } else {
                 trigger_error(TEM_ERR.': Please use alias for main table first in JOIN MULTI, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");', E_USER_WARNING);
@@ -1142,7 +1205,7 @@ class SENE_MySQLi_Engine
         if (empty($this->in_select)) {
             $this->in_select = "*";
         }
-        $sql = 'SELECT '.$this->in_select.' FROM `'.$this->table.'`';
+        $sql = 'SELECT '.$this->in_select.' FROM '.$this->quoteIdentifier($this->table);
 
         if (count($this->join) > 0) {
             $table_alias = array_search($this->table, $this->as_from);
@@ -1170,7 +1233,7 @@ class SENE_MySQLi_Engine
             if ($table_alias !== 0) {
                 foreach ($this->join_multi as $j) {
                     $sql .= strtoupper($j->method).' JOIN ';
-                    $sql .= '`'.$j->table.'` '.$j->table_as.' ON '.$j->on.' ';
+                    $sql .= $this->quoteIdentifier($j->table).' '.$j->table_as.' ON '.$j->on.' ';
                 }
             } else {
                 trigger_error(TEM_ERR.': Please use alias for main table first in JOIN MULTI, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");', E_USER_WARNING);
@@ -1260,7 +1323,7 @@ class SENE_MySQLi_Engine
             trigger_error(TEM_ERR.': Only accepted array!');
             die();
         }
-        $sql = 'INSERT INTO `'.$table.'`'.' (';
+        $sql = 'INSERT INTO '.$this->quoteIdentifier($table).' (';
 
         foreach ($datas as $data) {
             if (!is_array($data)) {
@@ -1268,7 +1331,7 @@ class SENE_MySQLi_Engine
                 die();
             }
             foreach ($data as $key=>$val) {
-                $sql .=''.$key.',';
+                $sql .= $this->quoteIdentifier($key).',';
             }
             break;
         }
@@ -1303,7 +1366,7 @@ class SENE_MySQLi_Engine
             trigger_error(TEM_ERR.': Only accepted array!');
             die();
         }
-        $sql = 'INSERT IGNORE INTO `'.$table.'`'.'(';
+        $sql = 'INSERT IGNORE INTO '.$this->quoteIdentifier($table).'(';
 
         foreach ($datas as $data) {
             if (!is_array($data)) {
@@ -1311,7 +1374,7 @@ class SENE_MySQLi_Engine
                 die();
             }
             foreach ($data as $key=>$val) {
-                $sql .='`'.$key."`,";
+                $sql .= $this->quoteIdentifier($key).",";
             }
             break;
         }
@@ -1350,10 +1413,10 @@ class SENE_MySQLi_Engine
         if ($multi_array) {
             $this->insert_multi($table, $datas, $is_debug);
         } else {
-            $sql = 'INSERT INTO `'.$table.'`'.'(';
+            $sql = 'INSERT INTO '.$this->quoteIdentifier($table).'(';
 
             foreach ($datas as $key=>$val) {
-                $sql .='`'.$key."`,";
+                $sql .= $this->quoteIdentifier($key).",";
             }
             $sql  = rtrim($sql, ',');
             $sql .= ') VALUES(';
@@ -1387,12 +1450,12 @@ class SENE_MySQLi_Engine
             die();
         }
 
-        $sql = "UPDATE `".$table."` SET ";
+        $sql = "UPDATE ".$this->quoteIdentifier($table)." SET ";
         foreach ($datas as $key=>$val) {
             if ($val=='now()' || $val=='NOW()' || $val=="NULL" || $val=='null') {
-                $sql .='`'.$key.'` = '.$val.',';
+                $sql .= $this->quoteIdentifier($key).' = '.$val.',';
             } else {
-                $sql .='`'.$key.'` = '.$this->esc($val).',';
+                $sql .= $this->quoteIdentifier($key).' = '.$this->esc($val).',';
             }
         }
         $sql = rtrim($sql, ',');
@@ -1424,7 +1487,7 @@ class SENE_MySQLi_Engine
             die();
         }
 
-        $sql = 'DELETE FROM `'.$table.'`';
+        $sql = 'DELETE FROM '.$this->quoteIdentifier($table);
 
         if (!empty($this->in_where)) {
             $this->in_where = rtrim($this->in_where, "AND ");
@@ -1450,8 +1513,10 @@ class SENE_MySQLi_Engine
     {
         $join = new stdClass();
         $join->method = strtoupper(trim($method));
-        $join->table = '`'.$table.'` '.$table_as;
-        $join->on = array($table_as.'.`'.$table_key.'` = '.$reff_as.'.`'.$reff_key.'`');
+        $this->assertAlias($table_as, 'join');
+        $this->assertAlias($reff_as, 'join');
+        $join->table = $this->quoteIdentifier($table).' '.$table_as;
+        $join->on = array($table_as.'.'.$this->quoteIdentifier($table_key).' = '.$reff_as.'.'.$this->quoteIdentifier($reff_key));
         $this->join[] = $join;
         $this->in_join = $this->in_join+1;
         $this->as_from[$table_as] = $table;
@@ -1501,6 +1566,7 @@ class SENE_MySQLi_Engine
                 break;
         }
         //set table alias
+        $this->assertAlias($table_alias, 'join_composite');
         $this->as_from[$table_alias] = $table;
 
         //building new join class
@@ -1552,7 +1618,7 @@ class SENE_MySQLi_Engine
     public function between($key, $val1, $val2, $is_not=0)
     {
         $this->in_where .= '(';
-        $this->in_where .= ' '.$key.'';
+        $this->in_where .= ' '.$this->assertColumn($key, 'between').'';
         if ($is_not) {
             $this->in_where .= " NOT ";
         }
@@ -1564,10 +1630,10 @@ class SENE_MySQLi_Engine
     {
         if (is_array($params)) {
             foreach ($params as $k=>$v) {
-                $this->in_group .= " GROUP BY ".$v.", ";
+                $this->in_group .= " GROUP BY ".$this->assertColumn($v, 'group_by').", ";
             }
         } else {
-            $this->in_group .= " GROUP BY ".$params.", ";
+            $this->in_group .= " GROUP BY ".$this->assertColumn($params, 'group_by').", ";
         }
         return $this;
     }
@@ -1582,10 +1648,10 @@ class SENE_MySQLi_Engine
         if ($multi_array) {
             $this->replace_multi($table, $datas, $is_debug);
         } else {
-            $sql = 'REPLACE INTO `'.$table.'`'.' (';
+            $sql = 'REPLACE INTO '.$this->quoteIdentifier($table).' (';
 
             foreach ($datas as $key=>$val) {
-                $sql .='`'.$key."`,";
+                $sql .= $this->quoteIdentifier($key).",";
             }
             $sql  = rtrim($sql, ',');
             $sql .= ') VALUES(';
@@ -1618,7 +1684,7 @@ class SENE_MySQLi_Engine
             trigger_error(TEM_ERR.': Only accepted array!');
             die();
         }
-        $sql = 'REPLACE INTO `'.$table.'`'.' (';
+        $sql = 'REPLACE INTO '.$this->quoteIdentifier($table).' (';
 
         foreach ($datas as $data) {
             if (!is_array($data)) {
@@ -1626,11 +1692,7 @@ class SENE_MySQLi_Engine
                 die();
             }
             foreach ($data as $key=>$val) {
-                if (strtolower((string) $val)=='now()' || strtolower((string) $val)=='null') {
-                    $sql .=''.$val.',';
-                } else {
-                    $sql .=''.$this->esc($val).',';
-                }
+                $sql .= $this->quoteIdentifier($key).',';
             }
             break;
         }
@@ -1674,7 +1736,7 @@ class SENE_MySQLi_Engine
         if ($is_not == '1' || $is_not == 1) {
             $not = 'NOT';
         }
-        $this->in_where .= ' '.$tbl_key.' '.$not.' IN (';
+        $this->in_where .= ' '.$this->assertColumn($tbl_key, 'where_in').' '.$not.' IN (';
         foreach ($values as $v) {
             $this->in_where .= $this->esc($v).", ";
         }
@@ -1755,7 +1817,7 @@ class SENE_MySQLi_Engine
 
 		$this->in_select = rtrim($this->in_select,", ");
 		if(empty($this->in_select)) $this->in_select = "*";
-		$sql = "SELECT ".$this->in_select." FROM `".$this->table."`";
+		$sql = "SELECT ".$this->in_select." FROM ".$this->quoteIdentifier($this->table);
 
 		if (count($this->join) > 0) {
       $table_alias = array_search($this->table, $this->as_from);
