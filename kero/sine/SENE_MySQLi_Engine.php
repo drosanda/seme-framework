@@ -4,7 +4,7 @@
  * Contains some query builder that compatible with MySQL or MariaDB query / command.
  *
  * @author: Daeng Rosanda
- * @version 4.0.3
+ * @version 4.0.8
  *
  * @package SemeFramework\Kero\Sine
  * @since 2.0.0
@@ -423,6 +423,22 @@ class SENE_MySQLi_Engine
         return $this;
     }
 
+    /**
+     * Tell whether a value was supplied to where() / where_as().
+     *
+     * Only null and '' mean "no value" ('' is the default of the argument).
+     * 0, '0', 0.0 and false are real values and must produce a condition,
+     * otherwise a statement such as DELETE ... WHERE id = 0 would silently
+     * lose its WHERE clause and touch every row.
+     *
+     * @param  mixed $value value passed as the second argument
+     * @return bool
+     */
+    private function hasWhereValue($value)
+    {
+        return $value !== null && $value !== '';
+    }
+
     /*
     * Function Where
     * ==========================================================
@@ -551,7 +567,10 @@ class SENE_MySQLi_Engine
             unset($v);
             unset($k);
             unset($val);
-        } elseif (!empty($params) && !empty($params2)) {
+        } elseif (!empty($params) && $this->hasWhereValue($params2)) {
+            if (is_bool($params2)) {
+                $params2 = (int) $params2;
+            }
             $val = $params2;
             $v = $params2;
 
@@ -775,7 +794,10 @@ class SENE_MySQLi_Engine
             unset($v);
             unset($k);
             unset($val);
-        } elseif (!empty($params) && !empty($params2)) {
+        } elseif (!empty($params) && $this->hasWhereValue($params2)) {
+            if (is_bool($params2)) {
+                $params2 = (int) $params2;
+            }
             $val = $params2;
             $v = $params2;
 

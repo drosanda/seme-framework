@@ -384,30 +384,67 @@ final class SENE_MySQLi_EngineTest extends TestCase
         );
     }
 
-    #[DataProvider('falsyValueProvider')]
-    public function testWhereSilentlyIgnoresFalsyValues(mixed $value): void
+    #[DataProvider('zeroLikeValueProvider')]
+    public function testWhereKeepsZeroLikeValues(mixed $value, string $expected): void
     {
-        // CURRENT BEHAVIOUR: the string form tests !empty($value), so 0, '0'
-        // and '' add no condition at all. Combined with update()/delete()
-        // this widens the statement (see the delete test below).
+        // 0, '0', 0.0 and false are real values, not "no value".
+        $this->assertSame($expected, $this->whereOf(fn ($db) => $db->where('active', $value)));
+    }
+
+    /** @return array<string, array{mixed, string}> */
+    public static function zeroLikeValueProvider(): array
+    {
+        return [
+            'int zero'    => [0, '`active` = "0"'],
+            'string zero' => ['0', '`active` = "0"'],
+            'float zero'  => [0.0, '`active` = "0"'],
+            'false'       => [false, '`active` = "0"'],
+            'true'        => [true, '`active` = "1"'],
+        ];
+    }
+
+    #[DataProvider('noValueProvider')]
+    public function testWhereWithoutAValueAddsNoCondition(mixed $value): void
+    {
+        // null and '' (the argument's default) mean "no value supplied".
         $this->db->from('users')->where('active', $value)->get();
 
         $this->assertSame('SELECT * FROM `users`', $this->sql());
     }
 
     /** @return array<string, array{mixed}> */
-    public static function falsyValueProvider(): array
+    public static function noValueProvider(): array
     {
-        return ['int zero' => [0], 'string zero' => ['0'], 'empty string' => ['']];
+        return ['empty string' => [''], 'null' => [null]];
     }
 
-    public function testDeleteWithFalsyWhereValueDeletesEveryRow(): void
+    public function testWhereWithNoSecondArgumentAddsNoCondition(): void
     {
-        // CURRENT BEHAVIOUR (dangerous): where('id', 0) is dropped, so the
-        // DELETE has no WHERE clause.
+        $this->db->from('users')->where('active')->get();
+
+        $this->assertSame('SELECT * FROM `users`', $this->sql());
+    }
+
+    #[DataProvider('zeroLikeValueProvider')]
+    public function testWhereAsKeepsZeroLikeValues(mixed $value, string $unused): void
+    {
+        $expected = 'a.x = '.(int) $value;
+
+        $this->assertSame($expected, $this->whereOf(fn ($db) => $db->where_as('a.x', $value)));
+    }
+
+    public function testDeleteWithZeroWhereValueIsStillScoped(): void
+    {
         $this->db->where('id', 0)->delete('users');
 
-        $this->assertSame('DELETE FROM `users`', $this->sql());
+        $this->assertSame('DELETE FROM `users` WHERE `id` = "0"', trim((string) end($this->mysqli->queries)));
+    }
+
+    public function testUpdateWithZeroWhereValueIsStillScoped(): void
+    {
+        $this->db->where('id', '0')->update('users', ['active' => 1]);
+
+        $this->assertSame('UPDATE `users` SET `active` = "1" WHERE `id` = "0"', trim((string) end($this->mysqli->queries)));
     }
 
     public function testWhereDoesNotEscapeColumnNames(): void
