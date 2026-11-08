@@ -3,7 +3,7 @@
  * Helper Class for Input through HTTP method like GET, POST, and REQUEST
  *
  * @author Daeng Rosanda
- * @version 4.0.3
+ * @version 4.0.4
  *
  * @package SemeFramework\Kero\Sine
  * @since 4.0.0
@@ -19,7 +19,7 @@ class SENE_Input
      *
      * @return mixed        value from current keyname
      */
-    public function post(string $k, $d = 0)
+    public function post(string $k, $d = null)
     {
         if (isset($_POST[$k])) {
             return $_POST[$k];
@@ -36,7 +36,7 @@ class SENE_Input
      *
      * @return mixed        value from current keyname
      */
-    public function get(string $k, $d = 0)
+    public function get(string $k, $d = null)
     {
         if (isset($_GET[$k])) {
             return $_GET[$k];
@@ -53,7 +53,7 @@ class SENE_Input
      *
      * @return mixed        value from current keyname
      */
-    public function request(string $k, $d = 0)
+    public function request(string $k, $d = null)
     {
         if (isset($_REQUEST[$k])) {
             return $_REQUEST[$k];
@@ -67,7 +67,7 @@ class SENE_Input
         if (isset($_FILES[$var])) {
             return $_FILES[$var];
         } else {
-            return 0;
+            return null;
         }
     }
 

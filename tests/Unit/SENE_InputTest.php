@@ -52,9 +52,11 @@ final class SENE_InputTest extends TestCase
     }
 
     #[DataProvider('methodProvider')]
-    public function testDefaultsToZeroWhenKeyMissing(string $method): void
+    public function testDefaultsToNullWhenKeyMissing(string $method): void
     {
-        $this->assertSame(0, $this->input->$method('missing'));
+        // null, not 0: a missing parameter must not look like a real "0"
+        // when it is passed on to the query builder.
+        $this->assertNull($this->input->$method('missing'));
     }
 
     #[DataProvider('methodProvider')]
@@ -121,9 +123,9 @@ final class SENE_InputTest extends TestCase
         $this->assertSame($upload, $this->input->file('avatar'));
     }
 
-    public function testFileReturnsZeroWhenMissing(): void
+    public function testFileReturnsNullWhenMissing(): void
     {
-        $this->assertSame(0, $this->input->file('avatar'));
+        $this->assertNull($this->input->file('avatar'));
     }
 
     public function testDebugExposesAllFourSuperglobals(): void
