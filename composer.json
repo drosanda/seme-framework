@@ -9,13 +9,13 @@
       "email": "daengrosanda@gmail.com"
     }
   ],
-  "minimum-stability": "dev",
-  "require": {
-    "phpunit/phpunit": "^11.5.50"
-  },
+  "minimum-stability": "stable",
   "autoload": {
     "psr-4": {
       "seme\\": "kero/"
     }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11.5.50"
   }
 }
