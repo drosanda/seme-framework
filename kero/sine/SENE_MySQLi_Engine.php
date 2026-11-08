@@ -4,7 +4,7 @@
  * Contains some query builder that compatible with MySQL or MariaDB query / command.
  *
  * @author: Daeng Rosanda
- * @version 4.0.10
+ * @version 4.0.11
  *
  * @package SemeFramework\Kero\Sine
  * @since 2.0.0
@@ -1161,7 +1161,7 @@ class SENE_MySQLi_Engine
 
         if (!empty($this->in_group)) {
             $this->in_group = rtrim($this->in_group, ", ");
-            $sql .= $this->in_group;
+            $sql .= ' GROUP BY '.$this->in_group;
         }
 
         if (!empty($this->in_order)) {
@@ -1252,7 +1252,7 @@ class SENE_MySQLi_Engine
 
         if (!empty($this->in_group)) {
             $this->in_group = rtrim($this->in_group, ", ");
-            $sql .= $this->in_group;
+            $sql .= ' GROUP BY '.$this->in_group;
         }
 
         if (!empty($this->in_order)) {
@@ -1662,12 +1662,14 @@ class SENE_MySQLi_Engine
     }
     public function group_by($params)
     {
+        // in_group holds only the column list; the GROUP BY keyword is added
+        // once when the query is built, so arrays and repeated calls combine.
         if (is_array($params)) {
-            foreach ($params as $k=>$v) {
-                $this->in_group .= " GROUP BY ".$this->assertColumn($v, 'group_by').", ";
+            foreach ($params as $v) {
+                $this->in_group .= $this->assertColumn($v, 'group_by').", ";
             }
         } else {
-            $this->in_group .= " GROUP BY ".$this->assertColumn($params, 'group_by').", ";
+            $this->in_group .= $this->assertColumn($params, 'group_by').", ";
         }
         return $this;
     }

@@ -707,13 +707,34 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->assertSame('SELECT * FROM `users` GROUP BY role', $this->selectSql());
     }
 
-    public function testGroupByArrayRepeatsTheKeyword(): void
+    public function testGroupByArrayEmitsOneKeyword(): void
     {
-        // CURRENT BEHAVIOUR: each element gets its own "GROUP BY", which is
-        // invalid SQL. A comma-separated string works as a workaround.
-        $this->db->group_by(['a', 'b']);
+        $this->db->group_by(['a', 'u.b']);
 
-        $this->assertSame('SELECT * FROM `users` GROUP BY a, GROUP BY b', $this->selectSql());
+        $this->assertSame('SELECT * FROM `users` GROUP BY a, u.b', $this->selectSql());
+    }
+
+    public function testGroupByCallsAccumulateUnderOneKeyword(): void
+    {
+        $this->db->group_by('a')->group_by(['b', 'c'])->group_by('d');
+
+        $this->assertSame('SELECT * FROM `users` GROUP BY a, b, c, d', $this->selectSql());
+    }
+
+    public function testGroupByIsAppliedToGetFirstAndClearedAfterwards(): void
+    {
+        $this->db->from('users')->group_by(['a', 'b'])->get_first();
+        $this->assertSame('SELECT * FROM `users` GROUP BY a, b LIMIT 0, 1', $this->sql());
+
+        $this->db->get();
+        $this->assertSame('SELECT * FROM `users`', $this->sql());
+    }
+
+    public function testGroupByWithEmptyArrayAddsNothing(): void
+    {
+        $this->db->group_by([]);
+
+        $this->assertSame('SELECT * FROM `users`', $this->selectSql());
     }
 
     public function testGroupByRejectsExpressions(): void
