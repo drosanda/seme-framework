@@ -726,6 +726,37 @@ final class SENE_MySQLi_EngineTest extends TestCase
         );
     }
 
+    public function testWhereInAcceptsRawSubqueryString(): void
+    {
+        $this->assertSame(
+            'id IN (SELECT user_id FROM orders WHERE total > 100)',
+            $this->whereOf(fn ($db) => $db->where_in('id', ' SELECT user_id FROM orders WHERE total > 100 '))
+        );
+        $this->assertSame(
+            'id NOT IN (SELECT 1)',
+            $this->whereOf(fn ($db) => $db->where_in('id', 'SELECT 1', 1))
+        );
+    }
+
+    public function testWhereInAcceptsFunctionWrappedColumn(): void
+    {
+        $this->assertSame(
+            'LOWER(a.status) IN ("dikirim", "diterima")',
+            $this->whereOf(fn ($db) => $db->where_in('LOWER(a.status)', ['dikirim', 'diterima']))
+        );
+        $this->assertSame(
+            'UPPER(LOWER(a.status)) IN ("x")',
+            $this->whereOf(fn ($db) => $db->where_in('UPPER(LOWER(a.status))', ['x']))
+        );
+    }
+
+    public function testWhereInRejectsUnsafeFunctionColumns(): void
+    {
+        foreach (['LOWER(a.status) OR 1=1', 'LOWER(a)) OR (1', 'LOWER(a.b', 'LOWER(a, b)', 'LOWER(a);--'] as $col) {
+            $this->assertRejected(fn () => $this->db->where_in($col, [1]), 'where_in: invalid column');
+        }
+    }
+
     public function testWhereInWithEmptyListEmitsInvalidSql(): void
     {
         // CURRENT BEHAVIOUR: "IN ()" is a MySQL syntax error.

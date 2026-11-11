@@ -4,7 +4,7 @@
  * Contains some query builder that compatible with MySQL or MariaDB query / command.
  *
  * @author: Daeng Rosanda
- * @version 4.0.16
+ * @version 4.0.17
  *
  * @package SemeFramework\Kero\Sine
  * @since 2.0.0
@@ -443,7 +443,8 @@ class SENE_MySQLi_Engine
     /**
      * Validate a column reference that is emitted unquoted (ORDER BY,
      * GROUP BY, IN, BETWEEN ...). Only plain names, optionally qualified
-     * ("t.col") and optionally backticked, are accepted. Expressions must
+     * ("t.col"), optionally backticked and optionally wrapped in function
+     * calls ("LOWER(t.col)"), are accepted. Expressions must
      * go through the APIs that are raw by design (select_as, where_as ...).
      *
      * @param  string $name  column reference
@@ -452,7 +453,12 @@ class SENE_MySQLi_Engine
      */
     private function assertColumn($name, $where)
     {
-        if (!is_string($name) || !preg_match('/^`?[A-Za-z0-9_$]+`?(\.`?[A-Za-z0-9_$]+`?)*$/D', $name)) {
+        $col = '`?[A-Za-z0-9_$]+`?(\.`?[A-Za-z0-9_$]+`?)*';
+        $re = '/^(?:[A-Za-z_]+\(\s*)*'.$col.'(?:\s*\))*$/D';
+        // Plain column, optionally wrapped in function calls: LOWER(t.status)
+        $ok = is_string($name) && preg_match($re, $name)
+            && substr_count($name, '(') === substr_count($name, ')');
+        if (!$ok) {
             $this->invalidIdentifier($where.': invalid column reference');
         }
         return $name;
@@ -1798,7 +1804,9 @@ class SENE_MySQLi_Engine
     /**
      * Filter data by WHERE IN
      * @param  string  $tbl_key     column name
-     * @param  array   $values      plain array
+     * @param  array|string $values plain array, or a raw SQL string (e.g. a
+     *                              subquery "SELECT id FROM t") emitted as is,
+     *                              unescaped. Never pass user input as a string.
      * @param  int     $is_not      flag is not select (1|0)
      * @param  string  $after       operand (AND|OR)
      * @return object               this object model
@@ -1810,10 +1818,14 @@ class SENE_MySQLi_Engine
             $not = 'NOT';
         }
         $this->in_where .= ' '.$this->assertColumn($tbl_key, 'where_in').' '.$not.' IN (';
-        foreach ($values as $v) {
-            $this->in_where .= $this->esc($v).", ";
+        if (is_string($values)) {
+            $this->in_where .= trim($values);
+        } else {
+            foreach ($values as $v) {
+                $this->in_where .= $this->esc($v).", ";
+            }
+            $this->in_where = rtrim($this->in_where, ", ");
         }
-        $this->in_where = rtrim($this->in_where, ", ");
         $this->in_where .= ') '.$this->joiner($after).' ';
         return $this;
     }
