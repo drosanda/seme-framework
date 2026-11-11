@@ -745,69 +745,15 @@ final class SENE_MySQLi_EngineTest extends TestCase
         );
     }
 
-    /** @return array<string, array{mixed, mixed, string}> */
-    public static function betweenBoundProvider(): array
-    {
-        return [
-            'ints'                 => [18, 65, '( age BETWEEN 18 AND 65)'],
-            'negative'             => [-5, 5, '( age BETWEEN -5 AND 5)'],
-            'numeric strings'      => ['18', '65.5', '( age BETWEEN 18 AND 65.5)'],
-            'floats'               => [1.5, 2.25, '( age BETWEEN 1.5 AND 2.25)'],
-            'dates are quoted'     => ['2024-01-01', '2024-12-31', '( age BETWEEN "2024-01-01" AND "2024-12-31")'],
-            'null bound'           => [null, 10, '( age BETWEEN NULL AND 10)'],
-            'bool becomes int'     => [false, true, '( age BETWEEN 0 AND 1)'],
-            'quotes are escaped'   => ['a"b', 'c', '( age BETWEEN "a\\"b" AND "c")'],
-        ];
-    }
-
-    #[DataProvider('betweenBoundProvider')]
-    public function testBetweenRendersBoundsAsLiterals(mixed $low, mixed $high, string $expected): void
-    {
-        $this->assertSame($expected, $this->whereOf(fn ($db) => $db->between('age', $low, $high)));
-    }
-
-    public function testBetweenAcceptsRawExpressionButStillEscapesBounds(): void
+    public function testBetweenPassesColumnAndBoundsThroughRaw(): void
     {
         $this->assertSame(
-            '( DATE(a.sdate) BETWEEN "2026-01-01" AND "2026-12-31")',
-            $this->whereOf(fn ($db) => $db->between('DATE(a.sdate)', '2026-01-01', '2026-12-31'))
+            '( (bdj.sdate) BETWEEN (\'2026-11-01 00:00:00\') AND (\'2026-11-30 23:59:59\'))',
+            $this->whereOf(fn ($db) => $db->between('(bdj.sdate)', "('2026-11-01 00:00:00')", "('2026-11-30 23:59:59')"))
         );
-    }
-
-    #[DataProvider('hostileBoundProvider')]
-    public function testBetweenCannotBeInjectedThroughBounds(string $hostile, string $expected): void
-    {
-        // These used to be pasted into the SQL verbatim.
-        $this->assertSame($expected, $this->whereOf(fn ($db) => $db->between('age', $hostile, 2)));
-    }
-
-    /** @return array<string, array{string, string}> */
-    public static function hostileBoundProvider(): array
-    {
-        return [
-            'boolean injection' => ['1 OR 1=1', '( age BETWEEN "1 OR 1=1" AND 2)'],
-            'quote breakout'    => ['1" OR "1"="1', '( age BETWEEN "1\\" OR \\"1\\"=\\"1" AND 2)'],
-            'statement'         => ['1; DROP TABLE t', '( age BETWEEN "1; DROP TABLE t" AND 2)'],
-            'leading number'    => ['1abc', '( age BETWEEN "1abc" AND 2)'],
-            // sql() collapses whitespace, so the quoted "1\n" reads as "1 ".
-            'trailing newline'  => ["1\n", '( age BETWEEN "1 " AND 2)'],
-        ];
-    }
-
-    public function testBetweenUpperBoundIsEscapedToo(): void
-    {
         $this->assertSame(
-            '( age BETWEEN 1 AND "2 OR 1=1")',
-            $this->whereOf(fn ($db) => $db->between('age', 1, '2 OR 1=1'))
-        );
-    }
-
-    public function testBetweenNumericStringsWithExponentOrSignAreQuoted(): void
-    {
-        // Only plain decimals are treated as numbers; the rest is quoted.
-        $this->assertSame(
-            '( age BETWEEN "1e3" AND "+5")',
-            $this->whereOf(fn ($db) => $db->between('age', '1e3', '+5'))
+            '( DATE(a.sdate) BETWEEN \'2026-01-01\' AND CURDATE())',
+            $this->whereOf(fn ($db) => $db->between('DATE(a.sdate)', "'2026-01-01'", 'CURDATE()'))
         );
     }
 
@@ -1000,6 +946,22 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->db->group_by([]);
 
         $this->assertSame('SELECT * FROM `users`', $this->selectSql());
+    }
+
+    public function testRealAppQueryWithRawBetweenGroupAndOrder(): void
+    {
+        $as = 'bdj';
+        $this->db->between("($as.sdate)", "('2026-11-01 00:00:00')", "('2026-11-30 23:59:59')")
+            ->group_by(["DATE($as.sdate)", "$as.id"])
+            ->order_by("CAST(COALESCE($as.edate,CONCAT(DATE($as.sdate),' 23:59:59')) AS DATETIME)", "desc")
+            ->limit(0, 10);
+
+        $this->assertSame(
+            "SELECT * FROM `users` WHERE ( ($as.sdate) BETWEEN ('2026-11-01 00:00:00') AND ('2026-11-30 23:59:59'))"
+            ." GROUP BY DATE($as.sdate), $as.id"
+            ." ORDER BY CAST(COALESCE($as.edate,CONCAT(DATE($as.sdate),' 23:59:59')) AS DATETIME) DESC LIMIT 0, 10",
+            $this->selectSql()
+        );
     }
 
     public function testGroupByAcceptsRawExpression(): void

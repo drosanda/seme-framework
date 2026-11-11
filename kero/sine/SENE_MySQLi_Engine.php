@@ -1667,37 +1667,13 @@ class SENE_MySQLi_Engine
         return $this;
     }
     /**
-     * Render a BETWEEN bound as SQL.
+     * Add a BETWEEN condition. The column and both bounds are raw SQL and are
+     * NOT escaped: quote / escape values yourself, e.g. "'2026-01-01'", and
+     * only pass developer-written SQL, never user input.
      *
-     * Plain numbers are emitted as numeric literals so existing numeric
-     * ranges produce the same SQL as before. Everything else (dates,
-     * strings, null) is escaped and quoted like any other value.
-     *
-     * @param  mixed $value bound
-     * @return string       SQL literal
-     */
-    private function betweenBound($value)
-    {
-        if (is_bool($value)) {
-            $value = (int) $value;
-        }
-        if (is_int($value) || (is_float($value) && is_finite($value))) {
-            return (string) $value;
-        }
-        if (is_string($value) && preg_match('/^-?\d+(\.\d+)?$/D', $value)) {
-            return $value;
-        }
-        return $this->esc($value);
-    }
-
-    /**
-     * Add a BETWEEN condition. Both bounds are values: numbers stay
-     * unquoted, anything else is escaped and quoted.
-     *
-     * @param  string $key    column or raw SQL expression (NOT escaped: only
-     *                        pass developer-written SQL, never user input)
-     * @param  mixed  $val1   lower bound
-     * @param  mixed  $val2   upper bound
+     * @param  string $key    column or raw SQL expression
+     * @param  mixed  $val1   lower bound (raw SQL)
+     * @param  mixed  $val2   upper bound (raw SQL)
      * @param  int    $is_not 1 for NOT BETWEEN
      * @return object         this object
      */
@@ -1708,7 +1684,7 @@ class SENE_MySQLi_Engine
         if ($is_not) {
             $this->in_where .= " NOT ";
         }
-        $this->in_where .= " BETWEEN ".$this->betweenBound($val1)." AND ".$this->betweenBound($val2).'';
+        $this->in_where .= " BETWEEN ".trim((string) $val1)." AND ".trim((string) $val2).'';
         $this->in_where .= ") AND ";
         return $this;
     }
