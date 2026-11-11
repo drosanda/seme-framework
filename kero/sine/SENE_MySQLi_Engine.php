@@ -187,11 +187,6 @@ class SENE_MySQLi_Engine
         }
         $c = $this->stderr_color;
         $out = trim(preg_replace('/\s+/', ' ', $sql));
-        $out = preg_replace(
-            '/\s(FROM|WHERE|GROUP BY|ORDER BY|HAVING|LIMIT|UNION(?: ALL)?|(?:LEFT |RIGHT |INNER |OUTER |CROSS )*JOIN|ON DUPLICATE KEY UPDATE|VALUES|SET)\b/i',
-            "\n  $1",
-            $out
-        );
         if ($c) {
             $out = preg_replace(
                 '/\b(SELECT|INSERT(?: IGNORE)? INTO|REPLACE INTO|UPDATE|DELETE|FROM|WHERE|GROUP BY|ORDER BY|HAVING|LIMIT|UNION(?: ALL)?|(?:LEFT |RIGHT |INNER |OUTER |CROSS )*JOIN|ON DUPLICATE KEY UPDATE|VALUES|SET|AS|ON|AND|OR|NOT|IN|LIKE|IS|NULL|BETWEEN|DISTINCT|ASC|DESC)\b/i',
