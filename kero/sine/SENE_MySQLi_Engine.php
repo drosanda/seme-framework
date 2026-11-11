@@ -4,7 +4,7 @@
  * Contains some query builder that compatible with MySQL or MariaDB query / command.
  *
  * @author: Daeng Rosanda
- * @version 4.0.14
+ * @version 4.0.15
  *
  * @package SemeFramework\Kero\Sine
  * @since 2.0.0
@@ -1711,16 +1711,25 @@ class SENE_MySQLi_Engine
         $this->in_where .= ") AND ";
         return $this;
     }
+    /**
+     * GROUP BY one or more columns or raw SQL expressions.
+     *
+     * The columns / expressions are NOT escaped: only pass developer-written
+     * SQL, never user input.
+     *
+     * @param  string|array $params column / expression, or a list of them
+     * @return $this
+     */
     public function group_by($params)
     {
         // in_group holds only the column list; the GROUP BY keyword is added
         // once when the query is built, so arrays and repeated calls combine.
         if (is_array($params)) {
             foreach ($params as $v) {
-                $this->in_group .= $this->assertColumn($v, 'group_by').", ";
+                $this->in_group .= trim($v).", ";
             }
         } else {
-            $this->in_group .= $this->assertColumn($params, 'group_by').", ";
+            $this->in_group .= trim($params).", ";
         }
         return $this;
     }

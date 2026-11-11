@@ -994,10 +994,11 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->assertSame('SELECT * FROM `users`', $this->selectSql());
     }
 
-    public function testGroupByRejectsExpressions(): void
+    public function testGroupByAcceptsRawExpression(): void
     {
-        $this->assertRejected(fn () => $this->db->group_by('role; DROP TABLE users'), 'group_by: invalid column');
-        $this->assertRejected(fn () => $this->db->group_by(['ok', 'a b']), 'group_by: invalid column');
+        $this->db->group_by("DATE(a.sdate)")->group_by(["CAST(a.x AS CHAR)", 'b']);
+
+        $this->assertSame('SELECT * FROM `users` GROUP BY DATE(a.sdate), CAST(a.x AS CHAR), b', $this->selectSql());
     }
 
     public function testClauseOrderIsWhereGroupOrderLimit(): void
