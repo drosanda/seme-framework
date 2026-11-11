@@ -929,22 +929,12 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->assertSame('SELECT * FROM `users` ORDER BY u.name DESC, `created_at` ASC', $this->selectSql());
     }
 
-    #[DataProvider('hostileOrderColumnProvider')]
-    public function testOrderByRejectsExpressionsAndInjection(string $column): void
+    public function testOrderByAcceptsRawExpression(): void
     {
-        $this->assertRejected(fn () => $this->db->order_by($column), 'order_by: invalid column');
-    }
+        $expr = "CAST(COALESCE(a.edate,CONCAT(DATE(a.sdate),' 23:59:59')) AS DATETIME)";
+        $this->db->order_by($expr, 'desc')->order_by('id');
 
-    /** @return array<string, array{string}> */
-    public static function hostileOrderColumnProvider(): array
-    {
-        return [
-            'statement'      => ['name; DROP TABLE users'],
-            'subquery'       => ['(SELECT 1)'],
-            'function'       => ['RAND()'],
-            'comment'        => ['name -- x'],
-            'space'          => ['name desc'],
-        ];
+        $this->assertSame("SELECT * FROM `users` ORDER BY $expr DESC, id ASC", $this->selectSql());
     }
 
     #[DataProvider('hostileDirectionProvider')]
@@ -962,9 +952,9 @@ final class SENE_MySQLi_EngineTest extends TestCase
         ];
     }
 
-    public function testOrderByArrayFormValidatesKeysAndDirections(): void
+    public function testOrderByArrayFormValidatesDirections(): void
     {
-        $this->assertRejected(fn () => $this->db->order_by(['a; b' => 'asc']), 'order_by: invalid column');
+        $this->assertRejected(fn () => $this->db->order_by(['a' => 'sideways']), 'direction must be ASC or DESC');
     }
 
     public function testGroupByString(): void
@@ -1742,7 +1732,6 @@ final class SENE_MySQLi_EngineTest extends TestCase
     public function testValidatorsRejectTrailingNewline(): void
     {
         // PCRE's $ would accept "name\n" without the D modifier.
-        $this->assertRejected(fn () => $this->db->order_by("name\n"), 'order_by: invalid column');
         $this->assertRejected(fn () => $this->db->from('users', "u\n"), 'from: invalid table alias');
     }
 

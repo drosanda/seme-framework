@@ -4,7 +4,7 @@
  * Contains some query builder that compatible with MySQL or MariaDB query / command.
  *
  * @author: Daeng Rosanda
- * @version 4.0.13
+ * @version 4.0.14
  *
  * @package SemeFramework\Kero\Sine
  * @since 2.0.0
@@ -1027,14 +1027,25 @@ class SENE_MySQLi_Engine
         return $direction;
     }
 
+    /**
+     * ORDER BY a column or a raw SQL expression, e.g.
+     * order_by("CAST(COALESCE(a.edate, a.sdate) AS DATETIME)", "desc").
+     *
+     * The column / expression is NOT escaped: only pass developer-written SQL,
+     * never user input. The direction is still validated (ASC / DESC).
+     *
+     * @param  string|array $params  column / expression, or [expression => direction]
+     * @param  string       $params2 ASC or DESC, any case
+     * @return $this
+     */
     public function order_by($params, $params2="ASC")
     {
         if (is_array($params)) {
             foreach ($params as $k=>$v) {
-                $this->in_order .= $this->assertColumn($k, 'order_by').' '.$this->orderDirection($v).", ";
+                $this->in_order .= trim($k).' '.$this->orderDirection($v).", ";
             }
         } elseif (!empty($params) && !empty($params2)) {
-            $this->in_order .= $this->assertColumn($params, 'order_by').' '.$this->orderDirection($params2).", ";
+            $this->in_order .= trim($params).' '.$this->orderDirection($params2).", ";
         }
         return $this;
     }
