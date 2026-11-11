@@ -4,7 +4,7 @@
  * Contains some query builder that compatible with MySQL or MariaDB query / command.
  *
  * @author: Daeng Rosanda
- * @version 4.0.15
+ * @version 4.0.16
  *
  * @package SemeFramework\Kero\Sine
  * @since 2.0.0
@@ -1694,7 +1694,8 @@ class SENE_MySQLi_Engine
      * Add a BETWEEN condition. Both bounds are values: numbers stay
      * unquoted, anything else is escaped and quoted.
      *
-     * @param  string $key    column name
+     * @param  string $key    column or raw SQL expression (NOT escaped: only
+     *                        pass developer-written SQL, never user input)
      * @param  mixed  $val1   lower bound
      * @param  mixed  $val2   upper bound
      * @param  int    $is_not 1 for NOT BETWEEN
@@ -1703,7 +1704,7 @@ class SENE_MySQLi_Engine
     public function between($key, $val1, $val2, $is_not=0)
     {
         $this->in_where .= '(';
-        $this->in_where .= ' '.$this->assertColumn($key, 'between').'';
+        $this->in_where .= ' '.trim($key).'';
         if ($is_not) {
             $this->in_where .= " NOT ";
         }

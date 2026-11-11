@@ -766,6 +766,14 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->assertSame($expected, $this->whereOf(fn ($db) => $db->between('age', $low, $high)));
     }
 
+    public function testBetweenAcceptsRawExpressionButStillEscapesBounds(): void
+    {
+        $this->assertSame(
+            '( DATE(a.sdate) BETWEEN "2026-01-01" AND "2026-12-31")',
+            $this->whereOf(fn ($db) => $db->between('DATE(a.sdate)', '2026-01-01', '2026-12-31'))
+        );
+    }
+
     #[DataProvider('hostileBoundProvider')]
     public function testBetweenCannotBeInjectedThroughBounds(string $hostile, string $expected): void
     {
@@ -1725,7 +1733,6 @@ final class SENE_MySQLi_EngineTest extends TestCase
     public function testWhereInAndBetweenAndNullChecksValidateTheColumn(): void
     {
         $this->assertRejected(fn () => $this->db->where_in('id) OR (1', [1]), 'where_in: invalid column');
-        $this->assertRejected(fn () => $this->db->between('age BETWEEN 1 AND 2 OR 1', 1, 2), 'between: invalid column');
         $this->assertRejected(fn () => $this->db->where_null('a OR 1=1'), 'where_null: invalid column');
         $this->assertRejected(fn () => $this->db->where_not_null('a OR 1=1'), 'where_not_null: invalid column');
     }
