@@ -1462,6 +1462,7 @@ class SENE_MySQLi_Engine
         $this->flushQuery();
         return $res;
     }
+    
     public function insert($table, $datas=array(), $multi_array=0, $is_debug=0)
     {
         $this->last_id = 0;
@@ -1485,6 +1486,8 @@ class SENE_MySQLi_Engine
                     $sql .=''.$val.',';
                 } elseif ($val===null || strtolower((string) $val)=='null') {
                     $sql .='NULL,';
+                } elseif (stripos((string) $val, 'AES_ENCRYPT(') === 0 || stripos((string) $val, 'AES_DECRYPT(') === 0) {
+                    $sql .=$val.',';
                 } else {
                     $sql .=''.$this->esc($val).',';
                 }
