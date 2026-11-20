@@ -1274,6 +1274,77 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->assertSame('INSERT INTO `t`(`a`,`b`,`c`,`d`) VALUES(NOW(),NULL,NULL,now());', end($this->mysqli->queries));
     }
 
+    public function testInsertPassesAesEncryptAndDecryptThroughRaw(): void
+    {
+        $this->db->insert('users', [
+            'password' => 'AES_ENCRYPT("secret","mykey")',
+            'note'     => 'AES_DECRYPT(`password`,"mykey")',
+        ]);
+
+        $this->assertSame(
+            'INSERT INTO `users`(`password`,`note`) VALUES(AES_ENCRYPT("secret","mykey"),AES_DECRYPT(`password`,"mykey"));',
+            end($this->mysqli->queries)
+        );
+    }
+
+    #[DataProvider('aesFunctionCaseProvider')]
+    public function testInsertMatchesAesFunctionsCaseInsensitively(string $value): void
+    {
+        $this->db->insert('t', ['p' => $value]);
+
+        $this->assertSame('INSERT INTO `t`(`p`) VALUES('.$value.');', end($this->mysqli->queries));
+    }
+
+    /** @return array<string, array{string}> */
+    public static function aesFunctionCaseProvider(): array
+    {
+        return [
+            'upper' => ['AES_ENCRYPT("s","k")'],
+            'lower' => ['aes_encrypt("s","k")'],
+            'mixed' => ['Aes_Encrypt("s","k")'],
+            'decrypt upper' => ['AES_DECRYPT(`p`,"k")'],
+            'decrypt lower' => ['aes_decrypt(`p`,"k")'],
+        ];
+    }
+
+    /**
+     * Only a value that STARTS with the function call is raw. Everything else
+     * goes through esc(), so a value merely containing the text stays a string.
+     */
+    #[DataProvider('aesLookalikeProvider')]
+    public function testInsertEscapesAesLookalikeValues(string $value, string $expectedFragment): void
+    {
+        $this->db->insert('t', ['p' => $value]);
+
+        $this->assertSame('INSERT INTO `t`(`p`) VALUES('.$expectedFragment.');', end($this->mysqli->queries));
+    }
+
+    /** @return array<string, array{string, string}> */
+    public static function aesLookalikeProvider(): array
+    {
+        return [
+            'leading space'   => [' AES_ENCRYPT("s","k")', '" AES_ENCRYPT(\\"s\\",\\"k\\")"'],
+            'prefix text'     => ['x AES_ENCRYPT(s)',      '"x AES_ENCRYPT(s)"'],
+            'suffix text'     => ['AES_ENCRYPTED(s)',      '"AES_ENCRYPTED(s)"'],
+            'no parenthesis'  => ['AES_ENCRYPT',           '"AES_ENCRYPT"'],
+            'not a function'  => ['AES_DECRYPTX(y)',       '"AES_DECRYPTX(y)"'],
+        ];
+    }
+
+    public function testInsertPassesAesSuffixAfterTheCallRaw(): void
+    {
+        // CURRENT BEHAVIOUR: the check is a prefix test, so anything appended
+        // after a valid AES_ENCRYPT(...) call is emitted verbatim too. Fix the
+        // check (and this test) before accepting AES expressions from callers
+        // that mix in user input.
+        $this->db->insert('t', ['p' => 'AES_ENCRYPT("s","k") OR 1=1']);
+
+        $this->assertSame(
+            'INSERT INTO `t`(`p`) VALUES(AES_ENCRYPT("s","k") OR 1=1);',
+            end($this->mysqli->queries)
+        );
+    }
+
     public function testInsertEscapesBackticksInColumnNames(): void
     {
         $this->db->insert('t', ['a`) VALUES ("x"); -- ' => 1]);

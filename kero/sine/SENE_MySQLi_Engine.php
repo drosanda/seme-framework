@@ -1463,6 +1463,25 @@ class SENE_MySQLi_Engine
         return $res;
     }
     
+    /**
+     * Insert one row (or, with $multi_array, hand off to insert_multi()).
+     *
+     * Keys of $datas are used as column names and are quoted with
+     * quoteIdentifier(); values are escaped with esc(). A few values are passed
+     * through verbatim instead of being escaped: "NOW()" / "now()" (DB side
+     * timestamp), null or "NULL", and anything starting with AES_ENCRYPT( or
+     * AES_DECRYPT( (raw SQL - never pass user input there).
+     *
+     * $this->last_id is set to the auto-increment ID of the inserted row, and
+     * the query builder state is flushed afterwards.
+     *
+     * @param  string     $table       table name
+     * @param  array      $datas       column => value pairs
+     * @param  int|bool   $multi_array non-zero: $datas is an array of row arrays
+     *                                 and insert_multi() does the work
+     * @param  int|bool   $is_debug    non-zero: send HTTP 500 and die() with the SQL
+     * @return mixed                   exec() result, or NULL when $multi_array is set
+     */
     public function insert($table, $datas=array(), $multi_array=0, $is_debug=0)
     {
         $this->last_id = 0;
