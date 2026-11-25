@@ -6,14 +6,14 @@
 * @see https://seme.framework.web.id/4.0/  Official Seme Framework 4 Documentation
 *
 * @author daengrosanda@gmail.com
-* @version 4.0.3
+* @version 4.0.9
 *
 * @package SemeFramework
 * @since 1.0.0
 */
 
 /** Seme Framework version */
-define('SEME_VERSION', '4.0.3');
+define('SEME_VERSION', '4.0.9');
 
 /** Capture initiated time of this file execution */
 define('SEME_START', microtime(true));

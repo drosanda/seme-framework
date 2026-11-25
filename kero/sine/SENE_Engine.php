@@ -19,7 +19,7 @@ if (!defined('LBL_CDN_URL')) {
  *
  * @author Daeng Rosanda
  *
- * @version 4.0.7
+ * @version 4.0.9
  *
  * @package SemeFramework\Kero
  * @since 3.0.0
