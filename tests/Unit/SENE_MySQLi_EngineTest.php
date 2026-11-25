@@ -726,6 +726,37 @@ final class SENE_MySQLi_EngineTest extends TestCase
         );
     }
 
+    public function testWhereInAcceptsRawSubqueryString(): void
+    {
+        $this->assertSame(
+            'id IN (SELECT user_id FROM orders WHERE total > 100)',
+            $this->whereOf(fn ($db) => $db->where_in('id', ' SELECT user_id FROM orders WHERE total > 100 '))
+        );
+        $this->assertSame(
+            'id NOT IN (SELECT 1)',
+            $this->whereOf(fn ($db) => $db->where_in('id', 'SELECT 1', 1))
+        );
+    }
+
+    public function testWhereInAcceptsFunctionWrappedColumn(): void
+    {
+        $this->assertSame(
+            'LOWER(a.status) IN ("dikirim", "diterima")',
+            $this->whereOf(fn ($db) => $db->where_in('LOWER(a.status)', ['dikirim', 'diterima']))
+        );
+        $this->assertSame(
+            'UPPER(LOWER(a.status)) IN ("x")',
+            $this->whereOf(fn ($db) => $db->where_in('UPPER(LOWER(a.status))', ['x']))
+        );
+    }
+
+    public function testWhereInRejectsUnsafeFunctionColumns(): void
+    {
+        foreach (['LOWER(a.status) OR 1=1', 'LOWER(a)) OR (1', 'LOWER(a.b', 'LOWER(a, b)', 'LOWER(a);--'] as $col) {
+            $this->assertRejected(fn () => $this->db->where_in($col, [1]), 'where_in: invalid column');
+        }
+    }
+
     public function testWhereInWithEmptyListEmitsInvalidSql(): void
     {
         // CURRENT BEHAVIOUR: "IN ()" is a MySQL syntax error.
@@ -745,61 +776,15 @@ final class SENE_MySQLi_EngineTest extends TestCase
         );
     }
 
-    /** @return array<string, array{mixed, mixed, string}> */
-    public static function betweenBoundProvider(): array
-    {
-        return [
-            'ints'                 => [18, 65, '( age BETWEEN 18 AND 65)'],
-            'negative'             => [-5, 5, '( age BETWEEN -5 AND 5)'],
-            'numeric strings'      => ['18', '65.5', '( age BETWEEN 18 AND 65.5)'],
-            'floats'               => [1.5, 2.25, '( age BETWEEN 1.5 AND 2.25)'],
-            'dates are quoted'     => ['2024-01-01', '2024-12-31', '( age BETWEEN "2024-01-01" AND "2024-12-31")'],
-            'null bound'           => [null, 10, '( age BETWEEN NULL AND 10)'],
-            'bool becomes int'     => [false, true, '( age BETWEEN 0 AND 1)'],
-            'quotes are escaped'   => ['a"b', 'c', '( age BETWEEN "a\\"b" AND "c")'],
-        ];
-    }
-
-    #[DataProvider('betweenBoundProvider')]
-    public function testBetweenRendersBoundsAsLiterals(mixed $low, mixed $high, string $expected): void
-    {
-        $this->assertSame($expected, $this->whereOf(fn ($db) => $db->between('age', $low, $high)));
-    }
-
-    #[DataProvider('hostileBoundProvider')]
-    public function testBetweenCannotBeInjectedThroughBounds(string $hostile, string $expected): void
-    {
-        // These used to be pasted into the SQL verbatim.
-        $this->assertSame($expected, $this->whereOf(fn ($db) => $db->between('age', $hostile, 2)));
-    }
-
-    /** @return array<string, array{string, string}> */
-    public static function hostileBoundProvider(): array
-    {
-        return [
-            'boolean injection' => ['1 OR 1=1', '( age BETWEEN "1 OR 1=1" AND 2)'],
-            'quote breakout'    => ['1" OR "1"="1', '( age BETWEEN "1\\" OR \\"1\\"=\\"1" AND 2)'],
-            'statement'         => ['1; DROP TABLE t', '( age BETWEEN "1; DROP TABLE t" AND 2)'],
-            'leading number'    => ['1abc', '( age BETWEEN "1abc" AND 2)'],
-            // sql() collapses whitespace, so the quoted "1\n" reads as "1 ".
-            'trailing newline'  => ["1\n", '( age BETWEEN "1 " AND 2)'],
-        ];
-    }
-
-    public function testBetweenUpperBoundIsEscapedToo(): void
+    public function testBetweenPassesColumnAndBoundsThroughRaw(): void
     {
         $this->assertSame(
-            '( age BETWEEN 1 AND "2 OR 1=1")',
-            $this->whereOf(fn ($db) => $db->between('age', 1, '2 OR 1=1'))
+            '( (bdj.sdate) BETWEEN (\'2026-11-01 00:00:00\') AND (\'2026-11-30 23:59:59\'))',
+            $this->whereOf(fn ($db) => $db->between('(bdj.sdate)', "('2026-11-01 00:00:00')", "('2026-11-30 23:59:59')"))
         );
-    }
-
-    public function testBetweenNumericStringsWithExponentOrSignAreQuoted(): void
-    {
-        // Only plain decimals are treated as numbers; the rest is quoted.
         $this->assertSame(
-            '( age BETWEEN "1e3" AND "+5")',
-            $this->whereOf(fn ($db) => $db->between('age', '1e3', '+5'))
+            '( DATE(a.sdate) BETWEEN \'2026-01-01\' AND CURDATE())',
+            $this->whereOf(fn ($db) => $db->between('DATE(a.sdate)', "'2026-01-01'", 'CURDATE()'))
         );
     }
 
@@ -929,22 +914,12 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->assertSame('SELECT * FROM `users` ORDER BY u.name DESC, `created_at` ASC', $this->selectSql());
     }
 
-    #[DataProvider('hostileOrderColumnProvider')]
-    public function testOrderByRejectsExpressionsAndInjection(string $column): void
+    public function testOrderByAcceptsRawExpression(): void
     {
-        $this->assertRejected(fn () => $this->db->order_by($column), 'order_by: invalid column');
-    }
+        $expr = "CAST(COALESCE(a.edate,CONCAT(DATE(a.sdate),' 23:59:59')) AS DATETIME)";
+        $this->db->order_by($expr, 'desc')->order_by('id');
 
-    /** @return array<string, array{string}> */
-    public static function hostileOrderColumnProvider(): array
-    {
-        return [
-            'statement'      => ['name; DROP TABLE users'],
-            'subquery'       => ['(SELECT 1)'],
-            'function'       => ['RAND()'],
-            'comment'        => ['name -- x'],
-            'space'          => ['name desc'],
-        ];
+        $this->assertSame("SELECT * FROM `users` ORDER BY $expr DESC, id ASC", $this->selectSql());
     }
 
     #[DataProvider('hostileDirectionProvider')]
@@ -962,9 +937,9 @@ final class SENE_MySQLi_EngineTest extends TestCase
         ];
     }
 
-    public function testOrderByArrayFormValidatesKeysAndDirections(): void
+    public function testOrderByArrayFormValidatesDirections(): void
     {
-        $this->assertRejected(fn () => $this->db->order_by(['a; b' => 'asc']), 'order_by: invalid column');
+        $this->assertRejected(fn () => $this->db->order_by(['a' => 'sideways']), 'direction must be ASC or DESC');
     }
 
     public function testGroupByString(): void
@@ -1004,10 +979,27 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->assertSame('SELECT * FROM `users`', $this->selectSql());
     }
 
-    public function testGroupByRejectsExpressions(): void
+    public function testRealAppQueryWithRawBetweenGroupAndOrder(): void
     {
-        $this->assertRejected(fn () => $this->db->group_by('role; DROP TABLE users'), 'group_by: invalid column');
-        $this->assertRejected(fn () => $this->db->group_by(['ok', 'a b']), 'group_by: invalid column');
+        $as = 'bdj';
+        $this->db->between("($as.sdate)", "('2026-11-01 00:00:00')", "('2026-11-30 23:59:59')")
+            ->group_by(["DATE($as.sdate)", "$as.id"])
+            ->order_by("CAST(COALESCE($as.edate,CONCAT(DATE($as.sdate),' 23:59:59')) AS DATETIME)", "desc")
+            ->limit(0, 10);
+
+        $this->assertSame(
+            "SELECT * FROM `users` WHERE ( ($as.sdate) BETWEEN ('2026-11-01 00:00:00') AND ('2026-11-30 23:59:59'))"
+            ." GROUP BY DATE($as.sdate), $as.id"
+            ." ORDER BY CAST(COALESCE($as.edate,CONCAT(DATE($as.sdate),' 23:59:59')) AS DATETIME) DESC LIMIT 0, 10",
+            $this->selectSql()
+        );
+    }
+
+    public function testGroupByAcceptsRawExpression(): void
+    {
+        $this->db->group_by("DATE(a.sdate)")->group_by(["CAST(a.x AS CHAR)", 'b']);
+
+        $this->assertSame('SELECT * FROM `users` GROUP BY DATE(a.sdate), CAST(a.x AS CHAR), b', $this->selectSql());
     }
 
     public function testClauseOrderIsWhereGroupOrderLimit(): void
@@ -1280,6 +1272,77 @@ final class SENE_MySQLi_EngineTest extends TestCase
         $this->db->insert('t', ['a' => 'NOW()', 'b' => null, 'c' => 'null', 'd' => 'now()']);
 
         $this->assertSame('INSERT INTO `t`(`a`,`b`,`c`,`d`) VALUES(NOW(),NULL,NULL,now());', end($this->mysqli->queries));
+    }
+
+    public function testInsertPassesAesEncryptAndDecryptThroughRaw(): void
+    {
+        $this->db->insert('users', [
+            'password' => 'AES_ENCRYPT("secret","mykey")',
+            'note'     => 'AES_DECRYPT(`password`,"mykey")',
+        ]);
+
+        $this->assertSame(
+            'INSERT INTO `users`(`password`,`note`) VALUES(AES_ENCRYPT("secret","mykey"),AES_DECRYPT(`password`,"mykey"));',
+            end($this->mysqli->queries)
+        );
+    }
+
+    #[DataProvider('aesFunctionCaseProvider')]
+    public function testInsertMatchesAesFunctionsCaseInsensitively(string $value): void
+    {
+        $this->db->insert('t', ['p' => $value]);
+
+        $this->assertSame('INSERT INTO `t`(`p`) VALUES('.$value.');', end($this->mysqli->queries));
+    }
+
+    /** @return array<string, array{string}> */
+    public static function aesFunctionCaseProvider(): array
+    {
+        return [
+            'upper' => ['AES_ENCRYPT("s","k")'],
+            'lower' => ['aes_encrypt("s","k")'],
+            'mixed' => ['Aes_Encrypt("s","k")'],
+            'decrypt upper' => ['AES_DECRYPT(`p`,"k")'],
+            'decrypt lower' => ['aes_decrypt(`p`,"k")'],
+        ];
+    }
+
+    /**
+     * Only a value that STARTS with the function call is raw. Everything else
+     * goes through esc(), so a value merely containing the text stays a string.
+     */
+    #[DataProvider('aesLookalikeProvider')]
+    public function testInsertEscapesAesLookalikeValues(string $value, string $expectedFragment): void
+    {
+        $this->db->insert('t', ['p' => $value]);
+
+        $this->assertSame('INSERT INTO `t`(`p`) VALUES('.$expectedFragment.');', end($this->mysqli->queries));
+    }
+
+    /** @return array<string, array{string, string}> */
+    public static function aesLookalikeProvider(): array
+    {
+        return [
+            'leading space'   => [' AES_ENCRYPT("s","k")', '" AES_ENCRYPT(\\"s\\",\\"k\\")"'],
+            'prefix text'     => ['x AES_ENCRYPT(s)',      '"x AES_ENCRYPT(s)"'],
+            'suffix text'     => ['AES_ENCRYPTED(s)',      '"AES_ENCRYPTED(s)"'],
+            'no parenthesis'  => ['AES_ENCRYPT',           '"AES_ENCRYPT"'],
+            'not a function'  => ['AES_DECRYPTX(y)',       '"AES_DECRYPTX(y)"'],
+        ];
+    }
+
+    public function testInsertPassesAesSuffixAfterTheCallRaw(): void
+    {
+        // CURRENT BEHAVIOUR: the check is a prefix test, so anything appended
+        // after a valid AES_ENCRYPT(...) call is emitted verbatim too. Fix the
+        // check (and this test) before accepting AES expressions from callers
+        // that mix in user input.
+        $this->db->insert('t', ['p' => 'AES_ENCRYPT("s","k") OR 1=1']);
+
+        $this->assertSame(
+            'INSERT INTO `t`(`p`) VALUES(AES_ENCRYPT("s","k") OR 1=1);',
+            end($this->mysqli->queries)
+        );
     }
 
     public function testInsertEscapesBackticksInColumnNames(): void
@@ -1734,7 +1797,6 @@ final class SENE_MySQLi_EngineTest extends TestCase
     public function testWhereInAndBetweenAndNullChecksValidateTheColumn(): void
     {
         $this->assertRejected(fn () => $this->db->where_in('id) OR (1', [1]), 'where_in: invalid column');
-        $this->assertRejected(fn () => $this->db->between('age BETWEEN 1 AND 2 OR 1', 1, 2), 'between: invalid column');
         $this->assertRejected(fn () => $this->db->where_null('a OR 1=1'), 'where_null: invalid column');
         $this->assertRejected(fn () => $this->db->where_not_null('a OR 1=1'), 'where_not_null: invalid column');
     }
@@ -1742,7 +1804,6 @@ final class SENE_MySQLi_EngineTest extends TestCase
     public function testValidatorsRejectTrailingNewline(): void
     {
         // PCRE's $ would accept "name\n" without the D modifier.
-        $this->assertRejected(fn () => $this->db->order_by("name\n"), 'order_by: invalid column');
         $this->assertRejected(fn () => $this->db->from('users', "u\n"), 'from: invalid table alias');
     }
 

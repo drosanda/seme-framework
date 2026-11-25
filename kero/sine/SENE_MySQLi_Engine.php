@@ -4,7 +4,7 @@
  * Contains some query builder that compatible with MySQL or MariaDB query / command.
  *
  * @author: Daeng Rosanda
- * @version 4.0.13
+ * @version 4.0.17
  *
  * @package SemeFramework\Kero\Sine
  * @since 2.0.0
@@ -187,11 +187,6 @@ class SENE_MySQLi_Engine
         }
         $c = $this->stderr_color;
         $out = trim(preg_replace('/\s+/', ' ', $sql));
-        $out = preg_replace(
-            '/\s(FROM|WHERE|GROUP BY|ORDER BY|HAVING|LIMIT|UNION(?: ALL)?|(?:LEFT |RIGHT |INNER |OUTER |CROSS )*JOIN|ON DUPLICATE KEY UPDATE|VALUES|SET)\b/i',
-            "\n  $1",
-            $out
-        );
         if ($c) {
             $out = preg_replace(
                 '/\b(SELECT|INSERT(?: IGNORE)? INTO|REPLACE INTO|UPDATE|DELETE|FROM|WHERE|GROUP BY|ORDER BY|HAVING|LIMIT|UNION(?: ALL)?|(?:LEFT |RIGHT |INNER |OUTER |CROSS )*JOIN|ON DUPLICATE KEY UPDATE|VALUES|SET|AS|ON|AND|OR|NOT|IN|LIKE|IS|NULL|BETWEEN|DISTINCT|ASC|DESC)\b/i',
@@ -448,7 +443,8 @@ class SENE_MySQLi_Engine
     /**
      * Validate a column reference that is emitted unquoted (ORDER BY,
      * GROUP BY, IN, BETWEEN ...). Only plain names, optionally qualified
-     * ("t.col") and optionally backticked, are accepted. Expressions must
+     * ("t.col"), optionally backticked and optionally wrapped in function
+     * calls ("LOWER(t.col)"), are accepted. Expressions must
      * go through the APIs that are raw by design (select_as, where_as ...).
      *
      * @param  string $name  column reference
@@ -457,7 +453,12 @@ class SENE_MySQLi_Engine
      */
     private function assertColumn($name, $where)
     {
-        if (!is_string($name) || !preg_match('/^`?[A-Za-z0-9_$]+`?(\.`?[A-Za-z0-9_$]+`?)*$/D', $name)) {
+        $col = '`?[A-Za-z0-9_$]+`?(\.`?[A-Za-z0-9_$]+`?)*';
+        $re = '/^(?:[A-Za-z_]+\(\s*)*'.$col.'(?:\s*\))*$/D';
+        // Plain column, optionally wrapped in function calls: LOWER(t.status)
+        $ok = is_string($name) && preg_match($re, $name)
+            && substr_count($name, '(') === substr_count($name, ')');
+        if (!$ok) {
             $this->invalidIdentifier($where.': invalid column reference');
         }
         return $name;
@@ -1027,14 +1028,25 @@ class SENE_MySQLi_Engine
         return $direction;
     }
 
+    /**
+     * ORDER BY a column or a raw SQL expression, e.g.
+     * order_by("CAST(COALESCE(a.edate, a.sdate) AS DATETIME)", "desc").
+     *
+     * The column / expression is NOT escaped: only pass developer-written SQL,
+     * never user input. The direction is still validated (ASC / DESC).
+     *
+     * @param  string|array $params  column / expression, or [expression => direction]
+     * @param  string       $params2 ASC or DESC, any case
+     * @return $this
+     */
     public function order_by($params, $params2="ASC")
     {
         if (is_array($params)) {
             foreach ($params as $k=>$v) {
-                $this->in_order .= $this->assertColumn($k, 'order_by').' '.$this->orderDirection($v).", ";
+                $this->in_order .= trim($k).' '.$this->orderDirection($v).", ";
             }
         } elseif (!empty($params) && !empty($params2)) {
-            $this->in_order .= $this->assertColumn($params, 'order_by').' '.$this->orderDirection($params2).", ";
+            $this->in_order .= trim($params).' '.$this->orderDirection($params2).", ";
         }
         return $this;
     }
@@ -1450,6 +1462,26 @@ class SENE_MySQLi_Engine
         $this->flushQuery();
         return $res;
     }
+    
+    /**
+     * Insert one row (or, with $multi_array, hand off to insert_multi()).
+     *
+     * Keys of $datas are used as column names and are quoted with
+     * quoteIdentifier(); values are escaped with esc(). A few values are passed
+     * through verbatim instead of being escaped: "NOW()" / "now()" (DB side
+     * timestamp), null or "NULL", and anything starting with AES_ENCRYPT( or
+     * AES_DECRYPT( (raw SQL - never pass user input there).
+     *
+     * $this->last_id is set to the auto-increment ID of the inserted row, and
+     * the query builder state is flushed afterwards.
+     *
+     * @param  string     $table       table name
+     * @param  array      $datas       column => value pairs
+     * @param  int|bool   $multi_array non-zero: $datas is an array of row arrays
+     *                                 and insert_multi() does the work
+     * @param  int|bool   $is_debug    non-zero: send HTTP 500 and die() with the SQL
+     * @return mixed                   exec() result, or NULL when $multi_array is set
+     */
     public function insert($table, $datas=array(), $multi_array=0, $is_debug=0)
     {
         $this->last_id = 0;
@@ -1473,6 +1505,8 @@ class SENE_MySQLi_Engine
                     $sql .=''.$val.',';
                 } elseif ($val===null || strtolower((string) $val)=='null') {
                     $sql .='NULL,';
+                } elseif (stripos((string) $val, 'AES_ENCRYPT(') === 0 || stripos((string) $val, 'AES_DECRYPT(') === 0) {
+                    $sql .=$val.',';
                 } else {
                     $sql .=''.$this->esc($val).',';
                 }
@@ -1661,60 +1695,46 @@ class SENE_MySQLi_Engine
         return $this;
     }
     /**
-     * Render a BETWEEN bound as SQL.
+     * Add a BETWEEN condition. The column and both bounds are raw SQL and are
+     * NOT escaped: quote / escape values yourself, e.g. "'2026-01-01'", and
+     * only pass developer-written SQL, never user input.
      *
-     * Plain numbers are emitted as numeric literals so existing numeric
-     * ranges produce the same SQL as before. Everything else (dates,
-     * strings, null) is escaped and quoted like any other value.
-     *
-     * @param  mixed $value bound
-     * @return string       SQL literal
-     */
-    private function betweenBound($value)
-    {
-        if (is_bool($value)) {
-            $value = (int) $value;
-        }
-        if (is_int($value) || (is_float($value) && is_finite($value))) {
-            return (string) $value;
-        }
-        if (is_string($value) && preg_match('/^-?\d+(\.\d+)?$/D', $value)) {
-            return $value;
-        }
-        return $this->esc($value);
-    }
-
-    /**
-     * Add a BETWEEN condition. Both bounds are values: numbers stay
-     * unquoted, anything else is escaped and quoted.
-     *
-     * @param  string $key    column name
-     * @param  mixed  $val1   lower bound
-     * @param  mixed  $val2   upper bound
+     * @param  string $key    column or raw SQL expression
+     * @param  mixed  $val1   lower bound (raw SQL)
+     * @param  mixed  $val2   upper bound (raw SQL)
      * @param  int    $is_not 1 for NOT BETWEEN
      * @return object         this object
      */
     public function between($key, $val1, $val2, $is_not=0)
     {
         $this->in_where .= '(';
-        $this->in_where .= ' '.$this->assertColumn($key, 'between').'';
+        $this->in_where .= ' '.trim($key).'';
         if ($is_not) {
             $this->in_where .= " NOT ";
         }
-        $this->in_where .= " BETWEEN ".$this->betweenBound($val1)." AND ".$this->betweenBound($val2).'';
+        $this->in_where .= " BETWEEN ".trim((string) $val1)." AND ".trim((string) $val2).'';
         $this->in_where .= ") AND ";
         return $this;
     }
+    /**
+     * GROUP BY one or more columns or raw SQL expressions.
+     *
+     * The columns / expressions are NOT escaped: only pass developer-written
+     * SQL, never user input.
+     *
+     * @param  string|array $params column / expression, or a list of them
+     * @return $this
+     */
     public function group_by($params)
     {
         // in_group holds only the column list; the GROUP BY keyword is added
         // once when the query is built, so arrays and repeated calls combine.
         if (is_array($params)) {
             foreach ($params as $v) {
-                $this->in_group .= $this->assertColumn($v, 'group_by').", ";
+                $this->in_group .= trim($v).", ";
             }
         } else {
-            $this->in_group .= $this->assertColumn($params, 'group_by').", ";
+            $this->in_group .= trim($params).", ";
         }
         return $this;
     }
@@ -1806,7 +1826,9 @@ class SENE_MySQLi_Engine
     /**
      * Filter data by WHERE IN
      * @param  string  $tbl_key     column name
-     * @param  array   $values      plain array
+     * @param  array|string $values plain array, or a raw SQL string (e.g. a
+     *                              subquery "SELECT id FROM t") emitted as is,
+     *                              unescaped. Never pass user input as a string.
      * @param  int     $is_not      flag is not select (1|0)
      * @param  string  $after       operand (AND|OR)
      * @return object               this object model
@@ -1818,10 +1840,14 @@ class SENE_MySQLi_Engine
             $not = 'NOT';
         }
         $this->in_where .= ' '.$this->assertColumn($tbl_key, 'where_in').' '.$not.' IN (';
-        foreach ($values as $v) {
-            $this->in_where .= $this->esc($v).", ";
+        if (is_string($values)) {
+            $this->in_where .= trim($values);
+        } else {
+            foreach ($values as $v) {
+                $this->in_where .= $this->esc($v).", ";
+            }
+            $this->in_where = rtrim($this->in_where, ", ");
         }
-        $this->in_where = rtrim($this->in_where, ", ");
         $this->in_where .= ') '.$this->joiner($after).' ';
         return $this;
     }

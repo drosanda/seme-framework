@@ -3,7 +3,7 @@
 * Global functions that use by accross application
 *
 * @author Daeng Rosanda
-* @version 4.0.3
+* @version 4.0.4
 *
 * @package SemeFramework\Kero
 * @since 4.0.0
@@ -218,8 +218,7 @@ function seme_error_handling($errno, $errstr, $error_file, $error_line)
 
         echo '<div style="padding: 10px; background-color: #ededed;">';
         echo '<h2 style="color: #ef0000;">Error</h2>';
-        echo '<p>File: '.$error_file.'</p>';
-        echo '<p>Line: '.$error_line.'</p>';
+        echo '<p>File: '.$error_file.':'.$error_line.'</p>';
         echo "<p><b>Error:</b> [$errno] $errstr<br></p>";
         echo '</div>';
         echo '<div style="padding: 20px; border: 1px #dddddd solid; font-size: smaller;">';
@@ -235,8 +234,7 @@ function seme_error_handling($errno, $errstr, $error_file, $error_line)
             if (!isset($e['file'])) {
                 continue;
             }
-            echo '<p><b>File</b>: '.$e['file'].'</p>';
-            echo '<p><b>Line</b>: '.$e['line'].'</p>';
+            echo '<p><b>File</b>: '.$e['file'].':'.$e['line'].'</p>';
             if (isset($e['class'])) {
                 echo '<p><b>Class</b>: '.$e['class'].'</p>';
                 echo '<p><b>Method</b>: '.$e['function'].'</p>';
