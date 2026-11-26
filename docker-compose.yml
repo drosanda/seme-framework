@@ -15,7 +15,7 @@ services:
       - seme_webstack_network
 
   php:
-    # image: drosanda/seme_webstack_php:7.4
+    # image: drosanda/seme_webstack_php:7.4   # EOL and unpatched (issue #24): legacy only
     # build:
     #   context: ./docker/7.4/
     #   dockerfile: Dockerfile
@@ -36,9 +36,6 @@ services:
     #   dockerfile: Dockerfile
 
     image: drosanda/seme_webstack_php:8.5
-    build:
-      context: ./docker/8.5/
-      dockerfile: Dockerfile
 
     container_name: php
     volumes:
