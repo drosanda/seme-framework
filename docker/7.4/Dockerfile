@@ -1,3 +1,5 @@
+# WARNING: PHP 7.4 is end-of-life and has no official fix for CVE-2026-109618 / CVE-2026-109619 (see issue #24).
+# Legacy/local use only. Never expose this image to the internet. Use docker/8.2 or newer instead.
 # FROM arm64v8/php:7.4-fpm-bullseye
 FROM php:7.4-fpm-bullseye
 
